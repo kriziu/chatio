@@ -1,15 +1,23 @@
 import type { NextPage } from 'next';
 
+import axios from 'axios';
+import { useRouter } from 'next/router';
+
+import { Button } from '../components/Buttons/Button';
+
 const Home: NextPage = () => {
+  const router = useRouter();
+
   return (
     <div>
-      <button
-        onClick={() => {
-          document.cookie = 'jwt="123"';
-        }}
+      You are logged in!{' '}
+      <Button
+        onClick={() =>
+          axios.post('/api/auth/logout').then(res => router.push('/login'))
+        }
       >
-        Sign in
-      </button>
+        Log out
+      </Button>
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import { css, Global } from '@emotion/react';
-import { scrollY } from './scroll';
 
 export const GlobalStyles = () => (
   <Global
@@ -11,7 +10,7 @@ export const GlobalStyles = () => (
         padding: 0;
         box-sizing: inherit;
         font-family: 'Montserrat', sans-serif;
-        transition: var(---trans-default);
+        transition: var(--trans-default);
       }
 
       body {
@@ -21,23 +20,38 @@ export const GlobalStyles = () => (
         font-family: 'Montserrat', sans-serif;
         box-sizing: border-box;
         transition: all 0.3s;
-        ${scrollY}
+        overflow: hidden;
+        background-image: linear-gradient(
+          to bottom right,
+          rgb(3, 38, 57),
+          rgb(29, 0, 43)
+        );
+        height: 100vh;
       }
 
       html {
         font-size: 62.5%;
       }
 
+      a {
+        color: var(--color-white);
+      }
+
       :root {
         // COLORS
-        --color-yellow: #ffc526;
         --color-gray: #cbd5e0;
-        --color-gray-lighter: #fafafa;
-        --color-gray-light: #fcfcfc;
         --color-gray-dark: #343434;
         --color-black: #222;
         --color-white: #fff;
         --color-red: #e53e3e;
+        --color-blue: #3ea8e5;
+        // GRADIENTS
+        --gradient-main: linear-gradient(to bottom right, #f14a4a, #6153ff);
+        --gradient-secondary: linear-gradient(
+          to bottom right,
+          #4200ff,
+          #3a0000
+        );
         // TRANSITIONS
         --trans-default: all 0.2s ease;
         --trans-long: all 0.7s ease;

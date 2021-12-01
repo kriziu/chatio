@@ -34,6 +34,7 @@ const Login: NextPage = () => {
     axios
       .post('/api/auth/login', { email: email.value, password: password.value })
       .then(res => {
+        console.log(res.data);
         if (res.status === 200) router.push('/');
       })
       .catch(err => {

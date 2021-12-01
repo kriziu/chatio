@@ -11,8 +11,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const user = await userModel.findOne({ email }).select('+password');
 
-    console.log(user);
-
     if (!user) {
       return res.status(404).end();
     }
@@ -23,10 +21,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         process.env.ACCESS_TOKEN_SECRET as string
       );
 
+      const { fName, lName } = user;
+
       return res
         .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)
         .status(200)
-        .json(user);
+        .json({ fName, lName, email });
     }
 
     return res.status(403).end();

@@ -1,7 +1,14 @@
 import mongoose from 'mongoose';
 import { validateEmail } from '../lib/utility';
 
-const userSchema = new mongoose.Schema({
+export interface UserType {
+  fName: string;
+  lName: string;
+  email: string;
+  password: string;
+}
+
+const userSchema = new mongoose.Schema<UserType>({
   fName: {
     type: String,
     required: true,
@@ -22,6 +29,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const userModel = mongoose.models.User || mongoose.model('User', userSchema);
+const userModel =
+  (mongoose.models.User as mongoose.Model<UserType>) ||
+  mongoose.model<UserType>('User', userSchema);
 
 export default userModel;

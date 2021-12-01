@@ -25,12 +25,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     await user.save();
-    const token = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET as string);
+    const token = jwt.sign(
+      { fName, lName, email },
+      process.env.ACCESS_TOKEN_SECRET as string
+    );
 
     return res
       .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)
-      .status(200)
-      .json(user);
+      .status(201)
+      .json({ fName, lName, email });
   } catch (err) {
     const msg = (err as Error).message;
     console.log(msg);

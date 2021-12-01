@@ -47,7 +47,7 @@ const Login: NextPage = () => {
       })
       .then(res => {
         console.log(res);
-        if (res.status === 200) router.push('/');
+        if (res.status === 201) router.push('/');
       })
       .catch(() => {
         errToast('Account with that email already exists!');

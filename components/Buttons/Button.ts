@@ -7,12 +7,12 @@ export const Button = styled.button`
   color: var(--color-white);
   padding: 1rem;
   font-weight: 300;
-  border: none;
+
   background-image: var(--gradient-main);
+  border: none;
 
   :focus {
-    border: none;
-    outline: none;
+    opacity: 0.8;
   }
 
   :hover {

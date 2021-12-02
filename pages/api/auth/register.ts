@@ -27,7 +27,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     await user.save();
     const token = jwt.sign(
       { fName, lName, email },
-      process.env.ACCESS_TOKEN_SECRET as string
+      process.env.ACCESS_TOKEN_SECRET as string,
+      { expiresIn: '45s' }
     );
 
     return res

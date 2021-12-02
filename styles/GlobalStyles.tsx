@@ -13,6 +13,12 @@ export const GlobalStyles = () => (
         transition: var(--trans-default);
       }
 
+      svg {
+        color: var(--color-white);
+        width: 2.3rem;
+        height: 2.3rem;
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -44,6 +50,7 @@ export const GlobalStyles = () => (
         --color-black: #222;
         --color-white: #fff;
         --color-red: #e53e3e;
+        --color-green: #00ff57;
         --color-blue: #3ea8e5;
         // GRADIENTS
         --gradient-main: linear-gradient(to bottom right, #f14a4a, #6153ff);
@@ -52,6 +59,7 @@ export const GlobalStyles = () => (
           #4200ff,
           #3a0000
         );
+        --gradient-mine: linear-gradient(to right bottom, #242f4d, #222);
         // TRANSITIONS
         --trans-default: all 0.2s ease;
         --trans-long: all 0.7s ease;

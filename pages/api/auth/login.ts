@@ -16,12 +16,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign(
-        { user },
-        process.env.ACCESS_TOKEN_SECRET as string
-      );
-
       const { fName, lName } = user;
+
+      const token = jwt.sign(
+        { fName, lName, email },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        { expiresIn: '1h' }
+      );
 
       return res
         .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)

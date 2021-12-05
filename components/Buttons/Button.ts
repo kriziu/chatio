@@ -3,8 +3,7 @@ import styled from '@emotion/styled';
 export const Button = styled.button`
   border-radius: 1.5rem;
   font-size: 1.6rem;
-  width: 25rem;
-  color: var(--color-white);
+  width: 100%;
   padding: 1rem;
   font-weight: 300;
 

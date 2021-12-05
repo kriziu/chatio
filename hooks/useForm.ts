@@ -16,7 +16,7 @@ const useForm = (initialState: {
   let newState: returnedObject = {};
 
   for (const [key, value] of Object.entries(initialState)) {
-    newState = { ...newState, [key]: { ...value, checked: true } };
+    newState = { ...newState, [key]: { ...value, checked: false } };
   }
 
   const [formData, setFormData] = useState(newState);
@@ -24,9 +24,9 @@ const useForm = (initialState: {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const checked = formData[e.target.name].required
       ? e.target.value
-        ? true
-        : false
-      : true;
+        ? false
+        : true
+      : false;
 
     setFormData({
       ...formData,
@@ -59,7 +59,7 @@ const useForm = (initialState: {
       if (!formData[field].value && formData[field].required) {
         tempObj = {
           ...tempObj,
-          [field]: { ...formData[field], checked: false },
+          [field]: { ...formData[field], checked: true },
         };
         isValid = false;
       } else

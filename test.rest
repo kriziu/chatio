@@ -1,1 +1,2 @@
-POST http://localhost:3000/api/hello
+POST http://localhost:3000/api/user/getUser
+Cookie: jwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmTmFtZSI6IkJydW5vIiwibE5hbWUiOiJEemnEmWNpZWxza2kiLCJlbWFpbCI6ImJydW5vZHppMDdAZ21haWwuY29tIiwiX2lkIjoiNjFhNjY2YTQzMmNjOTMxMjZhNDJhYTM5IiwiaWF0IjoxNjM4NzA3MTk2LCJleHAiOjE2Mzg3MTA3OTZ9.xRCfSEmhIPGVVffcK_Nf4zfsAMyLfVJ8UVlSL3WHLh4"

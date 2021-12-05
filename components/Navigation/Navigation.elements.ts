@@ -1,14 +1,33 @@
 import styled from '@emotion/styled';
 import { Background } from '../Background/Background';
+import { Flex } from '../Flex/Flex';
 
-export const NavBtn = styled.button<{ opened: boolean }>`
+export const NavBtn = styled.button`
+  width: 4rem;
+  height: 4rem;
+  position: fixed;
+  top: 2.5rem;
+  background-color: transparent;
+  border: none;
+  left: 1.8rem;
+  z-index: 11;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  :hover {
+    transform: scale(1.1);
+  }
+`;
+
+export const NavBtnIcon = styled.span<{ opened: boolean }>`
   border: none;
   border-radius: 1rem;
   background-color: white;
-  position: fixed;
-  top: 4.3rem;
-  left: 2rem;
-  z-index: 11;
+  position: relative;
+  display: inline-block;
   width: 3.3rem;
   height: 0.4rem;
 
@@ -54,5 +73,23 @@ export const NavBackground = styled(Background)<{ opened: boolean }>`
 
   border-top-right-radius: 2rem;
   border-bottom-right-radius: 2rem;
+
+  background-image: linear-gradient(
+    to bottom,
+    rgba(32, 16, 16, 0.85),
+    rgba(0, 10, 47, 0.72)
+  );
+
+  padding: 0 2rem;
+
   z-index: 10;
+`;
+
+export const Top = styled(Flex)`
+  margin-left: 4rem;
+  margin-top: 1.5rem;
+
+  div {
+    margin-right: 1rem;
+  }
 `;

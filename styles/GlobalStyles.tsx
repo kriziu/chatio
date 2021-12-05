@@ -11,6 +11,7 @@ export const GlobalStyles = () => (
         box-sizing: inherit;
         font-family: 'Montserrat', sans-serif;
         transition: var(--trans-default);
+        color: var(--color-white);
       }
 
       svg {

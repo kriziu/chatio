@@ -16,18 +16,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (await bcrypt.compare(password, user.password)) {
-      const { fName, lName } = user;
+      const { fName, lName, _id } = user;
 
       const token = jwt.sign(
-        { fName, lName, email },
+        { fName, lName, email, _id },
         process.env.ACCESS_TOKEN_SECRET as string,
-        { expiresIn: '1h' }
+        { expiresIn: '30s' }
       );
 
       return res
         .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)
         .status(200)
-        .json({ fName, lName, email });
+        .json({ fName, lName, email, _id });
     }
 
     return res.status(403).end();

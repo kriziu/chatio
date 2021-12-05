@@ -1,7 +1,7 @@
 import { createContext, FC, useEffect, useState } from 'react';
 import axios from 'axios';
 
-export const defaultUser = { fName: '', lName: '', email: '' };
+export const defaultUser = { fName: '', lName: '', email: '', _id: '' };
 
 export const userContext = createContext<{
   user: UserType;
@@ -12,9 +12,10 @@ const UserProvider: FC = ({ children }) => {
   const [user, setUser] = useState<UserType>(defaultUser);
 
   useEffect(() => {
-    axios
-      .get<UserType>('/api/auth/getCredentials')
-      .then(res => setUser(res.data));
+    axios.get<UserType>('/api/auth/getCredentials').then(res => {
+      console.log(res);
+      setUser(res.data);
+    });
 
     //es-lint disable next line
   }, []);

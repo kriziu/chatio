@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import { useContext } from 'react';
 
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -11,7 +12,11 @@ import useForm from '../hooks/useForm';
 import { validateEmail } from '../lib/utility';
 import { errToast } from '../lib/toasts';
 
+import { userContext } from '../context/userContext';
+
 const Login: NextPage = () => {
+  const { setUser } = useContext(userContext);
+
   const router = useRouter();
 
   const [formData, , toggleChecked, handleInputChange, checkValidity] = useForm(
@@ -46,8 +51,10 @@ const Login: NextPage = () => {
         password: password.value,
       })
       .then(res => {
-        console.log(res);
-        if (res.status === 201) router.push('/');
+        if (res.status === 201) {
+          router.push('/');
+          setUser(res.data);
+        }
       })
       .catch(() => {
         errToast('Account with that email already exists!');

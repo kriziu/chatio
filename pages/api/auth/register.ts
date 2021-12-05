@@ -8,11 +8,8 @@ import userModel from '../../../models/user.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, password, fName, lName } = req.body;
 
-  console.log(req.body);
-
   try {
     const userWithEmail = await userModel.findOne({ email });
-    console.log(userWithEmail);
     if (userWithEmail) return res.status(409).end();
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -25,16 +22,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     await user.save();
+
     const token = jwt.sign(
-      { fName, lName, email },
+      { fName, lName, email, _id: user._id },
       process.env.ACCESS_TOKEN_SECRET as string,
-      { expiresIn: '45s' }
+      { expiresIn: '1h' }
     );
 
     return res
       .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)
       .status(201)
-      .json({ fName, lName, email });
+      .json({ fName, lName, email, _id: user._id });
   } catch (err) {
     const msg = (err as Error).message;
     console.log(msg);

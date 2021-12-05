@@ -20,14 +20,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const token = jwt.sign(
         { fName, lName, email, _id },
-        process.env.ACCESS_TOKEN_SECRET as string,
-        { expiresIn: '30s' }
+        process.env.REFRESH_TOKEN_SECRET as string,
+        { expiresIn: '72h' }
       );
 
       return res
-        .setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Path=/`)
+        .setHeader('Set-Cookie', `REFRESH=${token};HttpOnly;Path=/`)
         .status(200)
-        .json({ fName, lName, email, _id });
+        .end();
     }
 
     return res.status(403).end();

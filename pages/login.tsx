@@ -1,5 +1,4 @@
 import type { NextPage } from 'next';
-import { useContext } from 'react';
 
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -11,11 +10,8 @@ import { Button } from '../components/Buttons/Button';
 import useForm from '../hooks/useForm';
 import { validateEmail } from '../lib/utility';
 import { errToast } from '../lib/toasts';
-import { userContext } from '../context/userContext';
 
 const Login: NextPage = () => {
-  const { setUser } = useContext(userContext);
-
   const router = useRouter();
 
   const [formData, , toggleChecked, handleInputChange, checkValidity] = useForm(
@@ -43,7 +39,6 @@ const Login: NextPage = () => {
       .then(res => {
         if (res.status === 200) {
           router.push('/');
-          setUser(res.data);
         }
       })
       .catch(err => {

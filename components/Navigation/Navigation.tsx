@@ -24,7 +24,7 @@ const Navigation: FC = () => {
     if (router.pathname === '/login' || router.pathname === '/register')
       setShow(false);
     else setShow(true);
-  });
+  }, [router.pathname]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

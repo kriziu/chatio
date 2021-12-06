@@ -8,15 +8,10 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
   const access = req.cookies['ACCESS'];
   const refresh = req.cookies['REFRESH'];
 
-  const user = await (await fetch('/api/auth/token')).json();
-
-  console.log('user:', user);
-
   return jwt.verify(
     access,
     process.env.ACCESS_TOKEN_SECRET as string,
-    (err, user) => {
-      console.log(err);
+    async (err, user) => {
       if (!err) {
         if (
           req.nextUrl.pathname === '/login' ||
@@ -34,11 +29,17 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
         return jwt.verify(
           refresh,
           process.env.REFRESH_TOKEN_SECRET as string,
-          (refreshErr, refreshUser) => {
-            console.log(refreshErr);
+          async (refreshErr, refreshUser) => {
+            const redirect = NextResponse.redirect('/login')
+              .clearCookie('REFRESH')
+              .clearCookie('ACCESS');
+
             if (refreshErr) {
-              return NextResponse.redirect('/login');
+              return redirect;
             }
+
+            const token = await fetch('/api/auth/token?refresh=' + refresh);
+            if (token.status === 404) return redirect;
 
             const { fName, lName, email, _id } = refreshUser as UserType;
             const newAccess = generateAccess({ fName, lName, email, _id });

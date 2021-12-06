@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 
 import connectDB from '../../../middlewares/connectDB';
 import userModel from '../../../models/user.model';
+import tokenModel from '../../../models/token.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, password } = req.body;
@@ -23,6 +24,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         process.env.REFRESH_TOKEN_SECRET as string,
         { expiresIn: '72h' }
       );
+
+      const savedToken = new tokenModel({
+        token,
+        expireAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+      });
+      await savedToken.save();
 
       return res
         .setHeader('Set-Cookie', `REFRESH=${token};HttpOnly;Path=/`)

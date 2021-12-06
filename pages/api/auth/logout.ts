@@ -1,12 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from '../../../middlewares/connectDB';
+import tokenModel from '../../../models/token.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const refresh = req.cookies['REFRESH'];
+
   try {
-    res
+    await tokenModel.findOneAndDelete({ refresh });
+
+    return res
       .setHeader('Set-Cookie', [
-        'REFRESH=; HttpOnly; Path=/; max-age=0',
-        'ACCESS=; Path=/; max-age=0',
+        'REFRESH=; HttpOnly; Path=/;',
+        'ACCESS=; Path=/;',
       ])
       .status(200)
       .json({ success: true });

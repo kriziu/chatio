@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import connectDB from '../../../middlewares/connectDB';
 import userModel from '../../../models/user.model';
 import tokenModel from '../../../models/token.model';
+import { generateRefresh, week } from '../../../lib/generateTokens';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, password, fName, lName } = req.body;
@@ -24,15 +24,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     await user.save();
 
-    const token = jwt.sign(
-      { fName, lName, email, _id: user._id },
-      process.env.REFRESH_TOKEN_SECRET as string,
-      { expiresIn: '72h' }
-    );
+    const token = generateRefresh({ fName, lName, _id: user._id, email });
 
     const savedToken = new tokenModel({
       token,
-      expireAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+      expireAt: week,
     });
     await savedToken.save();
 

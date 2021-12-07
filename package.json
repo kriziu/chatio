@@ -25,6 +25,7 @@
     "swr": "^1.1.0"
   },
   "devDependencies": {
+    "@tsndr/cloudflare-worker-jwt": "^1.1.5",
     "@types/bcrypt": "^5.0.0",
     "@types/js-cookie": "^3.0.1",
     "@types/jsonwebtoken": "^8.5.6",

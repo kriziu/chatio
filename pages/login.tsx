@@ -8,7 +8,7 @@ import { Input } from '../components/Input/Input';
 import { Header1 } from '../components/Headers/Headers';
 import { Button } from '../components/Buttons/Button';
 import useForm from '../hooks/useForm';
-import { validateEmail } from '../lib/utility';
+import { validateEmail } from '../lib/validators';
 import { errToast } from '../lib/toasts';
 
 const Login: NextPage = () => {
@@ -38,7 +38,7 @@ const Login: NextPage = () => {
       })
       .then(res => {
         if (res.status === 200) {
-          router.push('/');
+          router.push('/chat/61a72fde651e2a979b5e7422');
         }
       })
       .catch(err => {

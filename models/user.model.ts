@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { validateEmail } from '../lib/utility';
+import { validateEmail } from '../lib/validators';
 
 interface UserModelType extends UserType {
   password: string;

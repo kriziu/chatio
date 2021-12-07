@@ -68,7 +68,15 @@ const Navigation: FC = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <Button style={{ width: 'max-content' }}>++</Button>
+          <Button
+            style={{ width: 'max-content' }}
+            onClick={() => {
+              setOpened(false);
+              router.push('/find');
+            }}
+          >
+            ++
+          </Button>
         </Flex>
       </NavBackground>
     </>

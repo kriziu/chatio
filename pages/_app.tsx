@@ -72,7 +72,9 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
               transition={animation.transition}
             >
               <Navigation />
-              <Component {...pageProps} />
+              <div style={{ padding: '2rem 0' }}>
+                <Component {...pageProps} />
+              </div>
             </m.div>
           </AnimatePresence>
         </LazyMotion>

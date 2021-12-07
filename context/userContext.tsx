@@ -14,8 +14,6 @@ const UserProvider: FC = ({ children }) => {
   const access = Cookies.get('ACCESS');
 
   useEffect(() => {
-    console.log(access);
-
     if (access) {
       const decoded = decode<UserType>(access);
       const { fName, lName, email, _id } = decoded;

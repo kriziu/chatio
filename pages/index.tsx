@@ -21,7 +21,7 @@ const Home: NextPage = () => {
   const router = useRouter();
 
   return (
-    <div style={{ padding: '2rem 0' }}>
+    <div>
       <Flex
         style={{
           width: '100%',

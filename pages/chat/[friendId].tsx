@@ -37,7 +37,7 @@ const Home: NextPage = () => {
   console.log(data);
 
   return (
-    <div style={{ padding: '2rem 0' }}>
+    <div>
       <Flex
         style={{
           width: '100%',

@@ -4,12 +4,14 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Input } from '../components/Input/Input';
-import { Header1 } from '../components/Headers/Headers';
-import { Button } from '../components/Buttons/Button';
+import { Input } from '../components/Simple/Input';
+import { Header1 } from '../components/Simple/Headers';
+import { Button } from '../components/Simple/Button';
 import useForm from '../hooks/useForm';
 import { validateEmail } from '../lib/validators';
 import { errToast } from '../lib/toasts';
+import { Flex } from 'components/Simple/Flex';
+import { Form } from 'components/Simple/Form';
 
 const Login: NextPage = () => {
   const router = useRouter();
@@ -56,27 +58,15 @@ const Login: NextPage = () => {
   };
 
   return (
-    <div
+    <Flex
       style={{
-        display: 'flex',
         width: '100vw',
         height: '85vh',
-        justifyContent: 'center',
-        alignItems: 'center',
         flexDirection: 'column',
       }}
     >
-      <Header1>Register</Header1>
-      <form
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '35rem',
-          justifyContent: 'space-around',
-        }}
-        onSubmit={handleLogin}
-        noValidate
-      >
+      <Header1 style={{ marginBottom: '1rem' }}>Register</Header1>
+      <Form onSubmit={handleLogin} noValidate>
         <Input
           placeholder="First name"
           value={fName.value}
@@ -118,11 +108,19 @@ const Login: NextPage = () => {
           warn={checkPassword.checked}
         />
         <Button type="submit">Register</Button>
-      </form>
-      <Link href="/login">
-        <a style={{ marginLeft: '20rem' }}>Login</a>
-      </Link>
-    </div>
+      </Form>
+      <Flex
+        style={{
+          width: '25rem',
+          justifyContent: 'flex-end',
+          marginTop: '.5rem',
+        }}
+      >
+        <Link href="/login">
+          <a style={{ marginLeft: '20rem' }}>Login</a>
+        </Link>
+      </Flex>
+    </Flex>
   );
 };
 

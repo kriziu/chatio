@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { Background } from '../Background/Background';
-import { Flex } from '../Flex/Flex';
+import { Background } from '../Simple/Background';
+import { Flex } from '../Simple/Flex';
 
 export const NavBtn = styled.button`
   width: 4rem;

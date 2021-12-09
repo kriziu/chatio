@@ -4,12 +4,14 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Input } from '../components/Input/Input';
-import { Header1 } from '../components/Headers/Headers';
-import { Button } from '../components/Buttons/Button';
+import { Input } from '../components/Simple/Input';
+import { Header1 } from '../components/Simple/Headers';
+import { Button } from '../components/Simple/Button';
 import useForm from '../hooks/useForm';
 import { validateEmail } from '../lib/validators';
 import { errToast } from '../lib/toasts';
+import { Flex } from 'components/Simple/Flex';
+import { Form } from 'components/Simple/Form';
 
 const Login: NextPage = () => {
   const router = useRouter();
@@ -52,27 +54,15 @@ const Login: NextPage = () => {
   };
 
   return (
-    <div
+    <Flex
       style={{
-        display: 'flex',
         width: '100vw',
         height: '85vh',
-        justifyContent: 'center',
-        alignItems: 'center',
         flexDirection: 'column',
       }}
     >
-      <Header1>Sign in</Header1>
-      <form
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '17rem',
-          justifyContent: 'space-around',
-        }}
-        onSubmit={handleLogin}
-        noValidate
-      >
+      <Header1 style={{ marginBottom: '1rem' }}>Sign in</Header1>
+      <Form onSubmit={handleLogin} noValidate>
         <Input
           placeholder="Email"
           value={email.value}
@@ -90,18 +80,22 @@ const Login: NextPage = () => {
           warn={password.checked}
         />
         <Button type="submit">Login</Button>
-      </form>
-      <div style={{ display: 'flex' }}>
+      </Form>
+      <Flex
+        style={{
+          width: '25rem',
+          justifyContent: 'space-between',
+          marginTop: '.5rem',
+        }}
+      >
         <Link href="/login">
-          <a style={{ marginRight: '6.5rem', color: 'var(--color-gray)' }}>
-            Lost password
-          </a>
+          <a style={{ color: 'var(--color-gray)' }}>Lost password</a>
         </Link>
         <Link href="/register">
           <a>Register</a>
         </Link>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 };
 

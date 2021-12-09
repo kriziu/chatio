@@ -5,12 +5,12 @@ import { useContext } from 'react';
 import axios from 'axios';
 import { BsTelephoneFill } from 'react-icons/bs';
 
-import { Button } from '../../components/Buttons/Button';
-import { Header4 } from '../../components/Headers/Headers';
+import { Button } from '../../components/Simple/Button';
+import { Header4 } from '../../components/Simple/Headers';
 import { defaultUser, userContext } from '../../context/userContext';
 import ChatContainer from '../../components/Chat/ChatContainer';
-import { AvatarSmall } from '../../components/Avatar/Avatars';
-import { Flex } from '../../components/Flex/Flex';
+import { AvatarSmall } from '../../components/Simple/Avatars';
+import { Flex } from '../../components/Simple/Flex';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
@@ -37,7 +37,7 @@ const Home: NextPage = () => {
   console.log(data);
 
   return (
-    <div>
+    <>
       <Flex
         style={{
           width: '100%',
@@ -71,7 +71,7 @@ const Home: NextPage = () => {
       >
         Log out
       </Button>
-    </div>
+    </>
   );
 };
 

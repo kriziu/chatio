@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion';
 
 import { GlobalStyles } from '../styles/GlobalStyles';
-import { Background } from '../components/Background/Background';
+import { Background } from '../components/Simple/Background';
 import Circle from '../components/Shapes/AnimatedCircle';
 import UserProvider from '../context/userContext';
 import Navigation from '../components/Navigation/Navigation';

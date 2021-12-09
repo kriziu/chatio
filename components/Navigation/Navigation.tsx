@@ -2,11 +2,11 @@ import { useRouter } from 'next/router';
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 
 import { userContext } from '../../context/userContext';
-import { Avatar } from '../Avatar/Avatars';
-import { Button } from '../Buttons/Button';
-import { Flex } from '../Flex/Flex';
-import { Header2 } from '../Headers/Headers';
-import { Input } from '../Input/Input';
+import { Avatar } from '../Simple/Avatars';
+import { Button } from '../Simple/Button';
+import { Flex } from '../Simple/Flex';
+import { Header2 } from '../Simple/Headers';
+import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
 
 const Navigation: FC = () => {

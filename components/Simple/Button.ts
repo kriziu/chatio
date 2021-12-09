@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 
-export const Button = styled.button`
+export const Button = styled.button<{ inputSize?: boolean }>`
   border-radius: 1.5rem;
   font-size: 1.6rem;
-  width: 100%;
+  width: ${({ inputSize }) => (inputSize ? '25rem' : '100%')};
   padding: 1rem;
   font-weight: 300;
 

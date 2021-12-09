@@ -38,7 +38,7 @@ const useForm = (initialState: {
     });
   };
 
-  const toggleChecked = (name: string, bool: boolean = false): void => {
+  const toggleChecked = (name: string, bool: boolean = true): void => {
     setFormData({
       ...formData,
       [name]: {

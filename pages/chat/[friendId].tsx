@@ -4,6 +4,8 @@ import { useContext } from 'react';
 
 import axios from 'axios';
 import { BsTelephoneFill } from 'react-icons/bs';
+import useSWR from 'swr';
+import { ClipLoader } from 'react-spinners';
 
 import { Button } from '../../components/Simple/Button';
 import { Header4 } from '../../components/Simple/Headers';
@@ -11,7 +13,6 @@ import { defaultUser, userContext } from '../../context/userContext';
 import ChatContainer from '../../components/Chat/ChatContainer';
 import { AvatarSmall } from '../../components/Simple/Avatars';
 import { Flex } from '../../components/Simple/Flex';
-import useSWR from 'swr';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
@@ -31,7 +32,12 @@ const Home: NextPage = () => {
   );
 
   if (error) return <div>failed to load</div>;
-  if (!data) return <div>loading...</div>;
+  if (!data)
+    return (
+      <Flex style={{ height: '100%' }}>
+        <ClipLoader color="white" loading={true} size={100} />
+      </Flex>
+    );
 
   const { fName, lName } = data;
   console.log(data);

@@ -1,5 +1,13 @@
 import { useRouter } from 'next/router';
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FC,
+  RefCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useSwipeable } from 'react-swipeable';
 
 import { userContext } from '../../context/userContext';
 import { Avatar } from '../Simple/Avatars';
@@ -14,11 +22,24 @@ const Navigation: FC = () => {
     user: { email },
   } = useContext(userContext);
   const router = useRouter();
-  const ref = useRef<HTMLDivElement>(null);
+  const back = useRef<HTMLDivElement>(null);
 
   const [show, setShow] = useState(false);
   const [opened, setOpened] = useState(false);
   const [search, setSearch] = useState('');
+
+  const { ref } = useSwipeable({
+    onSwipedRight(e) {
+      show && e.absX > 40 && setOpened(true);
+    },
+    onSwipedLeft(e) {
+      show && e.absX > 40 && setOpened(false);
+    },
+  }) as { ref: RefCallback<Document> };
+
+  useEffect(() => {
+    ref(document);
+  });
 
   useEffect(() => {
     if (router.pathname === '/login' || router.pathname === '/register')
@@ -30,8 +51,8 @@ const Navigation: FC = () => {
     const handleClick = (e: MouseEvent) => {
       if (
         opened &&
-        ref.current &&
-        !(e.composedPath() as HTMLElement[]).includes(ref.current)
+        back.current &&
+        !(e.composedPath() as HTMLElement[]).includes(back.current)
       )
         setOpened(false);
     };
@@ -54,7 +75,7 @@ const Navigation: FC = () => {
         opened={opened}
         w="32rem"
         h="100vh"
-        ref={ref}
+        ref={back}
         style={{ maxWidth: '100vw' }}
       >
         <Top>

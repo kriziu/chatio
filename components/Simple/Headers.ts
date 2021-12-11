@@ -12,6 +12,12 @@ export const Header2 = styled.h2`
   text-align: center;
 `;
 
+export const Header3 = styled.h2`
+  font-size: 2.3rem;
+  font-weight: 300;
+  text-align: center;
+`;
+
 export const Header4 = styled.h4`
   font-size: 1.7rem;
   font-weight: 400;

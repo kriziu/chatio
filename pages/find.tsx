@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
 
-import { Header1, Header2 } from '../components/Simple/Headers';
+import { Header1, Header2, Header3 } from '../components/Simple/Headers';
 import { userContext } from '../context/userContext';
 import { Input } from 'components/Simple/Input';
 import { Flex } from '../components/Simple/Flex';
@@ -11,6 +11,10 @@ import { Button } from 'components/Simple/Button';
 import { Form } from 'components/Simple/Form';
 import useForm from 'hooks/useForm';
 import { validateEmail } from 'lib/validators';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { AvatarSmall } from 'components/Simple/Avatars';
+
+// PRZENIESC INLINE STYLES DO COMPONENTS/PAGES/STRONA I TU ROBIC KOMPONENTY
 
 const Home: NextPage = () => {
   const {
@@ -102,17 +106,33 @@ const Home: NextPage = () => {
           Search
         </Button>
       </Form>
-      {loading && 'loading'}
+      <Flex style={{ height: '40%', display: loading ? 'flex' : 'none' }}>
+        <ClipLoader color="white" size={100} />
+      </Flex>
 
-      {users.length
-        ? users.map(user => {
-            return (
-              <div key="123">
-                {user.fName} {user.lName}
-              </div>
-            );
-          })
-        : ''}
+      <Flex style={{ flexDirection: 'column', marginTop: '4rem' }} as="ul">
+        {users.length && !loading
+          ? users.map((user, index) => {
+              return (
+                <Flex
+                  as="li"
+                  key={user._id}
+                  style={{
+                    width: '31rem',
+                    justifyContent: 'space-between',
+                    marginBottom: index === users.length - 1 ? '0' : '2rem',
+                  }}
+                >
+                  <AvatarSmall />
+                  <Header3 style={{ maxWidth: '20rem' }}>
+                    {user.fName} {user.lName}
+                  </Header3>
+                  <Button style={{ width: 'max-content' }}>++</Button>
+                </Flex>
+              );
+            })
+          : ''}
+      </Flex>
     </>
   );
 };

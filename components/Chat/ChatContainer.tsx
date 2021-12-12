@@ -2,8 +2,8 @@ import { FC, useContext } from 'react';
 
 import styled from '@emotion/styled';
 
-import { scrollY } from '../../styles/scroll';
-import { userContext } from '../../context/userContext';
+import { scrollY } from 'styles/scroll';
+import { userContext } from 'context/userContext';
 import { Message } from './Message/Message';
 
 const Container = styled.div`

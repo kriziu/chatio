@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
 
-import connectDB from '../../../middlewares/connectDB';
-import userModel from '../../../models/user.model';
-import tokenModel from '../../../models/token.model';
-import { generateRefresh, week } from '../../../lib/generateTokens';
+import connectDB from 'middlewares/connectDB';
+import userModel from 'models/user.model';
+import tokenModel from 'models/token.model';
+import { generateRefresh, week } from 'lib/generateTokens';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, password } = req.body;

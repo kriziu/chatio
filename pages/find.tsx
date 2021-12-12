@@ -2,23 +2,22 @@ import type { NextPage } from 'next';
 import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { AiOutlineUserAdd } from 'react-icons/ai';
 
-import { Header1, Header2, Header3 } from '../components/Simple/Headers';
-import { userContext } from '../context/userContext';
+import { Header1, Header2, Header3 } from 'components/Simple/Headers';
+import { userContext } from 'context/userContext';
 import { Input } from 'components/Simple/Input';
-import { Flex } from '../components/Simple/Flex';
+import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
 import { Form } from 'components/Simple/Form';
 import useForm from 'hooks/useForm';
 import { validateEmail } from 'lib/validators';
-import ClipLoader from 'react-spinners/ClipLoader';
 import { AvatarSmall } from 'components/Simple/Avatars';
-
-// PRZENIESC INLINE STYLES DO COMPONENTS/PAGES/STRONA I TU ROBIC KOMPONENTY
 
 const Home: NextPage = () => {
   const {
-    user: { email },
+    user: { email, _id },
     setUser,
   } = useContext(userContext);
 
@@ -69,6 +68,10 @@ const Home: NextPage = () => {
         setUsers(res.data);
         setLoading(false);
       });
+  };
+
+  const createInvite = (to: string) => {
+    axios.post('/api/invite', { to }).then(res => console.log(res.data));
   };
 
   return (
@@ -127,7 +130,13 @@ const Home: NextPage = () => {
                   <Header3 style={{ maxWidth: '20rem' }}>
                     {user.fName} {user.lName}
                   </Header3>
-                  <Button style={{ width: 'max-content' }}>++</Button>
+                  <Button
+                    style={{ width: 'max-content' }}
+                    icon
+                    onClick={() => createInvite(user._id)}
+                  >
+                    <AiOutlineUserAdd />
+                  </Button>
                 </Flex>
               );
             })

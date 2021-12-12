@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import connectDB from '../../../middlewares/connectDB';
-import userModel from '../../../models/user.model';
+import connectDB from 'middlewares/connectDB';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let { email, name } = req.query;

@@ -4,12 +4,12 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import { Input } from '../components/Simple/Input';
-import { Header1 } from '../components/Simple/Headers';
-import { Button } from '../components/Simple/Button';
-import useForm from '../hooks/useForm';
-import { validateEmail } from '../lib/validators';
-import { errToast } from '../lib/toasts';
+import { Input } from 'components/Simple/Input';
+import { Header1 } from 'components/Simple/Headers';
+import { Button } from 'components/Simple/Button';
+import useForm from 'hooks/useForm';
+import { validateEmail } from 'lib/validators';
+import { errToast } from 'lib/toasts';
 import { Flex } from 'components/Simple/Flex';
 import { Form } from 'components/Simple/Form';
 

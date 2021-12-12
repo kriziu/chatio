@@ -8,6 +8,19 @@ declare global {
   interface UserType extends FetchedUserType {
     email: string;
   }
+
+  interface InviteType {
+    _id: string;
+    from: string;
+    to: string;
+    date: Date;
+  }
+
+  interface CConnectionType {
+    _id: string;
+    users: UserType[];
+    group: boolean;
+  }
 }
 
 export {};

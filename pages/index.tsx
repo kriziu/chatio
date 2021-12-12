@@ -5,12 +5,12 @@ import { useContext } from 'react';
 import axios from 'axios';
 import { BsTelephoneFill } from 'react-icons/bs';
 
-import { Button } from '../components/Simple/Button';
-import { Header4 } from '../components/Simple/Headers';
-import { defaultUser, userContext } from '../context/userContext';
-import ChatContainer from '../components/Chat/ChatContainer';
-import { AvatarSmall } from '../components/Simple/Avatars';
-import { Flex } from '../components/Simple/Flex';
+import { Button } from 'components/Simple/Button';
+import { Header4 } from 'components/Simple/Headers';
+import { defaultUser, userContext } from 'context/userContext';
+import ChatContainer from 'components/Chat/ChatContainer';
+import { AvatarSmall } from 'components/Simple/Avatars';
+import { Flex } from 'components/Simple/Flex';
 
 const Home: NextPage = () => {
   const {

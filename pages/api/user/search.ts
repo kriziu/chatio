@@ -50,21 +50,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             _id: string;
           }
       ) => {
-        let toReturn = true;
+        let toReturn = !(_id === user._id.toString());
 
-        connections.forEach(connection => {
-          connection.users.forEach(userCon => {
-            if (
-              user.equals(
-                userCon as Document<any, any, UserType> &
-                  UserType & {
-                    _id: string;
-                  }
+        if (toReturn)
+          connections.forEach(connection => {
+            connection.users.forEach(userCon => {
+              if (
+                user.equals(
+                  userCon as Document<any, any, UserType> &
+                    UserType & {
+                      _id: string;
+                    }
+                )
               )
-            )
-              toReturn = false;
+                toReturn = false;
+            });
           });
-        });
 
         if (toReturn) {
           invites.forEach(invite => {

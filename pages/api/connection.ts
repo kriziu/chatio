@@ -13,14 +13,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    const connId = req.query['id'];
+
     switch (req.method) {
       case 'GET':
-        const connId = req.query['id'];
-
         if (connId) {
-          const connections = await connectionModel.findById(connId);
+          const connection = await connectionModel.findById(connId);
 
-          return res.json(connections);
+          return res.json(connection);
         }
 
         const connections = await connectionModel.find({
@@ -31,8 +31,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // case 'PATCH':
       //   break;
 
-      // case 'DELETE':
-      //   break;
+      case 'DELETE':
+        const connection = await connectionModel.findById(connId);
+
+        await connection?.delete();
+
+        return res.json(connection);
       default:
         return res.status(400).end();
     }

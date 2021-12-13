@@ -1,12 +1,11 @@
 import type { NextPage } from 'next';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
 import { Header1, Header2, Header3 } from 'components/Simple/Headers';
-import { userContext } from 'context/userContext';
 import { Input } from 'components/Simple/Input';
 import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
@@ -16,11 +15,6 @@ import { validateEmail } from 'lib/validators';
 import { AvatarSmall } from 'components/Simple/Avatars';
 
 const Home: NextPage = () => {
-  const {
-    user: { email, _id },
-    setUser,
-  } = useContext(userContext);
-
   const [formData, setFormData, toggleChecked, handleInputChange] = useForm({
     emailInput: { value: '', required: false },
     name: { value: '', required: false },

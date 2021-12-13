@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
@@ -7,7 +7,6 @@ import { BsCheck } from 'react-icons/bs';
 import { MdDelete } from 'react-icons/md';
 
 import { Header1, Header2, Header3 } from 'components/Simple/Headers';
-import { userContext } from 'context/userContext';
 import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
@@ -20,11 +19,6 @@ interface UserInvited extends UserType {
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Home: NextPage = () => {
-  const {
-    user: { email },
-    setUser,
-  } = useContext(userContext);
-
   const { mutate } = useSWRConfig();
 
   const { data, error } = useSWR<InviteType[]>(`/api/invite`, fetcher, {

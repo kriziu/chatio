@@ -51,7 +51,7 @@ export const GlobalStyles = () => (
         --color-gray-darker: #343434;
         --color-black: #222;
         --color-white: #fff;
-        --color-red: #e53e3e;
+        --color-red: #fc2c2c;
         --color-green: #00ff57;
         --color-blue: #3ea8e5;
         // GRADIENTS

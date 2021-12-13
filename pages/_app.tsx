@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from 'react';
+import { FC } from 'react';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 

@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import {
   FC,
   RefCallback,
@@ -7,18 +6,21 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import { useRouter } from 'next/router';
 import { useSwipeable } from 'react-swipeable';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import axios from 'axios';
+import useSWR from 'swr';
 
 import { userContext } from 'context/userContext';
 import { Avatar, AvatarSmall } from '../Simple/Avatars';
 import { Button } from '../Simple/Button';
 import { Flex } from '../Simple/Flex';
-import { Header2, Header3, Header4, Header5 } from '../Simple/Headers';
+import { Header2, Header4, Header5 } from '../Simple/Headers';
 import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
-import useSWR from 'swr';
+
 import { getUserFromIds } from 'lib/ids';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
@@ -146,6 +148,7 @@ const Navigation: FC = () => {
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         marginLeft: '1rem',
+                        cursor: 'pointer',
                       }}
                     >
                       <Header4>

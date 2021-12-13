@@ -13,10 +13,7 @@ import { AvatarSmall } from 'components/Simple/Avatars';
 import { Flex } from 'components/Simple/Flex';
 
 const Home: NextPage = () => {
-  const {
-    user: { email },
-    setUser,
-  } = useContext(userContext);
+  const { setUser } = useContext(userContext);
 
   const router = useRouter();
 

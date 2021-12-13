@@ -15,6 +15,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     switch (req.method) {
       case 'GET':
+        const connId = req.query['id'];
+
+        if (connId) {
+          const connections = await connectionModel.findById(connId);
+
+          return res.json(connections);
+        }
+
         const connections = await connectionModel.find({
           'users._id': _id,
         });

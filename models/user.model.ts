@@ -5,7 +5,7 @@ interface UserModelType extends UserType {
   password: string;
 }
 
-export const userSchema = new mongoose.Schema<UserModelType>({
+export const userSchema = new mongoose.Schema<UserType>({
   fName: {
     type: String,
     required: true,
@@ -19,6 +19,9 @@ export const userSchema = new mongoose.Schema<UserModelType>({
     required: true,
     validate: validateEmail,
   },
+});
+
+const userPasswordSchema = new mongoose.Schema<UserModelType>({
   password: {
     type: String,
     required: true,
@@ -26,8 +29,10 @@ export const userSchema = new mongoose.Schema<UserModelType>({
   },
 });
 
+userPasswordSchema.add(userSchema);
+
 const userModel =
   (mongoose.models.User as mongoose.Model<UserModelType>) ||
-  mongoose.model<UserModelType>('User', userSchema);
+  mongoose.model<UserModelType>('User', userPasswordSchema);
 
 export default userModel;

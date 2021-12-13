@@ -49,7 +49,7 @@ const Login: NextPage = () => {
       })
       .then(res => {
         if (res.status === 201) {
-          router.push('/chat/61a72fde651e2a979b5e7422');
+          router.push('/profile');
         }
       })
       .catch(() => {

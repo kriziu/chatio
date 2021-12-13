@@ -15,8 +15,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    const { inviteId } = req.body;
+    const inviteFound = await inviteModel.findById(inviteId);
+
     switch (req.method) {
       case 'GET':
+        const your = req.query['your'];
+
+        if (your) {
+          const invites = await inviteModel.find({ from: _id });
+          return res.json(invites);
+        }
+
         const invites = await inviteModel.find({ to: _id });
 
         return res.json(invites);
@@ -28,15 +38,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         return res.status(201).json(invite);
       case 'PATCH':
-        const { inviteId } = req.body;
-        console.log(inviteId);
-        const inviteAccepted = await inviteModel.findById(inviteId);
-
-        if (inviteAccepted) {
+        if (inviteFound?.to.toString() === _id) {
           const fromUser = await userModel.findOne({
-            _id: inviteAccepted.from,
+            _id: inviteFound.from,
           });
-          const toUser = await userModel.findOne({ _id: inviteAccepted.to });
+          const toUser = await userModel.findOne({ _id: inviteFound.to });
 
           const newConnection = new connectionModel({
             users: [fromUser, toUser],
@@ -44,14 +50,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
 
           await newConnection.save();
-          await inviteAccepted.delete();
+          await inviteFound.delete();
 
           return res.status(201).json(newConnection);
         }
-        return res.status(404).end();
 
-      // case 'DELETE':
-      //   break;
+        return res.status(400).end();
+
+      case 'DELETE':
+        if (
+          inviteFound?.to.toString() === _id ||
+          inviteFound?.from.toString() === _id
+        ) {
+          await inviteFound.delete();
+
+          return res.end();
+        }
       default:
         return res.status(400).end();
     }

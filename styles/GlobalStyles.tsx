@@ -47,7 +47,8 @@ export const GlobalStyles = () => (
       :root {
         // COLORS
         --color-gray: #cbd5e0;
-        --color-gray-dark: #343434;
+        --color-gray-dark: #9ea3a8;
+        --color-gray-darker: #343434;
         --color-black: #222;
         --color-white: #fff;
         --color-red: #e53e3e;

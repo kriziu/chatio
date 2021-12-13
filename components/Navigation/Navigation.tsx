@@ -12,13 +12,14 @@ import { AiOutlineUserAdd } from 'react-icons/ai';
 import axios from 'axios';
 
 import { userContext } from 'context/userContext';
-import { Avatar } from '../Simple/Avatars';
+import { Avatar, AvatarSmall } from '../Simple/Avatars';
 import { Button } from '../Simple/Button';
 import { Flex } from '../Simple/Flex';
-import { Header2 } from '../Simple/Headers';
+import { Header2, Header3, Header4, Header5 } from '../Simple/Headers';
 import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
 import useSWR from 'swr';
+import { getUserFromIds } from 'lib/ids';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
@@ -26,13 +27,20 @@ const Navigation: FC = () => {
   const {
     user: { email, _id },
   } = useContext(userContext);
+
   const router = useRouter();
   const back = useRef<HTMLDivElement>(null);
 
   const [show, setShow] = useState(false);
   const [opened, setOpened] = useState(false);
   const [search, setSearch] = useState('');
-  const { data, error } = useSWR<CConnectionType[]>(`/api/connection`, fetcher);
+  const { data, error } = useSWR<CConnectionType[]>(
+    show ? `/api/connection` : null,
+    fetcher,
+    {
+      refreshInterval: 30000,
+    }
+  );
 
   const { ref } = useSwipeable({
     onSwipedRight(e) {
@@ -111,17 +119,45 @@ const Navigation: FC = () => {
             <AiOutlineUserAdd />
           </Button>
         </Flex>
-        <ul>
+        <Flex
+          as="ul"
+          style={{
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}
+        >
           {data
             ? data.map(connection => {
-                const user = [...connection.users].filter(
-                  userF => userF._id !== _id
-                )[0];
+                const user = getUserFromIds(connection, _id);
 
-                return <li key={connection._id}>{user.fName}</li>;
+                return (
+                  <Flex
+                    key={user._id}
+                    as="li"
+                    style={{ marginTop: '2rem' }}
+                    onClick={() => {
+                      setOpened(false);
+                      router.push(`/chat/${connection._id}`);
+                    }}
+                  >
+                    <AvatarSmall />
+                    <Flex
+                      style={{
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        marginLeft: '1rem',
+                      }}
+                    >
+                      <Header4>
+                        {user.fName} {user.lName}
+                      </Header4>
+                      <Header5>You: Hello</Header5>
+                    </Flex>
+                  </Flex>
+                );
               })
             : 'loading...'}
-        </ul>
+        </Flex>
       </NavBackground>
     </>
   );

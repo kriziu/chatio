@@ -72,6 +72,7 @@ const Home: NextPage = () => {
 
   const createInvite = (to: string) => {
     axios.post('/api/invite', { to }).then(res => console.log(res.data));
+    setUsers(prev => prev.filter(pre => pre._id !== to));
   };
 
   return (

@@ -7,27 +7,28 @@ import { BsTelephoneFill } from 'react-icons/bs';
 import useSWR from 'swr';
 import { ClipLoader } from 'react-spinners';
 
-import { Button } from '../../components/Simple/Button';
-import { Header4 } from '../../components/Simple/Headers';
-import { defaultUser, userContext } from '../../context/userContext';
-import ChatContainer from '../../components/Chat/ChatContainer';
-import { AvatarSmall } from '../../components/Simple/Avatars';
-import { Flex } from '../../components/Simple/Flex';
+import { Button } from 'components/Simple/Button';
+import { Header4 } from 'components/Simple/Headers';
+import { defaultUser, userContext } from 'context/userContext';
+import ChatContainer from 'components/Chat/ChatContainer';
+import { AvatarSmall } from 'components/Simple/Avatars';
+import { Flex } from 'components/Simple/Flex';
+import { getUserFromIds } from 'lib/ids';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Home: NextPage = () => {
   const {
-    user: { email },
+    user: { email, _id },
     setUser,
   } = useContext(userContext);
 
   const router = useRouter();
 
-  const friendId = router.query.friendId as string;
+  const connectionId = router.query.connectionId as string;
 
-  const { data, error } = useSWR<UserType>(
-    friendId && `/api/user/${friendId}`,
+  const { data, error } = useSWR<CConnectionType>(
+    connectionId && `/api/connection?id=${connectionId}`,
     fetcher
   );
 
@@ -39,8 +40,8 @@ const Home: NextPage = () => {
       </Flex>
     );
 
-  const { fName, lName } = data;
-  console.log(data);
+  const user = getUserFromIds(data, _id);
+  console.log(user);
 
   return (
     <>
@@ -60,7 +61,7 @@ const Home: NextPage = () => {
               marginLeft: '1rem',
             }}
           >
-            {fName} {lName}
+            {user.fName} {user.lName}
           </Header4>
         </Flex>
         <div>

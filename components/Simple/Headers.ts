@@ -23,3 +23,10 @@ export const Header4 = styled.h4`
   font-weight: 400;
   text-align: center;
 `;
+
+export const Header5 = styled.h5`
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-align: center;
+  color: var(--color-gray-dark);
+`;

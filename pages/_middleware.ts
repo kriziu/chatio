@@ -38,7 +38,11 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
       return redirect;
     }
 
-    const token = await fetch('/api/auth/token?refresh=' + refresh);
+    const token = await fetch(
+      process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : '' + `/api/auth/token?refresh=${refresh}`
+    );
     if (token.status === 404) return redirect;
 
     const refreshUser = jwt.decode(refresh);

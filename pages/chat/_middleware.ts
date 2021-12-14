@@ -9,11 +9,16 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
 
   const userDecoded = jwt.decode(ACCESS) as UserType;
 
-  let connection = await fetch(`/api/connection?id=${connId}`, {
-    headers: {
-      Cookie: 'ACCESS=' + ACCESS,
-    },
-  });
+  let connection = await fetch(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : '' + `/api/connection?id=${connId}`,
+    {
+      headers: {
+        Cookie: 'ACCESS=' + ACCESS,
+      },
+    }
+  );
 
   const JSONEDconnection = (await connection.json()) as CConnectionType;
 

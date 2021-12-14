@@ -17,6 +17,8 @@ import { Button } from 'components/Simple/Button';
 // 3. const JSONEDconnection = (await connection.json()) as CConnectionType; problem gdy nie ma czatu o danym id
 // 4. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 // 5. usunac console logi z consoli
+// 6. 33:6  Warning: React Hook useEffect has missing dependencies: 'formData' and 'setFormData'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+// 41:6  Warning: React Hook useEffect has missing dependencies: 'formData' and 'setFormData'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
 
 interface UserInvited extends UserType {
   inviteDate: Date;

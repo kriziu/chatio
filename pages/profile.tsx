@@ -11,6 +11,13 @@ import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
 
+// TODO:
+// 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH)
+// 2. MOZE RESFRESH DANYCH NA KAZDE OTWARCIE MENU
+// 3. const JSONEDconnection = (await connection.json()) as CConnectionType; problem gdy nie ma czatu o danym id
+// 4. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
+// 5. usunac console logi z consoli
+
 interface UserInvited extends UserType {
   inviteDate: Date;
   inviteId: string;

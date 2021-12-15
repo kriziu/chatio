@@ -21,7 +21,7 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
     }
   );
 
-  return connection;
+  console.log(connection);
 
   if (connection.status !== 200) {
     return NextResponse.redirect('/');

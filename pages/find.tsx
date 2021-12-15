@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import axios from 'axios';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -15,30 +15,17 @@ import { validateEmail } from 'lib/validators';
 import { AvatarSmall } from 'components/Simple/Avatars';
 
 const Home: NextPage = () => {
-  const [formData, setFormData, toggleChecked, handleInputChange] = useForm({
-    emailInput: { value: '', required: false },
-    name: { value: '', required: false },
-  });
+  const [formData, setFormData, toggleChecked, handleInputChange] = useForm(
+    {
+      emailInput: { value: '', required: false },
+      name: { value: '', required: false },
+    },
+    true
+  );
   const { emailInput, name } = formData;
 
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
-
-  useEffect(() => {
-    if (emailInput.value)
-      setFormData({
-        ...formData,
-        name: { value: '', required: false, checked: false },
-      });
-  }, [emailInput.value]);
-
-  useEffect(() => {
-    if (name.value)
-      setFormData({
-        ...formData,
-        emailInput: { value: '', required: false, checked: false },
-      });
-  }, [name.value]);
 
   const searchUsers = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

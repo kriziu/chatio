@@ -4,9 +4,12 @@ interface returnedObject {
   [key: string]: { value: string; required: boolean; checked: boolean };
 }
 
-const useForm = (initialState: {
-  [key: string]: { value: string; required: boolean };
-}): [
+const useForm = (
+  initialState: {
+    [key: string]: { value: string; required: boolean };
+  },
+  onlyOne = false
+): [
   returnedObject,
   Dispatch<SetStateAction<returnedObject>>,
   (name: string, bool?: boolean) => void,
@@ -28,14 +31,25 @@ const useForm = (initialState: {
         : true
       : false;
 
-    setFormData({
-      ...formData,
-      [e.target.name]: {
-        ...formData[e.target.name],
-        value: e.target.value,
-        checked: checked,
-      },
-    });
+    setFormData(
+      onlyOne
+        ? {
+            ...newState,
+            [e.target.name]: {
+              ...formData[e.target.name],
+              value: e.target.value,
+              checked: checked,
+            },
+          }
+        : {
+            ...formData,
+            [e.target.name]: {
+              ...formData[e.target.name],
+              value: e.target.value,
+              checked: checked,
+            },
+          }
+    );
   };
 
   const toggleChecked = (name: string, bool: boolean = true): void => {

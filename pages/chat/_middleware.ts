@@ -10,9 +10,8 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
   const userDecoded = jwt.decode(ACCESS) as UserType;
 
   let connection = await fetch(
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : '' + `/api/connection?id=${connId}`,
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') +
+      `/api/connection?id=${connId}`,
     {
       headers: {
         'Content-Type': 'application/json',

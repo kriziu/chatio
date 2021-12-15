@@ -5,7 +5,9 @@ import jwt from '@tsndr/cloudflare-worker-jwt';
 
 export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
   const { ACCESS } = req.cookies;
-  const connId = req.url.slice(6);
+  const connId = req.url.slice(req.url.indexOf('chat/') + 5);
+
+  console.log(connId);
 
   const userDecoded = jwt.decode(ACCESS) as UserType;
 
@@ -19,8 +21,6 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
       },
     }
   );
-
-  console.log(connection);
 
   if (connection.status !== 200) {
     return NextResponse.redirect('/');

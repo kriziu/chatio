@@ -39,9 +39,8 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
     }
 
     const token = await fetch(
-      process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : '' + `/api/auth/token?refresh=${refresh}`
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') +
+        `/api/auth/token?refresh=${refresh}`
     );
     if (token.status === 404) return redirect;
 

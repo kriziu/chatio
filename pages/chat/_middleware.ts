@@ -20,6 +20,10 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
     }
   );
 
+  if (connection.status !== 200) {
+    return NextResponse.redirect('/');
+  }
+
   const JSONEDconnection = (await connection.json()) as CConnectionType;
 
   let redirect = true;

@@ -15,6 +15,7 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
       : '' + `/api/connection?id=${connId}`,
     {
       headers: {
+        'Content-Type': 'application/json',
         Cookie: 'ACCESS=' + ACCESS,
       },
     }

@@ -17,10 +17,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     switch (req.method) {
       case 'GET':
+        let forbidden = true;
+
         if (connId) {
           const connection = await connectionModel.findById(connId);
 
-          return res.json(connection);
+          connection?.users.forEach(user => {
+            if (user._id.toString() === _id) forbidden = false;
+          });
+
+          return forbidden ? res.status(403).end() : res.json(connection);
         }
 
         const connections = await connectionModel.find({

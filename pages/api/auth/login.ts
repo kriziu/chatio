@@ -27,7 +27,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await savedToken.save();
 
       return res
-        .setHeader('Set-Cookie', `REFRESH=${token};HttpOnly;Path=/`)
+        .setHeader(
+          'Set-Cookie',
+          `REFRESH=${token};HttpOnly;Path=/;expires=${week};`
+        )
         .status(200)
         .end();
     }

@@ -58,6 +58,6 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
       process.env.ACCESS_TOKEN_SECRET as string
     );
 
-    return NextResponse.next().cookie('ACCESS', newAccess);
+    return NextResponse.next().cookie('ACCESS', newAccess, {});
   }
 };

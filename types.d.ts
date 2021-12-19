@@ -21,6 +21,11 @@ declare global {
     users: UserType[];
     group: boolean;
   }
+
+  interface MessageType {
+    sender: UserType;
+    message: string;
+  }
 }
 
 export {};

@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
@@ -11,9 +12,10 @@ import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
 
+import { defaultUser, userContext } from 'context/userContext';
+
 // TODO:
 // 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH)
-// 2. MOZE RESFRESH DANYCH NA KAZDE OTWARCIE MENU
 // 4. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 
 interface UserInvited extends UserType {
@@ -23,7 +25,10 @@ interface UserInvited extends UserType {
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
-const Home: NextPage = () => {
+const Profile: NextPage = () => {
+  const { setUser } = useContext(userContext);
+
+  const router = useRouter();
   const { mutate } = useSWRConfig();
 
   const { data, error } = useSWR<InviteType[]>(`/api/invite`, fetcher, {
@@ -136,8 +141,16 @@ const Home: NextPage = () => {
         <Header2>Invites</Header2>
         {renderInvites()}
       </div>
+      <Button
+        onClick={() => {
+          setUser(defaultUser);
+          axios.post('/api/auth/logout').then(res => router.push('/login'));
+        }}
+      >
+        Log out
+      </Button>
     </>
   );
 };
 
-export default Home;
+export default Profile;

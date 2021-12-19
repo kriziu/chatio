@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 
 import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
-import { Message } from './Message/Message';
 
 const Container = styled.div`
   display: flex;
@@ -16,38 +15,40 @@ const Container = styled.div`
   ${scrollY}
 `;
 
-const ChatContainer: FC = () => {
-  const { user } = useContext(userContext);
+const Message = styled.p<{ mine?: boolean }>`
+  color: #eee;
+  padding: 1rem 1.5rem;
+  background-image: ${({ mine }) =>
+    mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
+  width: max-content;
+  max-width: 65%;
+  border-radius: 2rem;
+
+  ${({ mine }) => mine && 'align-self: flex-end'};
+
+  :not(:first-of-type) {
+    margin-top: 2rem;
+  }
+`;
+
+interface Props {
+  messages: MessageType[];
+}
+
+const ChatContainer: FC<Props> = ({ messages }) => {
+  const {
+    user: { _id },
+  } = useContext(userContext);
 
   return (
     <Container>
-      <Message>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, quo?
-        Voluptatibus sapiente obcaecati laborum maxime suscipit eos iusto
-        molestias atque consectetur maiores provident repellendus necessitatibus
-        omnis aspernatur, numquam deleniti culpa!
-      </Message>
-      <Message>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-      </Message>
-      <Message mine>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, quo?
-        Voluptatibus sapiente obcaecati laborum maxime suscipit eos iusto
-        molestias atque consectetur maiores provident repellendus necessitatibus
-        omnis aspernatur, numquam deleniti culpa!
-      </Message>
-      <Message>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-      </Message>
-      <Message mine>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, quo?
-        Voluptatibus sapiente obcaecati laborum maxime suscipit eos iusto
-        molestias atque consectetur maiores provident repellendus necessitatibus
-        omnis aspernatur, numquam deleniti culpa!
-      </Message>
-      <Message mine>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-      </Message>
+      {messages.map((message, index) => {
+        return (
+          <Message key={index} mine={message.sender._id === _id}>
+            {message.message}
+          </Message>
+        );
+      })}
     </Container>
   );
 };

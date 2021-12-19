@@ -14,8 +14,8 @@ import useForm from 'hooks/useForm';
 import { validateEmail } from 'lib/validators';
 import { AvatarSmall } from 'components/Simple/Avatars';
 
-const Home: NextPage = () => {
-  const [formData, setFormData, toggleChecked, handleInputChange] = useForm(
+const Find: NextPage = () => {
+  const [formData, , toggleChecked, handleInputChange] = useForm(
     {
       emailInput: { value: '', required: false },
       name: { value: '', required: false },
@@ -128,4 +128,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Find;

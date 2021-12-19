@@ -22,7 +22,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (connId) {
           const connection = await connectionModel.findById(connId);
 
-          connection?.users.forEach(user => {
+          if (!connection) return res.status(404).end();
+
+          connection.users.forEach(user => {
             if (user._id.toString() === _id) forbidden = false;
           });
 

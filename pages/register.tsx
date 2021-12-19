@@ -13,7 +13,7 @@ import { errToast } from 'lib/toasts';
 import { Flex } from 'components/Simple/Flex';
 import { Form } from 'components/Simple/Form';
 
-const Login: NextPage = () => {
+const Register: NextPage = () => {
   const router = useRouter();
 
   const [formData, , toggleChecked, handleInputChange, checkValidity] = useForm(
@@ -28,7 +28,7 @@ const Login: NextPage = () => {
 
   const { fName, lName, email, password, checkPassword } = formData;
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!checkValidity()) return;
     if (!validateEmail(email.value)) {
@@ -66,7 +66,7 @@ const Login: NextPage = () => {
       }}
     >
       <Header1 style={{ marginBottom: '1rem' }}>Register</Header1>
-      <Form onSubmit={handleLogin} noValidate>
+      <Form onSubmit={handleRegister} noValidate>
         <Input
           placeholder="First name"
           value={fName.value}
@@ -124,4 +124,4 @@ const Login: NextPage = () => {
   );
 };
 
-export default Login;
+export default Register;

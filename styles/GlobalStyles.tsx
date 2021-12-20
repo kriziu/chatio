@@ -33,11 +33,12 @@ export const GlobalStyles = () => (
           rgb(3, 38, 57),
           rgb(29, 0, 43)
         );
-        height: 100vh;
+        height: 100%;
       }
 
       html {
         font-size: 62.5%;
+        height: 100%;
       }
 
       a {

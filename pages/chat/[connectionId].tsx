@@ -3,20 +3,16 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
-import { BsTelephoneFill } from 'react-icons/bs';
+import { BiSend } from 'react-icons/bi';
 import useSWR from 'swr';
 import { ClipLoader } from 'react-spinners';
-import styled from '@emotion/styled';
 import { useSwipeable } from 'react-swipeable';
 
 import { Button } from 'components/Simple/Button';
-import { Header3, Header4 } from 'components/Simple/Headers';
 import { userContext } from 'context/userContext';
 import ChatContainer from 'components/Chat/ChatContainer';
-import { AvatarSmall } from 'components/Simple/Avatars';
 import { Flex } from 'components/Simple/Flex';
 import { getUserFromIds } from 'lib/ids';
-import { Background } from 'components/Simple/Background';
 import pusherJs from 'pusher-js';
 import ChatSettings from 'components/Chat/ChatSettings';
 import ChatTop from 'components/Chat/ChatTop';
@@ -39,6 +35,23 @@ const Chat: NextPage = () => {
     connectionId && `/api/connection?id=${connectionId}`,
     fetcher
   );
+
+  const fetchedMessages = useSWR<MessageDBType[]>(
+    connectionId && `/api/message/${connectionId}`,
+    fetcher
+  );
+  useEffect(() => {
+    if (fetchedMessages.data) {
+      setMessages(
+        fetchedMessages.data.map(message => {
+          return {
+            sender: message.sender,
+            message: message.message,
+          };
+        })
+      );
+    }
+  }, [fetchedMessages.data]);
 
   useEffect(() => {
     const pusher = new pusherJs(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
@@ -106,16 +119,25 @@ const Chat: NextPage = () => {
       <form
         onSubmit={e => {
           e.preventDefault();
+          message &&
+            axios.post('/api/pusher', {
+              connectionId,
+              message,
+              sender: user,
+            });
           setMessage('');
-          axios.post('/api/pusher', {
-            connectionId,
-            message,
-            sender: user,
-          });
         }}
       >
-        <Input value={message} onChange={e => setMessage(e.target.value)} />
-        <Button type="submit">Send</Button>
+        <Flex style={{ paddingTop: '2rem' }}>
+          <Input
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            style={{ marginRight: '1rem', width: '75%' }}
+          />
+          <Button type="submit" icon>
+            <BiSend />
+          </Button>
+        </Flex>
       </form>
     </>
   );

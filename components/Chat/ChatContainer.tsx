@@ -9,7 +9,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 2rem;
-  height: 80vh;
+  height: calc(100% - 13.5rem);
   margin-top: 2rem;
 
   ${scrollY}

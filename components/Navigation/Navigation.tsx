@@ -28,7 +28,7 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Navigation: FC = () => {
   const {
-    user: { email, _id },
+    user: { _id },
   } = useContext(userContext);
 
   const { mutate } = useSWRConfig();
@@ -57,7 +57,7 @@ const Navigation: FC = () => {
 
   useEffect(() => {
     ref(document);
-  });
+  }, []);
 
   useEffect(() => {
     if (router.pathname === '/login' || router.pathname === '/register')

@@ -26,6 +26,12 @@ declare global {
     sender: UserType;
     message: string;
   }
+
+  interface MessageDBType extends MessageType {
+    connectionId: string;
+    date: Date;
+    read: boolean;
+  }
 }
 
 export {};

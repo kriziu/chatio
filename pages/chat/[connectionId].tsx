@@ -17,12 +17,14 @@ import pusherJs from 'pusher-js';
 import ChatSettings from 'components/Chat/ChatSettings';
 import ChatTop from 'components/Chat/ChatTop';
 import { Input } from 'components/Simple/Input';
+import { connectionsContext } from 'context/connectionsContext';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
   const { _id } = user;
+  const { channels } = useContext(connectionsContext);
 
   const router = useRouter();
   const connectionId = router.query.connectionId as string;
@@ -36,40 +38,33 @@ const Chat: NextPage = () => {
     fetcher
   );
 
-  const fetchedMessages = useSWR<MessageDBType[]>(
+  const fetchedMessages = useSWR<MessageType[]>(
     connectionId && `/api/message/${connectionId}`,
     fetcher
   );
+
   useEffect(() => {
     if (fetchedMessages.data) {
-      setMessages(
-        fetchedMessages.data.map(message => {
-          return {
-            sender: message.sender,
-            message: message.message,
-          };
-        })
-      );
+      setMessages(fetchedMessages.data);
     }
   }, [fetchedMessages.data]);
 
   useEffect(() => {
-    const pusher = new pusherJs(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
-      authEndpoint: '/api/pusher/auth',
+    channels.forEach(channel => {
+      if (channel.name.slice(8) === connectionId) {
+        channel.bind('new_msg', (data: MessageType) => {
+          setMessages(prev => [...prev, data]);
+        });
+      }
     });
-
-    if (connectionId !== undefined) {
-      const channel = pusher.subscribe(`private-${connectionId}`);
-
-      channel.bind('new_msg', (data: MessageType) => {
-        setMessages(prev => [...prev, data]);
-      });
-    }
     return () => {
-      pusher.unsubscribe(`private-${connectionId}`);
+      channels.forEach(channel => {
+        if (channel.name.slice(8) === connectionId) {
+          channel.unbind('new_msg');
+        }
+      });
     };
-  }, [router]);
+  }, [connectionId, channels]);
 
   const handlersToOpen = useSwipeable({
     onSwipedDown() {

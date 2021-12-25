@@ -8,28 +8,26 @@ import {
 } from 'react';
 
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useSwipeable } from 'react-swipeable';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
 import { ClipLoader } from 'react-spinners';
 
-import { userContext } from 'context/userContext';
-import { Avatar, AvatarSmall } from '../Simple/Avatars';
+import { Avatar } from '../Simple/Avatars';
 import { Button } from '../Simple/Button';
 import { Flex } from '../Simple/Flex';
-import { Header2, Header4, Header5 } from '../Simple/Headers';
+import { Header2 } from '../Simple/Headers';
 import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
-import { getUserFromIds } from 'lib/ids';
-import { focusClick } from 'lib/utility';
+import NavigationConnection from './NavigationConnection';
+import { connectionsContext } from 'context/connectionsContext';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Navigation: FC = () => {
-  const {
-    user: { _id },
-  } = useContext(userContext);
+  const { setConnections } = useContext(connectionsContext);
 
   const { mutate } = useSWRConfig();
   const router = useRouter();
@@ -57,7 +55,7 @@ const Navigation: FC = () => {
 
   useEffect(() => {
     ref(document);
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
     if (router.pathname === '/login' || router.pathname === '/register')
@@ -81,47 +79,21 @@ const Navigation: FC = () => {
     return () => {
       window.removeEventListener('click', handleClick);
     };
-  }, [opened]);
+  }, [opened, mutate]);
+
+  useEffect(() => {
+    data && setConnections(data);
+  }, [data, setConnections]);
 
   const renderConnections = (): JSX.Element[] | JSX.Element => {
     return data ? (
-      data.map(connection => {
-        const user = getUserFromIds(connection, _id);
-
-        return (
-          <Flex
-            key={user._id}
-            as="li"
-            style={{ marginTop: '2rem' }}
-            onClick={() => {
-              setOpened(false);
-              router.push(`/chat/${connection._id}`);
-            }}
-            onKeyDown={e =>
-              focusClick(e, () => {
-                setOpened(false);
-                router.push(`/chat/${connection._id}`);
-              })
-            }
-            tabIndex={0}
-          >
-            <AvatarSmall />
-            <Flex
-              style={{
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                marginLeft: '1rem',
-                cursor: 'pointer',
-              }}
-            >
-              <Header4>
-                {user.fName} {user.lName}
-              </Header4>
-              <Header5>You: Hello</Header5>
-            </Flex>
-          </Flex>
-        );
-      })
+      data.map(connection => (
+        <NavigationConnection
+          connection={connection}
+          setOpened={setOpened}
+          key={connection._id}
+        />
+      ))
     ) : (
       <Flex style={{ width: '100%', height: '100%', marginTop: '5rem' }}>
         <ClipLoader color="white" size={50} />
@@ -143,15 +115,19 @@ const Navigation: FC = () => {
         ref={back}
         style={{ maxWidth: '100vw' }}
       >
-        <Top
-          onClick={() => {
-            setOpened(false);
-            router.push('/profile');
-          }}
-        >
-          <Avatar />
-          <Header2>Your profile</Header2>
-        </Top>
+        <Link href="/profile">
+          <a>
+            <Top
+              onClick={() => {
+                setOpened(false);
+              }}
+            >
+              <Avatar />
+              <Header2>Your profile</Header2>
+            </Top>
+          </a>
+        </Link>
+
         <Flex style={{ justifyContent: 'space-between', marginTop: '2rem' }}>
           <Input
             placeholder="Search..."
@@ -159,16 +135,18 @@ const Navigation: FC = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <Button
-            icon
-            style={{ width: 'max-content' }}
-            onClick={() => {
-              setOpened(false);
-              router.push('/find');
-            }}
-          >
-            <AiOutlineUserAdd />
-          </Button>
+          <Link href="/find" passHref>
+            <Button
+              icon
+              style={{ width: 'max-content' }}
+              onClick={() => {
+                setOpened(false);
+              }}
+              as="a"
+            >
+              <AiOutlineUserAdd />
+            </Button>
+          </Link>
         </Flex>
         <Flex
           as="ul"

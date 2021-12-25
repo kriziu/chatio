@@ -6,11 +6,6 @@ import messageModel from 'models/message.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { message, sender, connectionId } = req.body;
 
-  await pusher.trigger(`private-${connectionId}`, 'new_msg', {
-    message,
-    sender,
-  });
-
   const newMessage = new messageModel({
     connectionId,
     sender,
@@ -18,6 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     read: false,
   });
 
+  await pusher.trigger(`private-${connectionId}`, 'new_msg', newMessage);
   await newMessage.save();
 
   res.json({ message: 'completed' });

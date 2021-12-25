@@ -14,6 +14,14 @@ export const GlobalStyles = () => (
         color: var(--color-white);
       }
 
+      a {
+        text-decoration: none;
+      }
+
+      li {
+        list-style: none;
+      }
+
       svg {
         color: var(--color-white);
         width: 2.3rem;

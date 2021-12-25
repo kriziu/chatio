@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { userSchema } from './user.model';
 
-const messageSchema = new mongoose.Schema<MessageDBType>({
+const messageSchema = new mongoose.Schema<MessageType>({
   connectionId: {
     type: String,
     required: true,
@@ -27,7 +27,7 @@ const messageSchema = new mongoose.Schema<MessageDBType>({
 });
 
 const messageModel =
-  (mongoose.models.Message as mongoose.Model<MessageDBType>) ||
-  mongoose.model<MessageDBType>('Message', messageSchema);
+  (mongoose.models.Message as mongoose.Model<MessageType>) ||
+  mongoose.model<MessageType>('Message', messageSchema);
 
 export default messageModel;

@@ -1,4 +1,4 @@
-import { FC, useContext } from 'react';
+import { FC, useContext, useEffect, useRef } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -40,8 +40,17 @@ const ChatContainer: FC<Props> = ({ messages }) => {
     user: { _id },
   } = useContext(userContext);
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    ref.current?.scrollTo({
+      top: ref.current.scrollHeight,
+      behavior: 'smooth',
+    });
+  }, [messages]);
+
   return (
-    <Container>
+    <Container ref={ref}>
       {messages.map((message, index) => {
         return (
           <Message key={index} mine={message.sender._id === _id}>

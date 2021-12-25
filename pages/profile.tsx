@@ -17,6 +17,7 @@ import { defaultUser, userContext } from 'context/userContext';
 // TODO:
 // 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH)
 // 2. PROBLEM Z HEIGHT NA TELEFONACH NA CHACIE
+// 3. LINK ZAMIAST ROUTER.PUSH()
 // 4. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 
 interface UserInvited extends UserType {

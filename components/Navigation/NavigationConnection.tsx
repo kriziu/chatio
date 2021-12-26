@@ -42,6 +42,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
         });
       }
     });
+
     return () => {
       channels.forEach(channel => {
         if (channel.name.slice(8) === connection._id) {

@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
 import useWindowSize from 'hooks/useWindowSize';
 
-const Container = styled.div<{ height: number }>`
+const Container = styled.ul<{ height: number }>`
   display: flex;
   height: ${({ height }) => `calc(${height}px - 17rem)`};
   flex-direction: column;
@@ -17,33 +17,41 @@ const Container = styled.div<{ height: number }>`
   ${scrollY}
 `;
 
+const MessageContainer = styled.li<{ mine: boolean }>`
+  display: flex;
+  align-items: center;
+  align-self: ${({ mine }) => (mine ? 'flex-end' : 'flex-start')};
+  flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
+
+  max-width: 80%;
+
+  :not(:first-of-type) {
+    margin-top: 2rem;
+  }
+`;
+
 const Message = styled.p<{ mine?: boolean; read?: boolean }>`
   color: #eee;
   padding: 1rem 1.5rem;
   background-image: ${({ mine }) =>
     mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
   width: max-content;
-  max-width: 65%;
   border-radius: 2rem;
-
-  ${({ mine }) => mine && 'align-self: flex-end'};
-
-  :not(:first-of-type) {
-    margin-top: 2rem;
-  }
-
   position: relative;
+
   ::after {
-    display: ${({ mine, read }) => (mine && read ? 'block' : 'none')};
+    display: block;
     content: ' ';
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    background-color: white;
+    background-color: ${({ mine, read }) =>
+      mine && read ? 'white' : 'transparent'};
     position: absolute;
     right: -1.5rem;
     top: 50%;
     transform: translateY(-50%);
+    transition: all 0.2s ease;
   }
 `;
 
@@ -60,8 +68,9 @@ const ChatContainer: FC<Props> = ({ messages }) => {
   const [, windowHeight] = useWindowSize();
 
   const [obs, setObs] = useState<IntersectionObserver>();
+  const [touched, setTouched] = useState(false);
 
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLUListElement>(null);
   const messagesRef = useRef<HTMLParagraphElement[]>([]);
 
   useEffect(() => {
@@ -107,27 +116,48 @@ const ChatContainer: FC<Props> = ({ messages }) => {
   }, [obs, messages]);
 
   useEffect(() => {
-    if (ref.current) {
+    if (
+      ref.current &&
+      (ref.current.scrollHeight - ref.current.scrollTop <
+        ref.current.clientHeight + 100 ||
+        messages[messages.length - 1].sender._id === _id)
+    ) {
       ref.current.scrollTo({
         top: ref.current.scrollHeight,
-        behavior: 'smooth',
       });
     }
   }, [messages]);
 
   return (
-    <Container ref={ref} height={windowHeight}>
-      {messages.map((message, index) => {
+    <Container
+      ref={ref}
+      height={windowHeight}
+      onTouchStart={() => setTouched(true)}
+      onTouchEnd={() => setTouched(false)}
+    >
+      {messages.map((message, index, arr) => {
+        const mine = message.sender._id === _id;
         return (
-          <Message
-            key={index}
-            mine={message.sender._id === _id}
-            ref={el => el && (messagesRef.current[index] = el)}
-            id={message._id}
-            read={message.read}
-          >
-            {message.message}
-          </Message>
+          <MessageContainer key={message._id} mine={mine}>
+            <Message
+              mine={mine}
+              ref={el => el && (messagesRef.current[index] = el)}
+              id={message._id}
+              read={arr[index + 1]?.read ? false : message.read}
+            >
+              {message.message}
+            </Message>
+
+            <p
+              style={{
+                margin: '0 1rem',
+                color: touched ? 'white' : 'transparent',
+              }}
+            >
+              {new Date(message.date).getHours()}:
+              {new Date(message.date).getMinutes()}
+            </p>
+          </MessageContainer>
         );
       })}
     </Container>

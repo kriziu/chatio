@@ -15,9 +15,14 @@ import { Button } from 'components/Simple/Button';
 import { defaultUser, userContext } from 'context/userContext';
 
 // TODO:
-// 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH)
-// 2. PROBLEM Z HEIGHT NA TELEFONACH NA CHACIE
-// 4. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
+// 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH) / PUSHER
+// 2. W NavigactionConnection UZYC SWR ZAMIAST AXIOS BO CO ZMIANE STRONY ROBI REFRESH I NIE WYSWIETLA NAPISU
+// 3. DODAC REMOVE_CONNECTION SOCKET I BLOCK_CONNECTION SOCKET NA PRZYSZLOSC
+// 4. WIADOMOSCI ZA DLUGIE BEZ SPACJI SIE BUGUJE
+// 4. PRZYPIECIE WIADOMOSCI (TAKI KOMUNIKAT Z GORY SIE WYSWIETLI I BEDZIE W OPCJACH A WIADOMOSC NA ZLOTO)
+// 5. SLIDERY TAKIE PRZESUWANE PALCEM LEPIEJ
+// 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)
+// 3. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 
 interface UserInvited extends UserType {
   inviteDate: Date;

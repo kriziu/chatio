@@ -74,7 +74,11 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
                 transition={animation.transition}
               >
                 <Navigation />
-                <div style={{ padding: '2rem 0', height: '100vh' }}>
+                <div
+                  style={{
+                    padding: '2rem 0',
+                  }}
+                >
                   <Component {...pageProps} />
                 </div>
               </m.div>

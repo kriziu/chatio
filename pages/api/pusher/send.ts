@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     connectionId,
     sender,
     message,
-    read: false,
+    date: new Date(),
   });
 
   await pusher.trigger(`private-${connectionId}`, 'new_msg', newMessage);

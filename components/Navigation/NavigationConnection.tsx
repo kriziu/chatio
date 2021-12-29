@@ -40,6 +40,10 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
         channel.bind('new_msg', (data: MessageType) => {
           setMessage([data]);
         });
+
+        channel.bind('read_msg', (data: MessageType) => {
+          setMessage([data]);
+        });
       }
     });
 
@@ -47,6 +51,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
       channels.forEach(channel => {
         if (channel.name.slice(8) === connection._id) {
           channel.unbind('new_msg');
+          channel.unbind('read_msg');
         }
       });
     };
@@ -90,16 +95,16 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
             <Header5
               style={
                 message
-                  ? message[0].sender._id !== _id
-                    ? !message[0].read
+                  ? message[0]?.sender._id !== _id
+                    ? !message[0]?.read
                       ? { color: 'white', fontWeight: 500 }
                       : {}
                     : {}
                   : {}
               }
             >
-              {message && message[0].sender._id === _id ? 'You: ' : ''}{' '}
-              {message && message[0].message}
+              {message && message[0]?.sender._id === _id ? 'You: ' : ''}{' '}
+              {message && message[0]?.message}
             </Header5>
           </Flex>
         </Flex>

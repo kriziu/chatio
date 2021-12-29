@@ -37,11 +37,12 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
       return redirect;
     }
 
-    const token = await fetch(
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') +
-        `/api/auth/token?refresh=${refresh}`
-    );
-    if (token.status === 404) return redirect;
+    // CAN'T STORE TOKENS IN MONGODB BECAUSE OF EDGE MIDDLEWARE 1500ms TIMEOUT
+    // const token = await fetch(
+    //   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') +
+    //     `/api/auth/token?refresh=${refresh}`
+    // );
+    // if (token.status === 404) return redirect;
 
     const refreshUser = jwt.decode(refresh);
     const { fName, lName, email, _id } = refreshUser as UserType;

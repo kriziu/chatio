@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import { useEffect } from 'react';
 
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -27,6 +28,10 @@ const Register: NextPage = () => {
   );
 
   const { fName, lName, email, password, checkPassword } = formData;
+
+  useEffect(() => {
+    router.prefetch('/profile');
+  }, [router]);
 
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

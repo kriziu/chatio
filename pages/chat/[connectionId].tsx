@@ -55,12 +55,24 @@ const Chat: NextPage = () => {
         channel.bind('new_msg', (data: MessageType) => {
           setMessages(prev => [...prev, data]);
         });
+
+        channel.bind('read_msg', (data: MessageType) => {
+          setMessages(prev => {
+            return prev.map(pre => {
+              return new Date(pre.date).getTime() <=
+                new Date(data.date).getTime()
+                ? { ...pre, read: true }
+                : pre;
+            });
+          });
+        });
       }
     });
     return () => {
       channels.forEach(channel => {
         if (channel.name.slice(8) === connectionId) {
           channel.unbind('new_msg');
+          channel.unbind('read_msg');
         }
       });
     };
@@ -115,7 +127,7 @@ const Chat: NextPage = () => {
         onSubmit={e => {
           e.preventDefault();
           message &&
-            axios.post('/api/pusher', {
+            axios.post('/api/pusher/send', {
               connectionId,
               message,
               sender: user,

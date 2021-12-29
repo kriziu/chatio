@@ -18,11 +18,16 @@ const messageSchema = new mongoose.Schema<MessageType>({
   date: {
     type: Date,
     required: true,
-    default: new Date(),
   },
   read: {
     type: Boolean,
     required: true,
+    default: false,
+  },
+  pin: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 });
 

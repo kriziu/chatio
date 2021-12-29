@@ -28,6 +28,7 @@ declare global {
     connectionId: string;
     date: Date;
     read: boolean;
+    pin: boolean;
     _id: string;
   }
 }

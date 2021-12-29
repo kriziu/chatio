@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import { useEffect } from 'react';
 
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -24,6 +25,10 @@ const Login: NextPage = () => {
   );
 
   const { email, password } = formData;
+
+  useEffect(() => {
+    router.prefetch('/profile');
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -9,7 +9,7 @@ import { Header3 } from 'components/Simple/Headers';
 
 const Settings = styled(Background)<{ opened: boolean }>`
   margin-top: -2rem;
-  z-index: 11;
+  z-index: 15;
   transition: transform 0.4s ease;
   transform: ${({ opened }) =>
     !opened ? 'translateY(-100%)' : 'translateY(0)'};

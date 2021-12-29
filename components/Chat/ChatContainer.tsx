@@ -2,10 +2,12 @@ import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
 import axios from 'axios';
+import { BsChevronDown } from 'react-icons/bs';
 
 import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
 import useWindowSize from 'hooks/useWindowSize';
+import { Button } from 'components/Simple/Button';
 
 const Container = styled.ul<{ height: number }>`
   display: flex;
@@ -38,6 +40,7 @@ const Message = styled.p<{ mine?: boolean; read?: boolean }>`
   width: max-content;
   border-radius: 2rem;
   position: relative;
+  word-break: break-all;
 
   ::after {
     display: block;
@@ -55,11 +58,27 @@ const Message = styled.p<{ mine?: boolean; read?: boolean }>`
   }
 `;
 
+const DownContainer = styled.div<{ shown: boolean }>`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  bottom: 0;
+  left: 0;
+  margin-left: 50%;
+  transform: ${({ shown }) =>
+      shown ? 'translateY(-10rem)' : 'translateY(100%)'}
+    translateX(-50%);
+  transition: transform 0.3s ease;
+`;
+
 interface Props {
   messages: MessageType[];
 }
 
 let lastTimeOut: NodeJS.Timeout;
+let first = true;
+let prevMessages: MessageType[] = [];
 
 const ChatContainer: FC<Props> = ({ messages }) => {
   const {
@@ -69,6 +88,8 @@ const ChatContainer: FC<Props> = ({ messages }) => {
 
   const [obs, setObs] = useState<IntersectionObserver>();
   const [touched, setTouched] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [counter, setCounter] = useState(0);
 
   const ref = useRef<HTMLUListElement>(null);
   const messagesRef = useRef<HTMLParagraphElement[]>([]);
@@ -102,7 +123,51 @@ const ChatContainer: FC<Props> = ({ messages }) => {
         }
       )
     );
+
+    prevMessages.length !== messages.length && setCounter(counter + 1);
+
+    if (
+      ref.current &&
+      (ref.current.scrollHeight - ref.current.scrollTop <
+        ref.current.clientHeight + 200 ||
+        first)
+    ) {
+      ref.current.scrollTo({
+        top: ref.current.scrollHeight,
+      });
+    } else if (prevMessages.length !== messages.length) {
+      setShown(true);
+    }
+
+    prevMessages = messages;
+
+    if (ref.current && ref.current.scrollHeight > 0) first = false;
   }, [messages, _id]);
+
+  useEffect(() => {
+    const ifsetShown = () => {
+      if (
+        ref.current &&
+        ref.current.scrollHeight - ref.current.scrollTop >
+          ref.current.clientHeight + 1000
+      )
+        setShown(true);
+      else if (
+        ref.current &&
+        ref.current.scrollHeight - ref.current.scrollTop <=
+          ref.current.clientHeight
+      ) {
+        setShown(false);
+        setCounter(0);
+      }
+    };
+
+    ref.current?.addEventListener('scroll', ifsetShown);
+
+    return () => {
+      ref.current?.removeEventListener('scroll', ifsetShown);
+    };
+  }, [ref.current]);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {
@@ -114,19 +179,6 @@ const ChatContainer: FC<Props> = ({ messages }) => {
       };
     }
   }, [obs, messages]);
-
-  useEffect(() => {
-    if (
-      ref.current &&
-      (ref.current.scrollHeight - ref.current.scrollTop <
-        ref.current.clientHeight + 100 ||
-        messages[messages.length - 1].sender._id === _id)
-    ) {
-      ref.current.scrollTo({
-        top: ref.current.scrollHeight,
-      });
-    }
-  }, [messages]);
 
   return (
     <Container
@@ -144,6 +196,8 @@ const ChatContainer: FC<Props> = ({ messages }) => {
               ref={el => el && (messagesRef.current[index] = el)}
               id={message._id}
               read={arr[index + 1]?.read ? false : message.read}
+              onMouseEnter={() => setTouched(true)}
+              onMouseLeave={() => setTouched(false)}
             >
               {message.message}
             </Message>
@@ -154,12 +208,30 @@ const ChatContainer: FC<Props> = ({ messages }) => {
                 color: touched ? 'white' : 'transparent',
               }}
             >
-              {new Date(message.date).getHours()}:
-              {new Date(message.date).getMinutes()}
+              {(new Date(message.date).getHours() < 10 ? '0' : '') +
+                new Date(message.date).getHours()}
+              :
+              {(new Date(message.date).getMinutes() < 10 ? '0' : '') +
+                new Date(message.date).getMinutes()}
             </p>
           </MessageContainer>
         );
       })}
+      <DownContainer shown={shown}>
+        New messages: {counter}
+        <Button
+          onClick={() => {
+            ref.current &&
+              ref.current.scrollTo({
+                top: ref.current.scrollHeight,
+                behavior: 'smooth',
+              });
+          }}
+          icon
+        >
+          <BsChevronDown />
+        </Button>
+      </DownContainer>
     </Container>
   );
 };

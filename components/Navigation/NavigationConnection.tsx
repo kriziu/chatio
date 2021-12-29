@@ -12,16 +12,27 @@ import { focusClick } from 'lib/utility';
 import { userContext } from 'context/userContext';
 import { getUserFromIds } from 'lib/ids';
 import axios from 'axios';
+import useSWR from 'swr';
+import styled from '@emotion/styled';
 
 import { connectionsContext } from 'context/connectionsContext';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header4, Header5 } from 'components/Simple/Headers';
 
+const StyledHeader = styled(Header5)`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 20rem;
+`;
+
 interface Props {
   connection: CConnectionType;
   setOpened: React.Dispatch<SetStateAction<boolean>>;
 }
+
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   const {
@@ -30,8 +41,13 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   const { channels } = useContext(connectionsContext);
 
   const router = useRouter();
+
   const [message, setMessage] = useState<MessageType[]>();
 
+  const { data, error } = useSWR<MessageType[]>(
+    connection._id ? `/api/message/${connection._id}?latest=true` : null,
+    fetcher
+  );
   const user = getUserFromIds(connection, _id);
 
   useEffect(() => {
@@ -58,10 +74,8 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   }, [connection, channels]);
 
   useEffect(() => {
-    axios
-      .get<MessageType[]>(`/api/message/${connection._id}?latest=true`)
-      .then(res => setMessage(res.data));
-  }, [connection._id]);
+    data && setMessage(data);
+  }, [data]);
 
   return (
     <li key={user._id}>
@@ -92,7 +106,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
             <Header4>
               {user.fName} {user.lName}
             </Header4>
-            <Header5
+            <StyledHeader
               style={
                 message
                   ? message[0]?.sender._id !== _id
@@ -105,7 +119,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
             >
               {message && message[0]?.sender._id === _id ? 'You: ' : ''}{' '}
               {message && message[0]?.message}
-            </Header5>
+            </StyledHeader>
           </Flex>
         </Flex>
       </Link>

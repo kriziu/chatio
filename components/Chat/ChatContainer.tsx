@@ -153,8 +153,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
       if (
         ref.current &&
         ref.current.scrollHeight - ref.current.scrollTop >
-          ref.current.clientHeight + 1000 &&
-        !first
+          ref.current.clientHeight + 1000
       )
         setShown(true);
       else if (

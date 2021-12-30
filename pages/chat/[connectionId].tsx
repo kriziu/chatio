@@ -7,13 +7,13 @@ import { BiSend } from 'react-icons/bi';
 import useSWR from 'swr';
 import { ClipLoader } from 'react-spinners';
 import { useSwipeable } from 'react-swipeable';
+import { PresenceChannel } from 'pusher-js';
 
 import { Button } from 'components/Simple/Button';
 import { userContext } from 'context/userContext';
 import ChatContainer from 'components/Chat/ChatContainer';
 import { Flex } from 'components/Simple/Flex';
 import { getUserFromIds } from 'lib/ids';
-import pusherJs from 'pusher-js';
 import ChatSettings from 'components/Chat/ChatSettings';
 import ChatTop from 'components/Chat/ChatTop';
 import { Input } from 'components/Simple/Input';
@@ -30,8 +30,10 @@ const Chat: NextPage = () => {
   const connectionId = router.query.connectionId as string;
 
   const [settings, setSettings] = useState(false);
+  const [active, setActive] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [message, setMessage] = useState('');
+  const [channel, setChannel] = useState<PresenceChannel>();
 
   const { data, error } = useSWR<CConnectionType>(
     connectionId && `/api/connection?id=${connectionId}`,
@@ -50,33 +52,51 @@ const Chat: NextPage = () => {
   }, [fetchedMessages.data]);
 
   useEffect(() => {
-    channels.forEach(channel => {
-      if (channel.name.slice(8) === connectionId) {
-        channel.bind('new_msg', (data: MessageType) => {
-          setMessages(prev => [...prev, data]);
-        });
-
-        channel.bind('read_msg', (data: MessageType) => {
-          setMessages(prev => {
-            return prev.map(pre => {
-              return new Date(pre.date).getTime() <=
-                new Date(data.date).getTime()
-                ? { ...pre, read: true }
-                : pre;
-            });
-          });
-        });
+    channels.forEach(channel1 => {
+      if (channel1.name.slice(9) === connectionId) {
+        setChannel(channel1);
       }
     });
-    return () => {
-      channels.forEach(channel => {
-        if (channel.name.slice(8) === connectionId) {
-          channel.unbind('new_msg');
-          channel.unbind('read_msg');
-        }
-      });
-    };
   }, [connectionId, channels]);
+
+  useEffect(() => {
+    if (channel) {
+      if (channel.members.count >= 2) setActive(true);
+
+      channel.bind('new_msg', (data: MessageType) => {
+        setMessages(prev => [...prev, data]);
+      });
+
+      channel.bind('read_msg', (data: MessageType) => {
+        setMessages(prev => {
+          return prev.map(pre => {
+            return new Date(pre.date).getTime() <= new Date(data.date).getTime()
+              ? { ...pre, read: true }
+              : pre;
+          });
+        });
+      });
+
+      channel.bind('pusher:member_added', () => {
+        setActive(true);
+      });
+
+      channel.bind('pusher:member_removed', () => {
+        if (channel.members.count < 2) setActive(false);
+      });
+
+      return () => {
+        channels.forEach(channel => {
+          if (channel.name.slice(9) === connectionId) {
+            channel.unbind('new_msg');
+            channel.unbind('read_msg');
+            channel.unbind('pusher:member_added');
+            channel.unbind('pusher:member_removed');
+          }
+        });
+      };
+    }
+  }, [channel, channel?.members.count]);
 
   const handlersToOpen = useSwipeable({
     onSwipedDown() {
@@ -120,9 +140,11 @@ const Chat: NextPage = () => {
         secondUser={secondUser}
         handlersToOpen={handlersToOpen}
         setOpened={setSettings}
+        active={active}
       />
 
-      <ChatContainer messages={messages} />
+      <ChatContainer messages={messages} connectionId={connectionId} />
+
       <form
         onSubmit={e => {
           e.preventDefault();

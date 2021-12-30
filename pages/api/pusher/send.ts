@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     date: new Date(),
   });
 
-  await pusher.trigger(`private-${connectionId}`, 'new_msg', newMessage);
+  await pusher.trigger(`presence-${connectionId}`, 'new_msg', newMessage);
   await newMessage.save();
 
   res.json({ message: 'completed' });

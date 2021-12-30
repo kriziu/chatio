@@ -3,6 +3,7 @@ import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
+import { AnimatePresence, m } from 'framer-motion';
 
 import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
@@ -10,9 +11,7 @@ import useWindowSize from 'hooks/useWindowSize';
 import { Button } from 'components/Simple/Button';
 
 const Container = styled.ul<{ height: number }>`
-  display: flex;
   height: ${({ height }) => `calc(${height}px - 17rem)`};
-  flex-direction: column;
   padding: 0 2rem;
   margin-top: 2rem;
 
@@ -74,12 +73,13 @@ const DownContainer = styled.div<{ shown: boolean }>`
 
 interface Props {
   messages: MessageType[];
+  connectionId: string;
 }
 
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages: MessageType[] = [];
 
-const ChatContainer: FC<Props> = ({ messages }) => {
+const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
   const {
     user: { _id },
   } = useContext(userContext);
@@ -103,12 +103,12 @@ const ChatContainer: FC<Props> = ({ messages }) => {
               prev => prev._id === e[e.length - 1].target.id
             )[0];
 
-            if (!msg.read && msg.sender._id !== _id) {
+            if (!msg?.read && msg?.sender._id !== _id) {
               clearTimeout(lastTimeOut);
 
               lastTimeOut = setTimeout(() => {
                 axios.post(
-                  `/api/pusher/read?connectionId=${msg.connectionId}`,
+                  `/api/pusher/read?connectionId=${connectionId}`,
                   {
                     msg,
                   },
@@ -130,11 +130,10 @@ const ChatContainer: FC<Props> = ({ messages }) => {
 
     if (
       ref.current &&
-      ((ref.current.scrollHeight - ref.current.scrollTop <
-        ref.current.clientHeight + 200 &&
-        noNewMsg) ||
-        first ||
-        messages[messages.length - 1].sender._id === _id)
+      (ref.current.scrollHeight - ref.current.scrollTop <
+        ref.current.clientHeight + 200 ||
+        noNewMsg ||
+        messages[messages.length - 1]?.sender._id === _id)
     ) {
       ref.current.scrollTo({
         top: ref.current.scrollHeight,
@@ -145,15 +144,17 @@ const ChatContainer: FC<Props> = ({ messages }) => {
 
     prevMessages = messages;
 
-    if (ref.current && ref.current.scrollHeight > 0) setFirst(false);
-  }, [messages, _id, counter, first]);
+    if (ref.current && ref.current.scrollTop > 0) setFirst(false);
+    else setFirst(true);
+  }, [messages, _id, counter, first, connectionId]);
 
   useEffect(() => {
     const ifsetShown = () => {
       if (
         ref.current &&
         ref.current.scrollHeight - ref.current.scrollTop >
-          ref.current.clientHeight + 1000
+          ref.current.clientHeight + 1000 &&
+        !first
       )
         setShown(true);
       else if (
@@ -195,36 +196,49 @@ const ChatContainer: FC<Props> = ({ messages }) => {
       onTouchStart={() => setTouched(true)}
       onTouchEnd={() => setTouched(false)}
     >
-      {messages.map((message, index, arr) => {
-        const mine = message.sender._id === _id;
-        return (
-          <MessageContainer key={message._id} mine={mine}>
-            <Message
-              mine={mine}
-              ref={el => el && (messagesRef.current[index] = el)}
-              id={message._id}
-              read={arr[index + 1]?.read ? false : message.read}
-              onMouseEnter={() => setTouched(true)}
-              onMouseLeave={() => setTouched(false)}
-            >
-              {message.message}
-            </Message>
+      <AnimatePresence>
+        <m.div
+          initial={{ y: -300, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 300, opacity: 0 }}
+          transition={{
+            duration: 0.2,
+          }}
+          style={{ display: 'flex', flexDirection: 'column' }}
+          key={connectionId}
+        >
+          {messages.map((message, index, arr) => {
+            const mine = message.sender._id === _id;
+            return (
+              <MessageContainer key={message._id} mine={mine}>
+                <Message
+                  mine={mine}
+                  ref={el => el && (messagesRef.current[index] = el)}
+                  id={message._id}
+                  read={arr[index + 1]?.read ? false : message.read}
+                  onMouseEnter={() => setTouched(true)}
+                  onMouseLeave={() => setTouched(false)}
+                >
+                  {message.message}
+                </Message>
 
-            <p
-              style={{
-                margin: '0 1rem',
-                color: touched ? 'white' : 'transparent',
-              }}
-            >
-              {(new Date(message.date).getHours() < 10 ? '0' : '') +
-                new Date(message.date).getHours()}
-              :
-              {(new Date(message.date).getMinutes() < 10 ? '0' : '') +
-                new Date(message.date).getMinutes()}
-            </p>
-          </MessageContainer>
-        );
-      })}
+                <p
+                  style={{
+                    margin: '0 1rem',
+                    color: touched ? 'white' : 'transparent',
+                  }}
+                >
+                  {(new Date(message.date).getHours() < 10 ? '0' : '') +
+                    new Date(message.date).getHours()}
+                  :
+                  {(new Date(message.date).getMinutes() < 10 ? '0' : '') +
+                    new Date(message.date).getMinutes()}
+                </p>
+              </MessageContainer>
+            );
+          })}
+        </m.div>
+      </AnimatePresence>
       <DownContainer shown={shown}>
         New messages: {counter}
         <Button

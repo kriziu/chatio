@@ -91,10 +91,14 @@ const Login: NextPage = () => {
         }}
       >
         <Link href="/login">
-          <a style={{ color: 'var(--color-gray)' }}>Lost password</a>
+          <a
+            style={{ color: 'var(--color-gray)', textDecoration: 'underline' }}
+          >
+            Lost password
+          </a>
         </Link>
         <Link href="/register">
-          <a>Register</a>
+          <a style={{ textDecoration: 'underline' }}>Register</a>
         </Link>
       </Flex>
     </Flex>

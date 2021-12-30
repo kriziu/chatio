@@ -41,7 +41,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       read: true,
     };
 
-    await pusher.trigger(`private-${connectionId}`, 'read_msg', readMessage);
+    await pusher.trigger(`presence-${connectionId}`, 'read_msg', readMessage);
     return res.status(200).json(readMessage);
   } catch (err) {
     const msg = (err as Error).message;

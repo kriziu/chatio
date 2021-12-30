@@ -1,8 +1,9 @@
 import { createContext, FC, useEffect, useState } from 'react';
-import pusherJs, { Channel } from 'pusher-js';
+import pusherJs, { PresenceChannel } from 'pusher-js';
+import axios from 'axios';
 
 export const connectionsContext = createContext<{
-  channels: Channel[];
+  channels: PresenceChannel[];
   setConnections: React.Dispatch<React.SetStateAction<CConnectionType[]>>;
 }>({ channels: [], setConnections: () => {} });
 
@@ -16,19 +17,22 @@ export const pusher = new pusherJs(
 
 const ConnectionsProvider: FC = ({ children }) => {
   const [connections, setConnections] = useState<CConnectionType[]>([]);
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const [channels, setChannels] = useState<PresenceChannel[]>([]);
 
   useEffect(() => {
     setChannels([]);
 
     connections.forEach(connection => {
-      const channel = pusher.subscribe(`private-${connection._id}`);
+      const channel = pusher.subscribe(
+        `presence-${connection._id}`
+      ) as PresenceChannel;
+
       setChannels(prev => [...prev, channel]);
     });
 
     return () => {
       connections.forEach(connection => {
-        pusher.unsubscribe(`private-${connection._id}`);
+        pusher.unsubscribe(`presence-${connection._id}`);
       });
     };
   }, [connections]);

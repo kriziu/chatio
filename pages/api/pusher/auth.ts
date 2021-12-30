@@ -15,10 +15,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     lName: string;
   };
 
-  const randomString = Math.random().toString(36).slice(2);
-
   const presenceData = {
-    user_id: randomString,
+    user_id: _id,
     user_info: {
       username: fName + ' ' + lName,
     },
@@ -26,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const connection = await connectionModel.findById(
-      (channel_name as string).slice(8)
+      (channel_name as string).slice(9)
     );
 
     let access = false;

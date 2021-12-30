@@ -118,7 +118,9 @@ const Register: NextPage = () => {
         }}
       >
         <Link href="/login">
-          <a style={{ marginLeft: '20rem' }}>Login</a>
+          <a style={{ marginLeft: '20rem', textDecoration: 'underline' }}>
+            Login
+          </a>
         </Link>
       </Flex>
     </Flex>

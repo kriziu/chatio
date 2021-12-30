@@ -8,17 +8,18 @@ import React, {
 import Link from 'next/link';
 
 import { useRouter } from 'next/router';
-import { focusClick } from 'lib/utility';
-import { userContext } from 'context/userContext';
-import { getUserFromIds } from 'lib/ids';
 import axios from 'axios';
 import useSWR from 'swr';
 import styled from '@emotion/styled';
+import { PresenceChannel } from 'pusher-js';
 
 import { connectionsContext } from 'context/connectionsContext';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header4, Header5 } from 'components/Simple/Headers';
+import { focusClick } from 'lib/utility';
+import { userContext } from 'context/userContext';
+import { getUserFromIds } from 'lib/ids';
 
 const StyledHeader = styled(Header5)`
   text-overflow: ellipsis;
@@ -43,6 +44,8 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   const router = useRouter();
 
   const [message, setMessage] = useState<MessageType[]>();
+  const [active, setActive] = useState(false);
+  const [channel, setChannel] = useState<PresenceChannel>();
 
   const { data, error } = useSWR<MessageType[]>(
     connection._id ? `/api/message/${connection._id}?latest=true` : null,
@@ -51,27 +54,43 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   const user = getUserFromIds(connection, _id);
 
   useEffect(() => {
-    channels.forEach(channel => {
-      if (channel.name.slice(8) === connection._id) {
-        channel.bind('new_msg', (data: MessageType) => {
-          setMessage([data]);
-        });
-
-        channel.bind('read_msg', (data: MessageType) => {
-          setMessage([data]);
-        });
-      }
+    channels.forEach(channel1 => {
+      if (channel1.name.slice(9) === connection._id) setChannel(channel1);
     });
-
-    return () => {
-      channels.forEach(channel => {
-        if (channel.name.slice(8) === connection._id) {
-          channel.unbind('new_msg');
-          channel.unbind('read_msg');
-        }
-      });
-    };
   }, [connection, channels]);
+
+  useEffect(() => {
+    if (channel) {
+      if (channel.members.count >= 2) setActive(true);
+
+      channel.bind('new_msg', (data: MessageType) => {
+        setMessage([data]);
+      });
+
+      channel.bind('read_msg', (data: MessageType) => {
+        setMessage([data]);
+      });
+
+      channel.bind('pusher:member_added', (member: any) => {
+        setActive(true);
+      });
+
+      channel.bind('pusher:member_removed', () => {
+        if (channel.members.count < 2) setActive(false);
+      });
+
+      return () => {
+        channels.forEach(channel => {
+          if (channel.name.slice(9) === connection._id) {
+            channel.unbind('new_msg');
+            channel.unbind('read_msg');
+            channel.unbind('pusher:member_added');
+            channel.unbind('pusher:member_removed');
+          }
+        });
+      };
+    }
+  }, [channel, channel?.members.count]);
 
   useEffect(() => {
     data && setMessage(data);
@@ -94,7 +113,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
           }
           tabIndex={0}
         >
-          <AvatarSmall />
+          <AvatarSmall active={active} />
           <Flex
             style={{
               flexDirection: 'column',

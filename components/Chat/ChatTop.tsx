@@ -10,9 +10,15 @@ interface Props {
   setOpened: Dispatch<SetStateAction<boolean>>;
   secondUser: UserType;
   handlersToOpen: any;
+  active: boolean;
 }
 
-const ChatTop: FC<Props> = ({ setOpened, secondUser, handlersToOpen }) => {
+const ChatTop: FC<Props> = ({
+  setOpened,
+  secondUser,
+  handlersToOpen,
+  active,
+}) => {
   return (
     <Flex
       style={{
@@ -24,7 +30,7 @@ const ChatTop: FC<Props> = ({ setOpened, secondUser, handlersToOpen }) => {
       {...handlersToOpen}
     >
       <Flex style={{ marginLeft: '4rem' }}>
-        <AvatarSmall active />
+        <AvatarSmall active={active} />
         <Header4
           style={{
             width: 'min-content',

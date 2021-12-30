@@ -29,10 +29,6 @@ const Register: NextPage = () => {
 
   const { fName, lName, email, password, checkPassword } = formData;
 
-  useEffect(() => {
-    router.prefetch('/profile');
-  }, [router]);
-
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!checkValidity()) return;
@@ -54,7 +50,7 @@ const Register: NextPage = () => {
       })
       .then(res => {
         if (res.status === 201) {
-          router.push('/profile');
+          router.push('/');
         }
       })
       .catch(() => {

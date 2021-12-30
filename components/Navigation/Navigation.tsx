@@ -104,60 +104,64 @@ const Navigation: FC = () => {
   return (
     <>
       {show && (
-        <NavBtn onClick={() => setOpened(!opened)}>
-          <NavBtnIcon opened={opened} />
-        </NavBtn>
-      )}
-      <NavBackground
-        opened={opened}
-        w="32rem"
-        h="100vh"
-        ref={back}
-        style={{ maxWidth: '100vw' }}
-      >
-        <Link href="/profile">
-          <a>
-            <Top
-              onClick={() => {
-                setOpened(false);
-              }}
-            >
-              <Avatar />
-              <Header2>Your profile</Header2>
-            </Top>
-          </a>
-        </Link>
+        <>
+          <NavBtn onClick={() => setOpened(!opened)}>
+            <NavBtnIcon opened={opened} />
+          </NavBtn>
+          <NavBackground
+            opened={opened}
+            w="32rem"
+            h="100vh"
+            ref={back}
+            style={{ maxWidth: '100vw' }}
+          >
+            <Link href="/">
+              <a>
+                <Top
+                  onClick={() => {
+                    setOpened(false);
+                  }}
+                >
+                  <Avatar />
+                  <Header2>Your profile</Header2>
+                </Top>
+              </a>
+            </Link>
 
-        <Flex style={{ justifyContent: 'space-between', marginTop: '2rem' }}>
-          <Input
-            placeholder="Search..."
-            style={{ width: '80%' }}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <Link href="/find" passHref>
-            <Button
-              icon
-              style={{ width: 'max-content' }}
-              onClick={() => {
-                setOpened(false);
-              }}
-              as="a"
+            <Flex
+              style={{ justifyContent: 'space-between', marginTop: '2rem' }}
             >
-              <AiOutlineUserAdd />
-            </Button>
-          </Link>
-        </Flex>
-        <Flex
-          as="ul"
-          style={{
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          }}
-        >
-          {renderConnections()}
-        </Flex>
-      </NavBackground>
+              <Input
+                placeholder="Search..."
+                style={{ width: '80%' }}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+              <Link href="/find" passHref>
+                <Button
+                  icon
+                  style={{ width: 'max-content' }}
+                  onClick={() => {
+                    setOpened(false);
+                  }}
+                  as="a"
+                >
+                  <AiOutlineUserAdd />
+                </Button>
+              </Link>
+            </Flex>
+            <Flex
+              as="ul"
+              style={{
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+              }}
+            >
+              {renderConnections()}
+            </Flex>
+          </NavBackground>
+        </>
+      )}
     </>
   );
 };

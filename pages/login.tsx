@@ -26,10 +26,6 @@ const Login: NextPage = () => {
 
   const { email, password } = formData;
 
-  useEffect(() => {
-    router.prefetch('/profile');
-  }, [router]);
-
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!checkValidity()) return;
@@ -45,7 +41,8 @@ const Login: NextPage = () => {
       })
       .then(res => {
         if (res.status === 200) {
-          router.push('/profile');
+          console.log('1');
+          router.push('/');
         }
       })
       .catch(err => {

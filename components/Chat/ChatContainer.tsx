@@ -77,7 +77,6 @@ interface Props {
 }
 
 let lastTimeOut: NodeJS.Timeout;
-let first = true;
 let prevMessages: MessageType[] = [];
 
 const ChatContainer: FC<Props> = ({ messages }) => {
@@ -89,6 +88,7 @@ const ChatContainer: FC<Props> = ({ messages }) => {
   const [obs, setObs] = useState<IntersectionObserver>();
   const [touched, setTouched] = useState(false);
   const [shown, setShown] = useState(false);
+  const [first, setFirst] = useState(true);
   const [counter, setCounter] = useState(0);
 
   const ref = useRef<HTMLUListElement>(null);
@@ -124,13 +124,17 @@ const ChatContainer: FC<Props> = ({ messages }) => {
       )
     );
 
-    prevMessages.length !== messages.length && setCounter(counter + 1);
+    const noNewMsg = prevMessages.length !== messages.length;
+
+    noNewMsg && setCounter(counter + 1);
 
     if (
       ref.current &&
-      (ref.current.scrollHeight - ref.current.scrollTop <
-        ref.current.clientHeight + 200 ||
-        first)
+      ((ref.current.scrollHeight - ref.current.scrollTop <
+        ref.current.clientHeight + 200 &&
+        noNewMsg) ||
+        first ||
+        messages[messages.length - 1].sender._id === _id)
     ) {
       ref.current.scrollTo({
         top: ref.current.scrollHeight,
@@ -141,8 +145,8 @@ const ChatContainer: FC<Props> = ({ messages }) => {
 
     prevMessages = messages;
 
-    if (ref.current && ref.current.scrollHeight > 0) first = false;
-  }, [messages, _id]);
+    if (ref.current && ref.current.scrollHeight > 0) setFirst(false);
+  }, [messages, _id, counter, first]);
 
   useEffect(() => {
     const ifsetShown = () => {
@@ -162,12 +166,16 @@ const ChatContainer: FC<Props> = ({ messages }) => {
       }
     };
 
-    ref.current?.addEventListener('scroll', ifsetShown);
+    if (ref.current) {
+      const el = ref.current;
 
-    return () => {
-      ref.current?.removeEventListener('scroll', ifsetShown);
-    };
-  }, [ref.current]);
+      el.addEventListener('scroll', ifsetShown);
+
+      return () => {
+        el.removeEventListener('scroll', ifsetShown);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {

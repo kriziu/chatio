@@ -20,6 +20,10 @@ declare global {
     _id: string;
     users: UserType[];
     group: boolean;
+    blocked: {
+      by: string | null;
+      yes: boolean;
+    };
   }
 
   interface MessageType {

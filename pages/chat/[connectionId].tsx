@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { BiSend } from 'react-icons/bi';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { ClipLoader } from 'react-spinners';
 import { useSwipeable } from 'react-swipeable';
 import { PresenceChannel } from 'pusher-js';
@@ -18,13 +18,14 @@ import ChatSettings from 'components/Chat/ChatSettings';
 import ChatTop from 'components/Chat/ChatTop';
 import { Input } from 'components/Simple/Input';
 import { connectionsContext } from 'context/connectionsContext';
+import { Header3 } from 'components/Simple/Headers';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
   const { _id } = user;
-  const { channels } = useContext(connectionsContext);
+  const { channels, setConnections } = useContext(connectionsContext);
 
   const router = useRouter();
   const connectionId = router.query.connectionId as string;
@@ -60,10 +61,12 @@ const Chat: NextPage = () => {
   }, [connectionId, channels]);
 
   useEffect(() => {
+    console.log(channel);
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
 
       channel.bind('new_msg', (data: MessageType) => {
+        console.log('2');
         setMessages(prev => [...prev, data]);
       });
 
@@ -75,6 +78,14 @@ const Chat: NextPage = () => {
               : pre;
           });
         });
+      });
+
+      channel.bind('delete_connection', () => {
+        router.push('/');
+      });
+
+      channel.bind('block_connection', () => {
+        mutate(`/api/connection?id=${connectionId}`);
       });
 
       channel.bind('pusher:member_added', () => {
@@ -90,13 +101,14 @@ const Chat: NextPage = () => {
           if (channel.name.slice(9) === connectionId) {
             channel.unbind('new_msg');
             channel.unbind('read_msg');
+            channel.unbind('delete_connection');
             channel.unbind('pusher:member_added');
             channel.unbind('pusher:member_removed');
           }
         });
       };
     }
-  }, [channel, channel?.members.count]);
+  }, [channel, channel?.members.count, channels, connectionId, router]);
 
   const handlersToOpen = useSwipeable({
     onSwipedDown() {
@@ -120,12 +132,6 @@ const Chat: NextPage = () => {
 
   const secondUser = getUserFromIds(data, _id);
 
-  const deleteConnection = () => {
-    axios.delete('/api/connection?id=' + connectionId).then(() => {
-      router.push('/profile');
-    });
-  };
-
   return (
     <>
       <ChatSettings
@@ -133,7 +139,7 @@ const Chat: NextPage = () => {
         secondUser={secondUser}
         opened={settings}
         setOpened={setSettings}
-        deleteConnection={deleteConnection}
+        connectionId={connectionId}
       />
 
       <ChatTop
@@ -145,29 +151,33 @@ const Chat: NextPage = () => {
 
       <ChatContainer messages={messages} connectionId={connectionId} />
 
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          message &&
-            axios.post('/api/pusher/send', {
-              connectionId,
-              message,
-              sender: user,
-            });
-          setMessage('');
-        }}
-      >
-        <Flex style={{ paddingTop: '2rem' }}>
-          <Input
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            style={{ marginRight: '1rem', width: '75%' }}
-          />
-          <Button type="submit" icon>
-            <BiSend />
-          </Button>
-        </Flex>
-      </form>
+      {data.blocked.yes ? (
+        <Header3>Blocked</Header3>
+      ) : (
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            message &&
+              axios.post('/api/pusher/send', {
+                connectionId,
+                message,
+                sender: user,
+              });
+            setMessage('');
+          }}
+        >
+          <Flex style={{ paddingTop: '2rem' }}>
+            <Input
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              style={{ marginRight: '1rem', width: '75%' }}
+            />
+            <Button type="submit" icon>
+              <BiSend />
+            </Button>
+          </Flex>
+        </form>
+      )}
     </>
   );
 };

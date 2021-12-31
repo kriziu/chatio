@@ -124,15 +124,14 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
       )
     );
 
-    const noNewMsg = prevMessages.length !== messages.length;
-
-    noNewMsg && setCounter(counter + 1);
+    const newMsg = prevMessages.length !== messages.length;
+    newMsg && setCounter(prev => prev + 1);
 
     if (
       ref.current &&
       (ref.current.scrollHeight - ref.current.scrollTop <
         ref.current.clientHeight + 200 ||
-        noNewMsg ||
+        first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
       ref.current.scrollTo({
@@ -146,7 +145,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
 
     if (ref.current && ref.current.scrollTop > 0) setFirst(false);
     else setFirst(true);
-  }, [messages, _id, counter, first, connectionId]);
+  }, [messages, _id, first, connectionId]);
 
   useEffect(() => {
     const ifsetShown = () => {

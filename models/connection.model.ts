@@ -9,6 +9,10 @@ const connectionSchema = new mongoose.Schema<CConnectionType>({
     },
   ],
   group: { type: Boolean, require: true },
+  blocked: {
+    by: { type: String },
+    yes: { type: Boolean, required: true },
+  },
 });
 
 const connectionModel =

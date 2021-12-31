@@ -1,6 +1,5 @@
 import { createContext, FC, useEffect, useState } from 'react';
 import pusherJs, { PresenceChannel } from 'pusher-js';
-import axios from 'axios';
 
 export const connectionsContext = createContext<{
   channels: PresenceChannel[];
@@ -22,10 +21,17 @@ const ConnectionsProvider: FC = ({ children }) => {
   useEffect(() => {
     setChannels([]);
 
+    console.log(connections);
     connections.forEach(connection => {
       const channel = pusher.subscribe(
         `presence-${connection._id}`
       ) as PresenceChannel;
+
+      channel.bind('delete_connection', () =>
+        setConnections(prev =>
+          prev.filter(connection1 => connection1._id !== connection._id)
+        )
+      );
 
       setChannels(prev => [...prev, channel]);
     });
@@ -34,6 +40,8 @@ const ConnectionsProvider: FC = ({ children }) => {
       connections.forEach(connection => {
         pusher.unsubscribe(`presence-${connection._id}`);
       });
+
+      channels.forEach(channel => channel.unbind('delete'));
     };
   }, [connections]);
 

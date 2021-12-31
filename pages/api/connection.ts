@@ -39,12 +39,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // case 'PATCH':
       //   break;
 
-      case 'DELETE':
-        const connection = await connectionModel.findById(connId);
-
-        await connection?.delete();
-
-        return res.json(connection);
       default:
         return res.status(400).end();
     }

@@ -13,13 +13,12 @@ import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
 
 import { defaultUser, userContext } from 'context/userContext';
+import { connectionsContext } from 'context/connectionsContext';
 
 // TODO:
-// ANIMATE MESSAGES
+// ZAPRASZANIE I DODAWANIE NIE LACZY COS Z SOCKETEM
 // 1. DODAC TIMER DO ZAPOROSZEN DO REFRESHU (MOZNA KLIKNAC I ZROBI REFRESH) / PUSHER
-// !3. DODAC REMOVE_CONNECTION SOCKET I BLOCK_CONNECTION SOCKET NA PRZYSZLOSC
 // !4. PRZYPIECIE WIADOMOSCI (TAKI KOMUNIKAT Z GORY SIE WYSWIETLI I BEDZIE W OPCJACH A WIADOMOSC NA ZLOTO)
-// 5. SLIDERY TAKIE PRZESUWANE PALCEM LEPIEJ
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)
 // 3. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 
@@ -32,6 +31,7 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Profile: NextPage = () => {
   const { setUser } = useContext(userContext);
+  const { setConnections } = useContext(connectionsContext);
 
   const router = useRouter();
   const { mutate } = useSWRConfig();
@@ -84,12 +84,15 @@ const Profile: NextPage = () => {
                 icon
                 onClick={() =>
                   axios
-                    .patch('/api/invite', { inviteId: invite.inviteId })
-                    .then(() => {
+                    .patch<CConnectionType>('/api/invite', {
+                      inviteId: invite.inviteId,
+                    })
+                    .then(res => {
                       setInvites(prev =>
                         prev.filter(pre => pre.inviteId !== invite.inviteId)
                       );
-                      mutate('/api/connection');
+                      console.log(res.data);
+                      setConnections(prev => [...prev, res.data]);
                     })
                 }
               >
@@ -149,6 +152,7 @@ const Profile: NextPage = () => {
       <Button
         onClick={() => {
           setUser(defaultUser);
+          setConnections([]);
           axios.post('/api/auth/logout').then(res => router.push('/login'));
         }}
       >

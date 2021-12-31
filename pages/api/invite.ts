@@ -47,6 +47,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const newConnection = new connectionModel({
             users: [fromUser, toUser],
             group: false,
+            blocked: {
+              yes: false,
+              by: null,
+            },
           });
 
           await newConnection.save();

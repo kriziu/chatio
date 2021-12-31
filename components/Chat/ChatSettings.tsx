@@ -6,6 +6,8 @@ import { Background } from 'components/Simple/Background';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
+import axios from 'axios';
+import { errToast } from 'lib/toasts';
 
 const Settings = styled(Background)<{ opened: boolean }>`
   margin-top: -2rem;
@@ -20,7 +22,7 @@ interface Props {
   setOpened: Dispatch<SetStateAction<boolean>>;
   secondUser: UserType;
   handlersToClose: any;
-  deleteConnection: () => void;
+  connectionId: string;
 }
 
 const ChatSettings: FC<Props> = ({
@@ -28,7 +30,7 @@ const ChatSettings: FC<Props> = ({
   secondUser,
   handlersToClose,
   setOpened,
-  deleteConnection,
+  connectionId,
 }) => {
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToClose}>
@@ -52,7 +54,23 @@ const ChatSettings: FC<Props> = ({
       >
         <Header3
           style={{ color: 'var(--color-red)', cursor: 'pointer' }}
-          onClick={deleteConnection}
+          onClick={() => {
+            axios
+              .post('/api/pusher/block?connectionId=' + connectionId)
+              .catch(err => {
+                if (err.response.status === 403)
+                  errToast("You can't unblock conversation!");
+              });
+            setOpened(false);
+          }}
+        >
+          Block
+        </Header3>
+        <Header3
+          style={{ color: 'var(--color-red)', cursor: 'pointer' }}
+          onClick={() =>
+            axios.delete('/api/pusher/delete?connectionId=' + connectionId)
+          }
         >
           Delete
         </Header3>

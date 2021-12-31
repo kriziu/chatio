@@ -90,7 +90,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
         });
       };
     }
-  }, [channel, channel?.members.count]);
+  }, [channel, channel?.members.count, channels, connection._id]);
 
   useEffect(() => {
     data && setMessage(data);

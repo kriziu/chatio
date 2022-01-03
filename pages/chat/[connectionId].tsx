@@ -25,7 +25,7 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
   const { _id } = user;
-  const { channels, setConnections } = useContext(connectionsContext);
+  const { channels } = useContext(connectionsContext);
 
   const router = useRouter();
   const connectionId = router.query.connectionId as string;
@@ -65,12 +65,13 @@ const Chat: NextPage = () => {
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
 
-      channel.bind('new_msg', (data: MessageType) => {
+      const newMsgClb = (data: MessageType) => {
         console.log('2');
         setMessages(prev => [...prev, data]);
-      });
+      };
+      channel.bind('new_msg', newMsgClb);
 
-      channel.bind('read_msg', (data: MessageType) => {
+      const readMsgClb = (data: MessageType) => {
         setMessages(prev => {
           return prev.map(pre => {
             return new Date(pre.date).getTime() <= new Date(data.date).getTime()
@@ -78,37 +79,39 @@ const Chat: NextPage = () => {
               : pre;
           });
         });
-      });
+      };
+      channel.bind('read_msg', readMsgClb);
 
-      channel.bind('delete_connection', () => {
+      const delConnClb = () => {
         router.push('/');
-      });
+      };
+      channel.bind('delete_connection', delConnClb);
 
-      channel.bind('block_connection', () => {
+      const blockConnClb = () => {
         mutate(`/api/connection?id=${connectionId}`);
-      });
+      };
+      channel.bind('block_connection', blockConnClb);
 
-      channel.bind('pusher:member_added', () => {
+      const membAddClb = () => {
         setActive(true);
-      });
+      };
+      channel.bind('pusher:member_added', membAddClb);
 
-      channel.bind('pusher:member_removed', () => {
+      const membRmvClb = () => {
         if (channel.members.count < 2) setActive(false);
-      });
+      };
+      channel.bind('pusher:member_removed', membRmvClb);
 
       return () => {
-        channels.forEach(channel => {
-          if (channel.name.slice(9) === connectionId) {
-            channel.unbind('new_msg');
-            channel.unbind('read_msg');
-            channel.unbind('delete_connection');
-            channel.unbind('pusher:member_added');
-            channel.unbind('pusher:member_removed');
-          }
-        });
+        channel.unbind('new_msg', newMsgClb);
+        channel.unbind('read_msg', readMsgClb);
+        channel.unbind('delete_connection', delConnClb);
+        channel.unbind('block_connection', blockConnClb);
+        channel.unbind('pusher:member_added', membAddClb);
+        channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, channels, connectionId, router]);
+  }, [channel, channel?.members.count, router]);
 
   const handlersToOpen = useSwipeable({
     onSwipedDown() {

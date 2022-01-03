@@ -63,34 +63,30 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
 
-      channel.bind('new_msg', (data: MessageType) => {
+      const msgClb = (data: MessageType) => {
         setMessage([data]);
-      });
+      };
+      channel.bind('new_msg', msgClb);
+      channel.bind('read_msg', msgClb);
 
-      channel.bind('read_msg', (data: MessageType) => {
-        setMessage([data]);
-      });
-
-      channel.bind('pusher:member_added', (member: any) => {
+      const membAddClb = () => {
         setActive(true);
-      });
+      };
+      channel.bind('pusher:member_added', membAddClb);
 
-      channel.bind('pusher:member_removed', () => {
+      const membRmvClb = () => {
         if (channel.members.count < 2) setActive(false);
-      });
+      };
+      channel.bind('pusher:member_removed', membRmvClb);
 
       return () => {
-        channels.forEach(channel => {
-          if (channel.name.slice(9) === connection._id) {
-            channel.unbind('new_msg');
-            channel.unbind('read_msg');
-            channel.unbind('pusher:member_added');
-            channel.unbind('pusher:member_removed');
-          }
-        });
+        channel.unbind('new_msg', msgClb);
+        channel.unbind('read_msg', msgClb);
+        channel.unbind('pusher:member_added', membAddClb);
+        channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, channels, connection._id]);
+  }, [channel, channel?.members.count]);
 
   useEffect(() => {
     data && setMessage(data);

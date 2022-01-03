@@ -20,8 +20,6 @@ const ConnectionsProvider: FC = ({ children }) => {
 
   useEffect(() => {
     setChannels([]);
-
-    console.log(connections);
     connections.forEach(connection => {
       const channel = pusher.subscribe(
         `presence-${connection._id}`
@@ -37,11 +35,11 @@ const ConnectionsProvider: FC = ({ children }) => {
     });
 
     return () => {
+      channels.forEach(channel => channel.unbind('delete_connection'));
+
       connections.forEach(connection => {
         pusher.unsubscribe(`presence-${connection._id}`);
       });
-
-      channels.forEach(channel => channel.unbind('delete'));
     };
   }, [connections]);
 

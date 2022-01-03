@@ -23,6 +23,7 @@ interface Props {
   secondUser: UserType;
   handlersToClose: any;
   connectionId: string;
+  active: boolean;
 }
 
 const ChatSettings: FC<Props> = ({
@@ -31,11 +32,12 @@ const ChatSettings: FC<Props> = ({
   handlersToClose,
   setOpened,
   connectionId,
+  active,
 }) => {
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToClose}>
       <Flex style={{ marginTop: '2rem' }} onClick={() => setOpened(false)}>
-        <AvatarSmall active />
+        <AvatarSmall active={active} />
         <Header3
           style={{
             textAlign: 'left',

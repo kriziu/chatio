@@ -16,7 +16,6 @@ import { defaultUser, userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
 // TODO:
-// ZAPRASZANIE I DODAWANIE NIE LACZY COS Z SOCKETEM
 // !4. PRZYPIECIE WIADOMOSCI (TAKI KOMUNIKAT Z GORY SIE WYSWIETLI I BEDZIE W OPCJACH A WIADOMOSC NA ZLOTO)
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)
 // 3. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.

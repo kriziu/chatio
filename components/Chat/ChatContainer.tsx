@@ -3,12 +3,12 @@ import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
-import { AnimatePresence, m } from 'framer-motion';
 
 import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
 import useWindowSize from 'hooks/useWindowSize';
 import { Button } from 'components/Simple/Button';
+import MessageList from './MessageList';
 
 const Container = styled.ul<{ height: number }>`
   height: ${({ height }) => `calc(${height}px - 17rem)`};
@@ -16,45 +16,6 @@ const Container = styled.ul<{ height: number }>`
   margin-top: 2rem;
 
   ${scrollY}
-`;
-
-const MessageContainer = styled.li<{ mine: boolean }>`
-  display: flex;
-  align-items: center;
-  align-self: ${({ mine }) => (mine ? 'flex-end' : 'flex-start')};
-  flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
-
-  max-width: 80%;
-
-  :not(:first-of-type) {
-    margin-top: 2rem;
-  }
-`;
-
-const Message = styled.p<{ mine?: boolean; read?: boolean }>`
-  color: #eee;
-  padding: 1rem 1.5rem;
-  background-image: ${({ mine }) =>
-    mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
-  width: max-content;
-  border-radius: 2rem;
-  position: relative;
-  word-break: break-all;
-
-  ::after {
-    display: block;
-    content: ' ';
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background-color: ${({ mine, read }) =>
-      mine && read ? 'white' : 'transparent'};
-    position: absolute;
-    right: -1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.2s ease;
-  }
 `;
 
 const DownContainer = styled.div<{ shown: boolean }>`
@@ -194,49 +155,15 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
       onTouchStart={() => setTouched(true)}
       onTouchEnd={() => setTouched(false)}
     >
-      <AnimatePresence>
-        <m.div
-          initial={{ y: -300, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 300, opacity: 0 }}
-          transition={{
-            duration: 0.2,
-          }}
-          style={{ display: 'flex', flexDirection: 'column' }}
-          key={connectionId}
-        >
-          {messages.map((message, index, arr) => {
-            const mine = message.sender._id === _id;
-            return (
-              <MessageContainer key={message._id} mine={mine}>
-                <Message
-                  mine={mine}
-                  ref={el => el && (messagesRef.current[index] = el)}
-                  id={message._id}
-                  read={arr[index + 1]?.read ? false : message.read}
-                  onMouseEnter={() => setTouched(true)}
-                  onMouseLeave={() => setTouched(false)}
-                >
-                  {message.message}
-                </Message>
+      <MessageList
+        touched={touched}
+        messages={messages}
+        _id={_id}
+        messagesRef={messagesRef}
+        setTouched={setTouched}
+        connectionId={connectionId}
+      />
 
-                <p
-                  style={{
-                    margin: '0 1rem',
-                    color: touched ? 'white' : 'transparent',
-                  }}
-                >
-                  {(new Date(message.date).getHours() < 10 ? '0' : '') +
-                    new Date(message.date).getHours()}
-                  :
-                  {(new Date(message.date).getMinutes() < 10 ? '0' : '') +
-                    new Date(message.date).getMinutes()}
-                </p>
-              </MessageContainer>
-            );
-          })}
-        </m.div>
-      </AnimatePresence>
       <DownContainer shown={shown}>
         New messages: {counter}
         <Button

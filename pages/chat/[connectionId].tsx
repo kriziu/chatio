@@ -143,6 +143,7 @@ const Chat: NextPage = () => {
         opened={settings}
         setOpened={setSettings}
         connectionId={connectionId}
+        active={active}
       />
 
       <ChatTop

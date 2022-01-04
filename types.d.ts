@@ -34,6 +34,7 @@ declare global {
     read: boolean;
     pin: boolean;
     _id: string;
+    deleted: boolean;
   }
 }
 

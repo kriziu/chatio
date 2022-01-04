@@ -29,6 +29,11 @@ const messageSchema = new mongoose.Schema<MessageType>({
     required: true,
     default: false,
   },
+  deleted: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const messageModel =

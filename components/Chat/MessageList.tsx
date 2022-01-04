@@ -2,6 +2,8 @@ import { FC, useState } from 'react';
 
 import styled from '@emotion/styled';
 import { AnimatePresence, m } from 'framer-motion';
+import axios from 'axios';
+import { errToast } from 'lib/toasts';
 
 const MessageContainer = styled.li<{
   mine: boolean;
@@ -28,16 +30,23 @@ const MessageContainer = styled.li<{
   }
 `;
 
-const Message = styled.p<{ mine?: boolean; read?: boolean; pinned?: boolean }>`
+const Message = styled.p<{
+  mine?: boolean;
+  read?: boolean;
+  pinned?: boolean;
+  deleted?: boolean;
+}>`
   color: #eee;
   padding: 1rem 1.5rem;
-  background-image: ${({ mine }) =>
-    mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
+  background-image: ${({ mine, deleted }) =>
+    deleted ? 'none' : mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
   border: ${({ pinned }) => (pinned ? 2 : 0)}px solid white;
   width: max-content;
   border-radius: 2rem;
   position: relative;
   word-break: break-all;
+  user-select: none;
+  background-color: black;
 
   ::after {
     display: block;
@@ -60,14 +69,26 @@ const PinContainer = styled.div<{
   mine?: boolean;
   visible?: boolean;
 }>`
+  z-index: 5;
+
   opacity: ${({ visible }) => (visible ? 1 : 0)};
+  pointer-events: ${({ visible }) => (visible ? '' : 'none')};
   user-select: none;
   background-color: var(--color-gray-darker);
   border-radius: 2rem;
-  padding: 1rem 2rem;
+  padding: 1rem;
   position: absolute;
 
-  right: ${({ width, mine }) => (mine && width ? width + 10 : -20)}px;
+  right: ${({ width, mine }) => (mine && width ? width + 10 : -50)}px;
+
+  p {
+    padding: 1rem 0.5rem;
+    border-radius: 1rem;
+    :hover {
+      cursor: pointer;
+      background-color: black;
+    }
+  }
 `;
 
 interface Props {
@@ -80,6 +101,7 @@ interface Props {
 }
 
 let hover = false;
+let timeout: NodeJS.Timeout;
 
 const MessageList: FC<Props> = ({
   messages,
@@ -103,6 +125,7 @@ const MessageList: FC<Props> = ({
         style={{ display: 'flex', flexDirection: 'column' }}
         key={connectionId}
         onClick={() => setSelected(-1)}
+        onTouchMove={() => setSelected(-1)}
       >
         {messages.map((message, index, arr) => {
           const mine = message.sender._id === _id;
@@ -130,12 +153,15 @@ const MessageList: FC<Props> = ({
                   setTouched(false);
                   setTimeout(() => setSelected(index), 50);
                 }}
-                onMouseEnter={() => setSelected(index)}
+                onMouseEnter={() => {
+                  setSelected(index);
+                  timeout && clearTimeout(timeout);
+                }}
                 onMouseLeave={() =>
-                  setTimeout(
-                    () => !hover && selected !== index && setSelected(-1),
+                  (timeout = setTimeout(
+                    () => !hover && selected === index && setSelected(-1),
                     500
-                  )
+                  ))
                 }
                 title={
                   (new Date(message.date).getHours() < 10 ? '0' : '') +
@@ -144,8 +170,9 @@ const MessageList: FC<Props> = ({
                   (new Date(message.date).getMinutes() < 10 ? '0' : '') +
                   new Date(message.date).getMinutes()
                 }
+                deleted={message.deleted}
               >
-                {message.message}
+                {!message.deleted ? message.message : 'Deleted'}
               </Message>
               <PinContainer
                 width={
@@ -161,7 +188,22 @@ const MessageList: FC<Props> = ({
                   setSelected(-1);
                 }}
               >
-                Pin
+                <p>Pin</p>
+                <p>Copy</p>
+                <p
+                  onClick={() =>
+                    axios
+                      .delete(
+                        `/api/pusher/deleteMessage?messageId=${message._id}`
+                      )
+                      .catch(err => {
+                        if (err.response.status === 403)
+                          errToast('This is not your message!');
+                      })
+                  }
+                >
+                  Delete
+                </p>
               </PinContainer>
             </MessageContainer>
           );

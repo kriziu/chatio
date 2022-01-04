@@ -33,6 +33,8 @@ interface Props {
   setOpened: React.Dispatch<SetStateAction<boolean>>;
 }
 
+let tempMsg: MessageType;
+
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
@@ -64,10 +66,20 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
       if (channel.members.count >= 2) setActive(true);
 
       const msgClb = (data: MessageType) => {
+        console.log(data);
         setMessage([data]);
+        tempMsg = data;
       };
       channel.bind('new_msg', msgClb);
       channel.bind('read_msg', msgClb);
+
+      const delMsgClb = (id: string) => {
+        if (message && id === tempMsg._id)
+          setMessage(prev =>
+            prev ? [{ ...prev[0], message: '', deleted: true }] : prev
+          );
+      };
+      channel.bind('delete_msg', delMsgClb);
 
       const membAddClb = () => {
         setActive(true);
@@ -82,6 +94,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
       return () => {
         channel.unbind('new_msg', msgClb);
         channel.unbind('read_msg', msgClb);
+        channel.unbind('delete_msg', delMsgClb);
         channel.unbind('pusher:member_added', membAddClb);
         channel.unbind('pusher:member_removed', membRmvClb);
       };
@@ -89,7 +102,10 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
   }, [channel, channel?.members.count]);
 
   useEffect(() => {
-    data && setMessage(data);
+    if (data) {
+      setMessage(data);
+      tempMsg = data[0];
+    }
   }, [data]);
 
   return (
@@ -132,8 +148,14 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
                   : {}
               }
             >
-              {message && message[0]?.sender._id === _id ? 'You: ' : ''}{' '}
-              {message && message[0]?.message}
+              {message && message[0].deleted ? (
+                'Deleted'
+              ) : (
+                <>
+                  {message && message[0]?.sender._id === _id ? 'You: ' : ''}{' '}
+                  {message && message[0]?.message}
+                </>
+              )}
             </StyledHeader>
           </Flex>
         </Flex>

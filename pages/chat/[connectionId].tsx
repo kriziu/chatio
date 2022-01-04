@@ -82,6 +82,17 @@ const Chat: NextPage = () => {
       };
       channel.bind('read_msg', readMsgClb);
 
+      const delMsgClb = (id: string) => {
+        setMessages(prev =>
+          prev.map(message =>
+            message._id === id
+              ? { ...message, message: '', deleted: true }
+              : message
+          )
+        );
+      };
+      channel.bind('delete_msg', delMsgClb);
+
       const delConnClb = () => {
         router.push('/');
       };
@@ -105,6 +116,7 @@ const Chat: NextPage = () => {
       return () => {
         channel.unbind('new_msg', newMsgClb);
         channel.unbind('read_msg', readMsgClb);
+        channel.unbind('delete_message', delMsgClb);
         channel.unbind('delete_connection', delConnClb);
         channel.unbind('block_connection', blockConnClb);
         channel.unbind('pusher:member_added', membAddClb);

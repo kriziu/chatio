@@ -150,12 +150,16 @@ const MessageList: FC<Props> = ({
                 read={arr[index + 1]?.read ? false : message.read}
                 pinned={message.pin}
                 onClick={() => {
-                  setTouched(false);
-                  setTimeout(() => setSelected(index), 50);
+                  if (!message.deleted) {
+                    setTouched(false);
+                    setTimeout(() => setSelected(index), 50);
+                  }
                 }}
                 onMouseEnter={() => {
-                  setSelected(index);
-                  timeout && clearTimeout(timeout);
+                  if (!message.deleted) {
+                    setSelected(index);
+                    timeout && clearTimeout(timeout);
+                  }
                 }}
                 onMouseLeave={() =>
                   (timeout = setTimeout(
@@ -188,8 +192,18 @@ const MessageList: FC<Props> = ({
                   setSelected(-1);
                 }}
               >
-                <p>Pin</p>
-                <p>Copy</p>
+                <p
+                  onClick={() =>
+                    axios.delete(`/api/pusher/pin?messageId=${message._id}`)
+                  }
+                >
+                  Pin
+                </p>
+                <p
+                  onClick={() => navigator.clipboard.writeText(message.message)}
+                >
+                  Copy
+                </p>
                 <p
                   onClick={() =>
                     axios

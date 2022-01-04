@@ -15,7 +15,7 @@ const Container = styled.ul<{ height: number }>`
   padding: 0 2rem;
   margin-top: 2rem;
 
-  ${scrollY}
+  ${scrollY};
 `;
 
 const DownContainer = styled.div<{ shown: boolean }>`
@@ -90,6 +90,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
 
     if (
       ref.current &&
+      newMsg &&
       (ref.current.scrollHeight - ref.current.scrollTop <
         ref.current.clientHeight + 200 ||
         first ||

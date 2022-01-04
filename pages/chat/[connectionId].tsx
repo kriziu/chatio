@@ -61,7 +61,6 @@ const Chat: NextPage = () => {
   }, [connectionId, channels]);
 
   useEffect(() => {
-    console.log(channel);
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
 
@@ -93,6 +92,15 @@ const Chat: NextPage = () => {
       };
       channel.bind('delete_msg', delMsgClb);
 
+      const pinMsgClb = (id: string) => {
+        setMessages(prev =>
+          prev.map(message =>
+            message._id === id ? { ...message, pin: !message.pin } : message
+          )
+        );
+      };
+      channel.bind('pin_msg', pinMsgClb);
+
       const delConnClb = () => {
         router.push('/');
       };
@@ -117,6 +125,7 @@ const Chat: NextPage = () => {
         channel.unbind('new_msg', newMsgClb);
         channel.unbind('read_msg', readMsgClb);
         channel.unbind('delete_message', delMsgClb);
+        channel.unbind('pin_msg', pinMsgClb);
         channel.unbind('delete_connection', delConnClb);
         channel.unbind('block_connection', blockConnClb);
         channel.unbind('pusher:member_added', membAddClb);

@@ -35,9 +35,9 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
 
   return (
     <UserProvider>
+      <GlobalStyles />
       <ConnectionsProvider>
         <div style={{ overflow: 'hidden', width: '100vw' }}>
-          <GlobalStyles />
           <ToastContainer
             position="top-center"
             toastStyle={{

@@ -1,95 +1,16 @@
 import { FC, useState } from 'react';
 
-import styled from '@emotion/styled';
 import { AnimatePresence, m } from 'framer-motion';
 import axios from 'axios';
+
 import { errToast } from 'lib/toasts';
-
-const MessageContainer = styled.li<{
-  mine: boolean;
-  time: string;
-  touched: boolean;
-}>`
-  display: flex;
-  align-items: center;
-  align-self: ${({ mine }) => (mine ? 'flex-end' : 'flex-start')};
-  flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
-  position: relative;
-
-  max-width: 80%;
-
-  :not(:first-of-type) {
-    margin-top: 2rem;
-  }
-
-  ::after {
-    margin: 0 1rem;
-    color: ${({ touched }) => (touched ? 'white' : 'transparent')};
-    userselect: none;
-    content: '${({ time }) => time}';
-  }
-`;
-
-const Message = styled.p<{
-  mine?: boolean;
-  read?: boolean;
-  pinned?: boolean;
-  deleted?: boolean;
-}>`
-  color: #eee;
-  padding: 1rem 1.5rem;
-  background-image: ${({ mine, deleted }) =>
-    deleted ? 'none' : mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
-  border: ${({ pinned }) => (pinned ? 2 : 0)}px solid white;
-  width: max-content;
-  border-radius: 2rem;
-  position: relative;
-  word-break: break-all;
-  user-select: none;
-  background-color: black;
-
-  ::after {
-    display: block;
-    content: ' ';
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background-color: ${({ mine, read }) =>
-      mine && read ? 'white' : 'transparent'};
-    position: absolute;
-    right: -1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.2s ease;
-  }
-`;
-
-const PinContainer = styled.div<{
-  width?: number;
-  mine?: boolean;
-  visible?: boolean;
-}>`
-  z-index: 5;
-
-  opacity: ${({ visible }) => (visible ? 1 : 0)};
-  pointer-events: ${({ visible }) => (visible ? '' : 'none')};
-  user-select: none;
-  background-color: var(--color-gray-darker);
-  border-radius: 2rem;
-  padding: 1rem;
-  position: absolute;
-
-  right: ${({ width, mine }) => (mine && width ? width + 10 : -50)}px;
-
-  p {
-    padding: 1rem 0.5rem;
-    border-radius: 1rem;
-    :hover {
-      cursor: pointer;
-      background-color: black;
-    }
-  }
-`;
+import {
+  List,
+  Message,
+  MessageContainer,
+  PinContainer,
+} from './MessageList.elements';
+import Portal from '../Portal';
 
 interface Props {
   messages: MessageType[];
@@ -98,10 +19,13 @@ interface Props {
   setTouched: React.Dispatch<React.SetStateAction<boolean>>;
   _id: string;
   connectionId: string;
+  listRef: React.RefObject<HTMLUListElement>;
 }
 
 let hover = false;
 let timeout: NodeJS.Timeout;
+
+const MotionList = m(List);
 
 const MessageList: FC<Props> = ({
   messages,
@@ -110,31 +34,87 @@ const MessageList: FC<Props> = ({
   _id,
   setTouched,
   connectionId,
+  listRef,
 }) => {
   const [selected, setSelected] = useState(-1);
 
+  const viewportOffset =
+    messagesRef.current[selected] &&
+    messagesRef.current[selected].getBoundingClientRect();
+  const top = viewportOffset ? viewportOffset.top : 0;
+
+  const selectedMessage = messages[selected];
+
   return (
     <AnimatePresence>
-      <m.div
+      {selected !== -1 && (
+        <Portal>
+          <PinContainer
+            width={
+              messagesRef.current[selected]
+                ? messagesRef.current[selected].offsetWidth
+                : 0
+            }
+            mine={!selectedMessage ? false : selectedMessage.sender._id === _id}
+            onMouseEnter={() => (hover = true)}
+            onMouseLeave={() => {
+              hover = false;
+              setSelected(-1);
+            }}
+            top={top}
+          >
+            <p
+              onClick={() =>
+                axios.delete(`/api/pusher/pin?messageId=${selectedMessage._id}`)
+              }
+            >
+              Pin
+            </p>
+            <p
+              onClick={() =>
+                navigator.clipboard.writeText(selectedMessage.message)
+              }
+            >
+              Copy
+            </p>
+            <p
+              onClick={() =>
+                axios
+                  .delete(
+                    `/api/pusher/deleteMessage?messageId=${selectedMessage._id}`
+                  )
+                  .catch(err => {
+                    if (err.response.status === 403)
+                      errToast('This is not your message!');
+                  })
+              }
+            >
+              Delete
+            </p>
+          </PinContainer>
+        </Portal>
+      )}
+      <MotionList
         initial={{ y: -300, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 300, opacity: 0 }}
         transition={{
           duration: 0.2,
         }}
-        style={{ display: 'flex', flexDirection: 'column' }}
+        style={{ scale: '1,-1' }}
         key={connectionId}
-        onClick={() => setSelected(-1)}
         onTouchMove={() => setSelected(-1)}
+        ref={listRef}
       >
         {messages.map((message, index, arr) => {
-          const mine = message.sender._id === _id;
           const time =
             (new Date(message.date).getHours() < 10 ? '0' : '') +
             new Date(message.date).getHours() +
             ':' +
             (new Date(message.date).getMinutes() < 10 ? '0' : '') +
             new Date(message.date).getMinutes();
+
+          const mine = message.sender._id === _id;
 
           return (
             <MessageContainer
@@ -152,7 +132,7 @@ const MessageList: FC<Props> = ({
                 onClick={() => {
                   if (!message.deleted) {
                     setTouched(false);
-                    setTimeout(() => setSelected(index), 50);
+                    setSelected(index);
                   }
                 }}
                 onMouseEnter={() => {
@@ -178,51 +158,10 @@ const MessageList: FC<Props> = ({
               >
                 {!message.deleted ? message.message : 'Deleted'}
               </Message>
-              <PinContainer
-                width={
-                  messagesRef.current[index]
-                    ? messagesRef.current[index].offsetWidth
-                    : 0
-                }
-                mine={mine}
-                visible={selected === index}
-                onMouseEnter={() => (hover = true)}
-                onMouseLeave={() => {
-                  hover = false;
-                  setSelected(-1);
-                }}
-              >
-                <p
-                  onClick={() =>
-                    axios.delete(`/api/pusher/pin?messageId=${message._id}`)
-                  }
-                >
-                  Pin
-                </p>
-                <p
-                  onClick={() => navigator.clipboard.writeText(message.message)}
-                >
-                  Copy
-                </p>
-                <p
-                  onClick={() =>
-                    axios
-                      .delete(
-                        `/api/pusher/deleteMessage?messageId=${message._id}`
-                      )
-                      .catch(err => {
-                        if (err.response.status === 403)
-                          errToast('This is not your message!');
-                      })
-                  }
-                >
-                  Delete
-                </p>
-              </PinContainer>
             </MessageContainer>
           );
         })}
-      </m.div>
+      </MotionList>
     </AnimatePresence>
   );
 };

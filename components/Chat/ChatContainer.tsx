@@ -1,36 +1,13 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
-import styled from '@emotion/styled';
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
 
-import { scrollY } from 'styles/scroll';
 import { userContext } from 'context/userContext';
 import useWindowSize from 'hooks/useWindowSize';
 import { Button } from 'components/Simple/Button';
 import MessageList from './MessageList';
-
-const Container = styled.ul<{ height: number }>`
-  height: ${({ height }) => `calc(${height}px - 17rem)`};
-  padding: 0 2rem;
-  margin-top: 2rem;
-
-  ${scrollY};
-`;
-
-const DownContainer = styled.div<{ shown: boolean }>`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  bottom: 0;
-  left: 0;
-  margin-left: 50%;
-  transform: ${({ shown }) =>
-      shown ? 'translateY(-10rem)' : 'translateY(100%)'}
-    translateX(-50%);
-  transition: transform 0.3s ease;
-`;
+import { Container, DownContainer } from './ChatContainer.elements';
 
 interface Props {
   messages: MessageType[];
@@ -91,21 +68,21 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
     if (
       ref.current &&
       newMsg &&
-      (ref.current.scrollHeight - ref.current.scrollTop <
+      (ref.current.scrollHeight + ref.current.scrollTop <
         ref.current.clientHeight + 200 ||
         first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
       ref.current.scrollTo({
-        top: ref.current.scrollHeight,
+        top: -ref.current.scrollHeight,
       });
-    } else if (prevMessages.length !== messages.length) {
+    } else if (newMsg) {
       setShown(true);
     }
 
     prevMessages = messages;
 
-    if (ref.current && ref.current.scrollTop > 0) setFirst(false);
+    if (messages.length) setFirst(false);
     else setFirst(true);
   }, [messages, _id, first, connectionId]);
 
@@ -113,13 +90,13 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
     const ifsetShown = () => {
       if (
         ref.current &&
-        ref.current.scrollHeight - ref.current.scrollTop >
+        ref.current.scrollHeight + ref.current.scrollTop >
           ref.current.clientHeight + 1000
       )
         setShown(true);
       else if (
         ref.current &&
-        ref.current.scrollHeight - ref.current.scrollTop <=
+        ref.current.scrollHeight + ref.current.scrollTop <=
           ref.current.clientHeight
       ) {
         setShown(false);
@@ -151,7 +128,6 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
 
   return (
     <Container
-      ref={ref}
       height={windowHeight}
       onTouchStart={() => setTouched(true)}
       onTouchEnd={() => setTouched(false)}
@@ -163,6 +139,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
         messagesRef={messagesRef}
         setTouched={setTouched}
         connectionId={connectionId}
+        listRef={ref}
       />
 
       <DownContainer shown={shown}>
@@ -171,7 +148,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
           onClick={() => {
             ref.current &&
               ref.current.scrollTo({
-                top: ref.current.scrollHeight,
+                top: -ref.current.scrollHeight,
                 behavior: 'smooth',
               });
           }}

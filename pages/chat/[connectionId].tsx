@@ -65,7 +65,6 @@ const Chat: NextPage = () => {
       if (channel.members.count >= 2) setActive(true);
 
       const newMsgClb = (data: MessageType) => {
-        console.log('2');
         setMessages(prev => [...prev, data]);
       };
       channel.bind('new_msg', newMsgClb);

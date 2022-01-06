@@ -21,13 +21,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (forbidden) return res.status(403).end();
 
-    const messages = latest
-      ? await messageModel.find(
-          { connectionId },
-          {},
-          { sort: { _id: -1 }, limit: 1 }
-        )
-      : await messageModel.find({ connectionId });
+    const messages = await messageModel.find(
+      { connectionId },
+      {},
+      { sort: { _id: -1 }, limit: latest ? 1 : 0 }
+    );
+
+    messages.reverse();
 
     return res.status(200).json(messages);
   } catch (err) {

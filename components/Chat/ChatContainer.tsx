@@ -85,9 +85,6 @@ const ChatContainer: FC<Props> = ({
         first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
-      listRef.current.scrollTo({
-        top: listRef.current.scrollHeight,
-      });
     } else if (newMsg) {
       setShown(true);
     }

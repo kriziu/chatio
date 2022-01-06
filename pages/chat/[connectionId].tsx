@@ -24,6 +24,7 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 let height = 0;
 let size = 0;
+let msgs: MessageType[] = [];
 
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
@@ -48,16 +49,43 @@ const Chat: NextPage = () => {
     fetcher
   );
 
-  const fetchedMessages = useSWR<MessageType[]>(
-    connectionId && `/api/message/${connectionId}`,
-    fetcher
-  );
+  // const fetchedMessages = useSWR<MessageType[]>(
+  //   connectionId &&
+  //     `/api/message/${connectionId}${
+  //       messages[0] ? '?chunkId=' + messages[0]._id : ''
+  //     }`,
+  //   fetcher,
+  //   {
+  //     revalidateOnFocus: false,
+  //     revalidateOnMount: false,
+  //     revalidateOnReconnect: false,
+  //     refreshWhenOffline: false,
+  //     refreshWhenHidden: false,
+  //     refreshInterval: 0,
+  //   }
+  // );
+
+  const getAndSetMessages = async (): Promise<MessageType | undefined> => {
+    if (connectionId) {
+      const res = await axios.get<MessageType[]>(
+        `/api/message/${connectionId}${
+          msgs[0] ? '?chunkId=' + msgs[0]._id : ''
+        }`
+      );
+
+      const length = msgs.length;
+      setMessages(prev => [...res.data, ...prev]);
+      msgs = [...res.data, ...msgs];
+
+      return msgs[msgs.length - length - 1];
+    }
+  };
 
   useEffect(() => {
-    if (fetchedMessages.data) {
-      setMessages(fetchedMessages.data);
-    }
-  }, [fetchedMessages.data]);
+    msgs = [];
+    setMessages([]);
+    getAndSetMessages();
+  }, [connectionId]);
 
   useEffect(() => {
     channels.forEach(channel1 => {
@@ -142,7 +170,28 @@ const Chat: NextPage = () => {
 
   useEffect(() => {
     height = window.innerHeight;
-  }, [keyboard]);
+
+    const getMoreMessages = (e: Event) => {
+      const list = e.currentTarget as HTMLElement;
+
+      if (list.scrollTop === 0) {
+        getAndSetMessages().then(res => {
+          const index = msgs.findIndex(message => message._id === res?._id);
+
+          index !== -1 &&
+            listRef.current?.scrollTo({
+              top: messagesRef.current[index].offsetTop - 100,
+            });
+        });
+      }
+    };
+
+    listRef.current?.addEventListener('scroll', getMoreMessages);
+
+    return () => {
+      listRef.current?.removeEventListener('scroll', getMoreMessages);
+    };
+  }, [listRef.current]);
 
   useEffect(() => {
     const keyboardClb = () => {
@@ -200,8 +249,8 @@ const Chat: NextPage = () => {
     },
   });
 
-  if (error || fetchedMessages.error) return <div>failed to load</div>;
-  if (!data || !fetchedMessages.data)
+  if (error) return <div>failed to load</div>;
+  if (!data || !messages)
     return (
       <Flex style={{ height: '100%' }}>
         <ClipLoader color="white" loading={true} size={100} />

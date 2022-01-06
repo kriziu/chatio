@@ -9,7 +9,7 @@ import connectionModel from 'models/connection.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
   const { _id } = jwt.decode(ACCESS) as { _id: string };
-  const { connectionId, latest } = req.query;
+  const { connectionId, latest, chunkId } = req.query;
 
   try {
     const connection = await connectionModel.findById(connectionId);
@@ -21,10 +21,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (forbidden) return res.status(403).end();
 
+    const message = chunkId
+      ? await messageModel.findById(chunkId)
+      : await messageModel.findOne({}, {}, { sort: { _id: -1 }, limit: 1 });
+
+    if (!message) {
+      return res.status(404).end();
+    }
+
     const messages = await messageModel.find(
-      { connectionId },
+      {
+        connectionId,
+        date:
+          latest || !chunkId ? { $lte: message.date } : { $lt: message.date },
+      },
       {},
-      { sort: { _id: -1 }, limit: latest ? 1 : 0 }
+      { sort: { _id: -1 }, limit: latest ? 1 : 100 }
     );
 
     messages.reverse();

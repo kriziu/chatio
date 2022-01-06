@@ -158,11 +158,18 @@ const Chat: NextPage = () => {
           100
         );
       } else {
-        listRef.current &&
-          listRef.current.scrollTo({
-            top: listRef.current?.scrollTop + size,
-          });
-        size = 0;
+        if (listRef.current) {
+          const scrolledTop = Math.round(listRef.current?.scrollTop);
+
+          if (
+            listRef.current?.scrollHeight - scrolledTop >
+            window.innerHeight - 100
+          )
+            listRef.current.scrollTo({
+              top: listRef.current?.scrollTop + size,
+            });
+          size = 0;
+        }
       }
     };
 
@@ -181,9 +188,15 @@ const Chat: NextPage = () => {
 
   const handlersToClose = useSwipeable({
     onSwipedUp(e) {
-      e.event.target &&
-        (e.event.target as HTMLElement).tagName.toLowerCase() !== 'ul' &&
-        setSettings(false);
+      let close = true;
+
+      (e.event as TouchEvent).composedPath().forEach(target => {
+        const tr = target as HTMLElement;
+
+        if (tr.tagName && tr.tagName.toLowerCase() === 'ul') close = false;
+      });
+
+      close && setSettings(false);
     },
   });
 

@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await pusher.trigger(`presence-${connection?._id}`, 'delete_msg', messageId);
 
-  await message.updateOne({ deleted: true, message: '' });
+  await message.updateOne({ deleted: true, pin: false, message: '' });
 
   res.json({ message: 'completed' });
 };

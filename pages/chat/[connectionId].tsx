@@ -41,6 +41,7 @@ const Chat: NextPage = () => {
   const [keyboard, setKeyboard] = useState(false);
 
   const listRef = useRef<HTMLUListElement>(null);
+  const messagesRef = useRef<HTMLLIElement[]>([]);
 
   const { data, error } = useSWR<CConnectionType>(
     connectionId && `/api/connection?id=${connectionId}`,
@@ -90,7 +91,7 @@ const Chat: NextPage = () => {
         setMessages(prev =>
           prev.map(message =>
             message._id === id
-              ? { ...message, message: '', deleted: true }
+              ? { ...message, message: '', pin: false, deleted: true }
               : message
           )
         );
@@ -137,16 +138,15 @@ const Chat: NextPage = () => {
         channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, router]);
+  }, [channel, channel?.members.count, router, connectionId]);
 
   useEffect(() => {
     height = window.innerHeight;
   }, [keyboard]);
 
   useEffect(() => {
-    window.addEventListener('resize', e => {
+    const keyboardClb = () => {
       if (window.innerHeight < height * 0.9) {
-        axios.post('/api/e');
         size = window.innerHeight - height;
         setTimeout(
           () =>
@@ -157,12 +157,20 @@ const Chat: NextPage = () => {
             }),
           100
         );
-      } else
+      } else {
         listRef.current &&
           listRef.current.scrollTo({
             top: listRef.current?.scrollTop + size,
           });
-    });
+        size = 0;
+      }
+    };
+
+    window.addEventListener('resize', keyboardClb);
+
+    return () => {
+      window.removeEventListener('resize', keyboardClb);
+    };
   }, [listRef]);
 
   const handlersToOpen = useSwipeable({
@@ -172,8 +180,10 @@ const Chat: NextPage = () => {
   });
 
   const handlersToClose = useSwipeable({
-    onSwipedUp() {
-      setSettings(false);
+    onSwipedUp(e) {
+      e.event.target &&
+        (e.event.target as HTMLElement).tagName.toLowerCase() !== 'ul' &&
+        setSettings(false);
     },
   });
 
@@ -187,6 +197,17 @@ const Chat: NextPage = () => {
 
   const secondUser = getUserFromIds(data, _id);
 
+  const handlePinnedMessageClick = (messageId: string) => {
+    const index = messages.findIndex(message => message._id === messageId);
+
+    listRef.current?.scrollTo({
+      top: messagesRef.current[index].offsetTop - 100,
+      behavior: 'smooth',
+    });
+
+    setSettings(false);
+  };
+
   return (
     <>
       <ChatSettings
@@ -196,6 +217,8 @@ const Chat: NextPage = () => {
         setOpened={setSettings}
         connectionId={connectionId}
         active={active}
+        pinnedMessages={messages.filter(message => message.pin)}
+        handlePinnedMessageClick={handlePinnedMessageClick}
       />
 
       <ChatTop
@@ -209,6 +232,7 @@ const Chat: NextPage = () => {
         messages={messages}
         connectionId={connectionId}
         listRef={listRef}
+        messagesRef={messagesRef}
       />
 
       {data.blocked.yes ? (

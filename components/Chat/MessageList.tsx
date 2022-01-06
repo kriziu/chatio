@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
 import axios from 'axios';
@@ -11,13 +11,13 @@ import {
   PinContainer,
 } from './MessageList.elements';
 import Portal from '../Portal';
+import { userContext } from 'context/userContext';
 
 interface Props {
   messages: MessageType[];
-  messagesRef: React.MutableRefObject<HTMLParagraphElement[]>;
+  messagesRef: React.MutableRefObject<HTMLLIElement[]>;
   touched: boolean;
   setTouched: React.Dispatch<React.SetStateAction<boolean>>;
-  _id: string;
   connectionId: string;
   listRef: React.RefObject<HTMLUListElement>;
 }
@@ -31,11 +31,14 @@ const MessageList: FC<Props> = ({
   messages,
   messagesRef,
   touched,
-  _id,
   setTouched,
   connectionId,
   listRef,
 }) => {
+  const {
+    user: { _id },
+  } = useContext(userContext);
+
   const [selected, setSelected] = useState(-1);
 
   const viewportOffset =
@@ -61,6 +64,12 @@ const MessageList: FC<Props> = ({
               hover = false;
               setSelected(-1);
             }}
+            onClick={() =>
+              setTimeout(() => {
+                hover = false;
+                setSelected(-1);
+              }, 100)
+            }
             top={top}
           >
             <p
@@ -106,26 +115,28 @@ const MessageList: FC<Props> = ({
         ref={listRef}
       >
         {messages.map((message, index, arr) => {
+          const messageDate = new Date(message.date);
+
           const time =
-            (new Date(message.date).getHours() < 10 ? '0' : '') +
-            new Date(message.date).getHours() +
+            (messageDate.getHours() < 10 ? '0' : '') +
+            messageDate.getHours() +
             ':' +
-            (new Date(message.date).getMinutes() < 10 ? '0' : '') +
-            new Date(message.date).getMinutes();
+            (messageDate.getMinutes() < 10 ? '0' : '') +
+            messageDate.getMinutes();
 
           const mine = message.sender._id === _id;
 
           return (
             <MessageContainer
               key={message._id}
+              id={message._id}
               mine={mine}
               time={time}
               touched={touched}
+              ref={el => el && (messagesRef.current[index] = el)}
             >
               <Message
                 mine={mine}
-                ref={el => el && (messagesRef.current[index] = el)}
-                id={message._id}
                 read={arr[index + 1]?.read ? false : message.read}
                 pinned={message.pin}
                 onClick={() => {
@@ -146,13 +157,7 @@ const MessageList: FC<Props> = ({
                     500
                   ))
                 }
-                title={
-                  (new Date(message.date).getHours() < 10 ? '0' : '') +
-                  new Date(message.date).getHours() +
-                  ':' +
-                  (new Date(message.date).getMinutes() < 10 ? '0' : '') +
-                  new Date(message.date).getMinutes()
-                }
+                title={time}
                 deleted={message.deleted}
               >
                 {!message.deleted ? message.message : 'Deleted'}

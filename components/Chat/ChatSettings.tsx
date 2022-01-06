@@ -7,6 +7,7 @@ import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
 import axios from 'axios';
+import PinnedMessageList from './PinnedMessageList';
 import { errToast } from 'lib/toasts';
 
 const Settings = styled(Background)<{ opened: boolean }>`
@@ -24,6 +25,8 @@ interface Props {
   handlersToClose: any;
   connectionId: string;
   active: boolean;
+  pinnedMessages: MessageType[];
+  handlePinnedMessageClick: (messageId: string) => void;
 }
 
 const ChatSettings: FC<Props> = ({
@@ -33,6 +36,8 @@ const ChatSettings: FC<Props> = ({
   setOpened,
   connectionId,
   active,
+  pinnedMessages,
+  handlePinnedMessageClick,
 }) => {
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToClose}>
@@ -47,6 +52,10 @@ const ChatSettings: FC<Props> = ({
           {secondUser.fName} {secondUser.lName}
         </Header3>
       </Flex>
+      <PinnedMessageList
+        messages={pinnedMessages}
+        handlePinnedMessageClick={handlePinnedMessageClick}
+      />
       <Flex
         style={{
           flexDirection: 'column',

@@ -1,4 +1,12 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  FC,
+  MutableRefObject,
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
@@ -12,13 +20,19 @@ import { Container, DownContainer } from './ChatContainer.elements';
 interface Props {
   messages: MessageType[];
   connectionId: string;
-  listRef: React.RefObject<HTMLUListElement>;
+  listRef: RefObject<HTMLUListElement>;
+  messagesRef: MutableRefObject<HTMLLIElement[]>;
 }
 
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages: MessageType[] = [];
 
-const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
+const ChatContainer: FC<Props> = ({
+  messages,
+  connectionId,
+  listRef,
+  messagesRef,
+}) => {
   const {
     user: { _id },
   } = useContext(userContext);
@@ -29,8 +43,6 @@ const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
   const [shown, setShown] = useState(false);
   const [first, setFirst] = useState(true);
   const [counter, setCounter] = useState(0);
-
-  const messagesRef = useRef<HTMLParagraphElement[]>([]);
 
   useEffect(() => {
     setObs(
@@ -84,7 +96,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
 
     if (messages.length) setFirst(false);
     else setFirst(true);
-  }, [messages, _id, first, connectionId]);
+  }, [messages, _id, first, connectionId, listRef]);
 
   useEffect(() => {
     const ifsetShown = () => {
@@ -113,7 +125,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
         el.removeEventListener('scroll', ifsetShown);
       };
     }
-  }, []);
+  }, [listRef]);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {
@@ -124,7 +136,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
         obs.disconnect();
       };
     }
-  }, [obs, messages]);
+  }, [obs, messages, messagesRef]);
 
   return (
     <Container
@@ -135,7 +147,6 @@ const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
       <MessageList
         touched={touched}
         messages={messages}
-        _id={_id}
         messagesRef={messagesRef}
         setTouched={setTouched}
         connectionId={connectionId}

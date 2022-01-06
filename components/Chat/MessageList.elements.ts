@@ -60,10 +60,11 @@ export const Message = styled.p<{
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    background-color: ${({ mine, read }) =>
-      mine && read ? 'white' : 'transparent'};
+    background-color: ${({ mine, read }) => (read ? 'white' : 'transparent')};
     position: absolute;
-    right: -1.5rem;
+
+    ${({ mine }) => (mine ? 'right: -1.5rem' : 'left: -1.5rem')};
+
     top: 50%;
     transform: translateY(-50%);
     transition: all 0.2s ease;

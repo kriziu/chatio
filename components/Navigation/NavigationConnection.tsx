@@ -66,7 +66,6 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
       if (channel.members.count >= 2) setActive(true);
 
       const msgClb = (data: MessageType) => {
-        console.log(data);
         setMessage([data]);
         tempMsg = data;
       };
@@ -99,7 +98,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
         channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count]);
+  }, [channel, channel?.members.count, message]);
 
   useEffect(() => {
     if (data) {

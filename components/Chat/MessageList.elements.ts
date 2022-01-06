@@ -6,7 +6,7 @@ export const List = styled.ul`
   padding: 0 2rem;
   height: 100%;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 
   ${scrollY};
 `;
@@ -20,12 +20,12 @@ export const MessageContainer = styled.li<{
   align-items: center;
   align-self: ${({ mine }) => (mine ? 'flex-end' : 'flex-start')};
   flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
-  transform: scale(1, -1);
+  position: relative;
 
   transition: none;
   max-width: 80%;
 
-  :not(:last-of-type) {
+  :not(:first-of-type) {
     margin-top: 2rem;
   }
 

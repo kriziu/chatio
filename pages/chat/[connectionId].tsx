@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
+import { FocusEvent, useContext, useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
 import { BiSend } from 'react-icons/bi';
@@ -22,6 +22,9 @@ import { Header3 } from 'components/Simple/Headers';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
+let height = 0;
+let size = 0;
+
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
   const { _id } = user;
@@ -35,6 +38,9 @@ const Chat: NextPage = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [message, setMessage] = useState('');
   const [channel, setChannel] = useState<PresenceChannel>();
+  const [keyboard, setKeyboard] = useState(false);
+
+  const listRef = useRef<HTMLUListElement>(null);
 
   const { data, error } = useSWR<CConnectionType>(
     connectionId && `/api/connection?id=${connectionId}`,
@@ -133,6 +139,32 @@ const Chat: NextPage = () => {
     }
   }, [channel, channel?.members.count, router]);
 
+  useEffect(() => {
+    height = window.innerHeight;
+  }, [keyboard]);
+
+  useEffect(() => {
+    window.addEventListener('resize', e => {
+      if (window.innerHeight < height * 0.9) {
+        axios.post('/api/e');
+        size = window.innerHeight - height;
+        setTimeout(
+          () =>
+            listRef.current &&
+            listRef.current.scrollTo({
+              top: listRef.current?.scrollTop + height - window.innerHeight,
+              behavior: 'smooth',
+            }),
+          100
+        );
+      } else
+        listRef.current &&
+          listRef.current.scrollTo({
+            top: listRef.current?.scrollTop + size,
+          });
+    });
+  }, [listRef]);
+
   const handlersToOpen = useSwipeable({
     onSwipedDown() {
       setSettings(true);
@@ -145,8 +177,8 @@ const Chat: NextPage = () => {
     },
   });
 
-  if (error) return <div>failed to load</div>;
-  if (!data)
+  if (error || fetchedMessages.error) return <div>failed to load</div>;
+  if (!data || !fetchedMessages.data)
     return (
       <Flex style={{ height: '100%' }}>
         <ClipLoader color="white" loading={true} size={100} />
@@ -173,7 +205,11 @@ const Chat: NextPage = () => {
         active={active}
       />
 
-      <ChatContainer messages={messages} connectionId={connectionId} />
+      <ChatContainer
+        messages={messages}
+        connectionId={connectionId}
+        listRef={listRef}
+      />
 
       {data.blocked.yes ? (
         <Header3>Blocked</Header3>
@@ -195,6 +231,8 @@ const Chat: NextPage = () => {
               value={message}
               onChange={e => setMessage(e.target.value)}
               style={{ marginRight: '1rem', width: '75%' }}
+              onFocus={() => setKeyboard(true)}
+              onBlur={() => setKeyboard(false)}
             />
             <Button type="submit" icon>
               <BiSend />

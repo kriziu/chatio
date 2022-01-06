@@ -12,12 +12,13 @@ import { Container, DownContainer } from './ChatContainer.elements';
 interface Props {
   messages: MessageType[];
   connectionId: string;
+  listRef: React.RefObject<HTMLUListElement>;
 }
 
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages: MessageType[] = [];
 
-const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
+const ChatContainer: FC<Props> = ({ messages, connectionId, listRef }) => {
   const {
     user: { _id },
   } = useContext(userContext);
@@ -29,7 +30,6 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
   const [first, setFirst] = useState(true);
   const [counter, setCounter] = useState(0);
 
-  const ref = useRef<HTMLUListElement>(null);
   const messagesRef = useRef<HTMLParagraphElement[]>([]);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
           }
         },
         {
-          root: ref.current,
+          root: listRef.current,
         }
       )
     );
@@ -66,15 +66,15 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
     newMsg && setCounter(prev => prev + 1);
 
     if (
-      ref.current &&
+      listRef.current &&
       newMsg &&
-      (ref.current.scrollHeight + ref.current.scrollTop <
-        ref.current.clientHeight + 200 ||
+      (listRef.current.scrollHeight - listRef.current.scrollTop <
+        listRef.current.clientHeight + 200 ||
         first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
-      ref.current.scrollTo({
-        top: -ref.current.scrollHeight,
+      listRef.current.scrollTo({
+        top: listRef.current.scrollHeight,
       });
     } else if (newMsg) {
       setShown(true);
@@ -89,23 +89,23 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
   useEffect(() => {
     const ifsetShown = () => {
       if (
-        ref.current &&
-        ref.current.scrollHeight + ref.current.scrollTop >
-          ref.current.clientHeight + 1000
+        listRef.current &&
+        listRef.current.scrollHeight - listRef.current.scrollTop >
+          listRef.current.clientHeight + 1000
       )
         setShown(true);
       else if (
-        ref.current &&
-        ref.current.scrollHeight + ref.current.scrollTop <=
-          ref.current.clientHeight
+        listRef.current &&
+        listRef.current.scrollHeight - listRef.current.scrollTop <=
+          listRef.current.clientHeight
       ) {
         setShown(false);
         setCounter(0);
       }
     };
 
-    if (ref.current) {
-      const el = ref.current;
+    if (listRef.current) {
+      const el = listRef.current;
 
       el.addEventListener('scroll', ifsetShown);
 
@@ -139,16 +139,16 @@ const ChatContainer: FC<Props> = ({ messages, connectionId }) => {
         messagesRef={messagesRef}
         setTouched={setTouched}
         connectionId={connectionId}
-        listRef={ref}
+        listRef={listRef}
       />
 
       <DownContainer shown={shown}>
         New messages: {counter}
         <Button
           onClick={() => {
-            ref.current &&
-              ref.current.scrollTo({
-                top: -ref.current.scrollHeight,
+            listRef.current &&
+              listRef.current.scrollTo({
+                top: listRef.current.scrollHeight,
                 behavior: 'smooth',
               });
           }}

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
 import axios from 'axios';
@@ -101,7 +101,6 @@ const MessageList: FC<Props> = ({
         transition={{
           duration: 0.2,
         }}
-        style={{ scale: '1,-1' }}
         key={connectionId}
         onTouchMove={() => setSelected(-1)}
         ref={listRef}

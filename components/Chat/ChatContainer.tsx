@@ -22,6 +22,7 @@ interface Props {
   connectionId: string;
   listRef: RefObject<HTMLUListElement>;
   messagesRef: MutableRefObject<HTMLLIElement[]>;
+  fetched: boolean;
 }
 
 let lastTimeOut: NodeJS.Timeout;
@@ -32,6 +33,7 @@ const ChatContainer: FC<Props> = ({
   connectionId,
   listRef,
   messagesRef,
+  fetched,
 }) => {
   const {
     user: { _id },
@@ -53,7 +55,7 @@ const ChatContainer: FC<Props> = ({
               prev => prev._id === e[e.length - 1].target.id
             )[0];
 
-            if (!msg?.read && msg?.sender._id !== _id) {
+            if (msg && !msg?.read && msg?.sender._id !== _id) {
               clearTimeout(lastTimeOut);
 
               lastTimeOut = setTimeout(() => {
@@ -74,17 +76,24 @@ const ChatContainer: FC<Props> = ({
       )
     );
 
-    const newMsg = prevMessages.length !== messages.length;
-    newMsg && setCounter(prev => prev + 1);
+    console.log(listRef.current);
+
+    const newMsg =
+      prevMessages.length !== messages.length &&
+      prevMessages[0]?.connectionId === messages[0]?.connectionId;
+    newMsg && !fetched && setCounter(prev => prev + 1);
 
     if (
       listRef.current &&
-      newMsg &&
+      !fetched &&
       (listRef.current.scrollHeight - listRef.current.scrollTop <
         listRef.current.clientHeight + 200 ||
         first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
+      listRef.current.scrollTo({
+        top: listRef.current.scrollHeight,
+      });
     } else if (newMsg) {
       setShown(true);
     }
@@ -93,7 +102,7 @@ const ChatContainer: FC<Props> = ({
 
     if (messages.length) setFirst(false);
     else setFirst(true);
-  }, [messages, _id, first, connectionId, listRef]);
+  }, [messages, _id, first, connectionId, listRef, fetched]);
 
   useEffect(() => {
     const ifsetShown = () => {
@@ -122,7 +131,7 @@ const ChatContainer: FC<Props> = ({
         el.removeEventListener('scroll', ifsetShown);
       };
     }
-  }, [listRef]);
+  }, [listRef.current]);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {
@@ -146,7 +155,6 @@ const ChatContainer: FC<Props> = ({
         messages={messages}
         messagesRef={messagesRef}
         setTouched={setTouched}
-        connectionId={connectionId}
         listRef={listRef}
       />
 
@@ -154,6 +162,7 @@ const ChatContainer: FC<Props> = ({
         New messages: {counter}
         <Button
           onClick={() => {
+            console.log(listRef.current);
             listRef.current &&
               listRef.current.scrollTo({
                 top: listRef.current.scrollHeight,

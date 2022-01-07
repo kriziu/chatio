@@ -1,6 +1,13 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { FocusEvent, useContext, useEffect, useRef, useState } from 'react';
+import {
+  FocusEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import axios from 'axios';
 import { BiSend } from 'react-icons/bi';
@@ -19,12 +26,14 @@ import ChatTop from 'components/Chat/ChatTop';
 import { Input } from 'components/Simple/Input';
 import { connectionsContext } from 'context/connectionsContext';
 import { Header3 } from 'components/Simple/Headers';
+import Spinner from 'components/Spinner';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 let height = 0;
 let size = 0;
-let msgs: MessageType[] = [];
+let fetched = false;
+let oldestMsgId = '';
 
 const Chat: NextPage = () => {
   const { user } = useContext(userContext);
@@ -39,7 +48,6 @@ const Chat: NextPage = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [message, setMessage] = useState('');
   const [channel, setChannel] = useState<PresenceChannel>();
-  const [keyboard, setKeyboard] = useState(false);
 
   const listRef = useRef<HTMLUListElement>(null);
   const messagesRef = useRef<HTMLLIElement[]>([]);
@@ -49,43 +57,29 @@ const Chat: NextPage = () => {
     fetcher
   );
 
-  // const fetchedMessages = useSWR<MessageType[]>(
-  //   connectionId &&
-  //     `/api/message/${connectionId}${
-  //       messages[0] ? '?chunkId=' + messages[0]._id : ''
-  //     }`,
-  //   fetcher,
-  //   {
-  //     revalidateOnFocus: false,
-  //     revalidateOnMount: false,
-  //     revalidateOnReconnect: false,
-  //     refreshWhenOffline: false,
-  //     refreshWhenHidden: false,
-  //     refreshInterval: 0,
-  //   }
-  // );
-
-  const getAndSetMessages = async (): Promise<MessageType | undefined> => {
+  const getAndSetMessages = useCallback(async (): Promise<
+    MessageType[] | undefined
+  > => {
     if (connectionId) {
       const res = await axios.get<MessageType[]>(
         `/api/message/${connectionId}${
-          msgs[0] ? '?chunkId=' + msgs[0]._id : ''
+          oldestMsgId ? '?chunkId=' + oldestMsgId : ''
         }`
       );
 
-      const length = msgs.length;
-      setMessages(prev => [...res.data, ...prev]);
-      msgs = [...res.data, ...msgs];
-
-      return msgs[msgs.length - length - 1];
+      if (res.data[0]?._id !== oldestMsgId) {
+        setMessages(prev => [...res.data, ...prev]);
+        if (res.data[0]) oldestMsgId = res.data[0]._id;
+      }
+      return res.data;
     }
-  };
+  }, [connectionId]);
 
   useEffect(() => {
-    msgs = [];
+    oldestMsgId = '';
     setMessages([]);
     getAndSetMessages();
-  }, [connectionId]);
+  }, [connectionId, getAndSetMessages]);
 
   useEffect(() => {
     channels.forEach(channel1 => {
@@ -174,9 +168,15 @@ const Chat: NextPage = () => {
     const getMoreMessages = (e: Event) => {
       const list = e.currentTarget as HTMLElement;
 
-      if (list.scrollTop === 0) {
+      if (list.scrollTop === 0 && messages.length >= 100) {
+        fetched = true;
         getAndSetMessages().then(res => {
-          const index = msgs.findIndex(message => message._id === res?._id);
+          fetched = false;
+          const index = res
+            ? [...res, ...messages].findIndex(
+                message => message._id === messages[0]._id
+              )
+            : -1;
 
           index !== -1 &&
             listRef.current?.scrollTo({
@@ -186,12 +186,14 @@ const Chat: NextPage = () => {
       }
     };
 
-    listRef.current?.addEventListener('scroll', getMoreMessages);
+    const list = listRef.current;
+
+    list?.addEventListener('scroll', getMoreMessages);
 
     return () => {
-      listRef.current?.removeEventListener('scroll', getMoreMessages);
+      list?.removeEventListener('scroll', getMoreMessages);
     };
-  }, [listRef.current]);
+  }, [connectionId, messages, getAndSetMessages]);
 
   useEffect(() => {
     const keyboardClb = () => {
@@ -250,12 +252,7 @@ const Chat: NextPage = () => {
   });
 
   if (error) return <div>failed to load</div>;
-  if (!data || !messages)
-    return (
-      <Flex style={{ height: '100%' }}>
-        <ClipLoader color="white" loading={true} size={100} />
-      </Flex>
-    );
+  if (!data || !messages) return <Spinner />;
 
   const secondUser = getUserFromIds(data, _id);
 
@@ -295,6 +292,7 @@ const Chat: NextPage = () => {
         connectionId={connectionId}
         listRef={listRef}
         messagesRef={messagesRef}
+        fetched={fetched}
       />
 
       {data.blocked.yes ? (
@@ -317,8 +315,6 @@ const Chat: NextPage = () => {
               value={message}
               onChange={e => setMessage(e.target.value)}
               style={{ marginRight: '1rem', width: '75%' }}
-              onFocus={() => setKeyboard(true)}
-              onBlur={() => setKeyboard(false)}
             />
             <Button type="submit" icon>
               <BiSend />

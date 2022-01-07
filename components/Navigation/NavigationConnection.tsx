@@ -147,7 +147,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
                   : {}
               }
             >
-              {message && message[0].deleted ? (
+              {message && message[0]?.deleted ? (
                 'Deleted'
               ) : (
                 <>

@@ -15,6 +15,8 @@ import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
 import { ClipLoader } from 'react-spinners';
 
+import { connectionsContext } from 'context/connectionsContext';
+
 import { Avatar } from '../Simple/Avatars';
 import { Button } from '../Simple/Button';
 import { Flex } from '../Simple/Flex';
@@ -22,7 +24,6 @@ import { Header2 } from '../Simple/Headers';
 import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
 import NavigationConnection from './NavigationConnection';
-import { connectionsContext } from 'context/connectionsContext';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 

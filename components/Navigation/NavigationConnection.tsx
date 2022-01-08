@@ -14,12 +14,13 @@ import styled from '@emotion/styled';
 import { PresenceChannel } from 'pusher-js';
 
 import { connectionsContext } from 'context/connectionsContext';
+import { userContext } from 'context/userContext';
+import { focusClick } from 'lib/utility';
+import { getUserFromIds } from 'lib/ids';
+
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header4, Header5 } from 'components/Simple/Headers';
-import { focusClick } from 'lib/utility';
-import { userContext } from 'context/userContext';
-import { getUserFromIds } from 'lib/ids';
 
 const StyledHeader = styled(Header5)`
   text-overflow: ellipsis;

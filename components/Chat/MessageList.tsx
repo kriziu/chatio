@@ -1,8 +1,10 @@
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useContext, useState } from 'react';
 
-import { AnimatePresence, m, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import axios from 'axios';
 
+import { userContext } from 'context/userContext';
+import { chatContext } from 'context/chatContext';
 import { errToast } from 'lib/toasts';
 import {
   List,
@@ -10,15 +12,14 @@ import {
   MessageContainer,
   PinContainer,
 } from './MessageList.elements';
+
 import Portal from '../Portal';
-import { userContext } from 'context/userContext';
 import Spinner from 'components/Spinner';
-import { chatContext } from 'context/chatContext';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
 
-const MotionList = motion(List);
+const MotionList = m(List);
 
 const MessageList: FC = () => {
   const {

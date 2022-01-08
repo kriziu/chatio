@@ -5,13 +5,14 @@ import axios from 'axios';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
+import useForm from 'hooks/useForm';
+import { validateEmail } from 'lib/validators';
+
 import { Header1, Header2, Header3 } from 'components/Simple/Headers';
 import { Input } from 'components/Simple/Input';
 import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
 import { Form } from 'components/Simple/Form';
-import useForm from 'hooks/useForm';
-import { validateEmail } from 'lib/validators';
 import { AvatarSmall } from 'components/Simple/Avatars';
 
 const Find: NextPage = () => {

@@ -6,11 +6,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion';
 
-import { GlobalStyles } from 'styles/GlobalStyles';
-import { Background } from 'components/Simple/Background';
-import Circle from 'components/Shapes/AnimatedCircle';
 import UserProvider from 'context/userContext';
 import ConnectionsProvider from 'context/connectionsContext';
+import { GlobalStyles } from 'styles/GlobalStyles';
+
+import { Background } from 'components/Simple/Background';
+import Circle from 'components/Shapes/AnimatedCircle';
 import Navigation from 'components/Navigation/Navigation';
 
 const animation = {

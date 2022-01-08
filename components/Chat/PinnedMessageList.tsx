@@ -1,6 +1,7 @@
 import { FC, useContext } from 'react';
 
 import { userContext } from 'context/userContext';
+
 import { List, Message, MessageContainer } from './MessageList.elements';
 import { Header2 } from 'components/Simple/Headers';
 

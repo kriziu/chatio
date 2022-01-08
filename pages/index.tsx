@@ -7,13 +7,13 @@ import useSWR, { useSWRConfig } from 'swr';
 import { BsCheck } from 'react-icons/bs';
 import { MdDelete } from 'react-icons/md';
 
+import { defaultUser, userContext } from 'context/userContext';
+import { connectionsContext } from 'context/connectionsContext';
+
 import { Header1, Header2, Header3 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
-
-import { defaultUser, userContext } from 'context/userContext';
-import { connectionsContext } from 'context/connectionsContext';
 
 // TODO:
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)

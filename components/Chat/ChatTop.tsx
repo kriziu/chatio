@@ -1,18 +1,31 @@
-import { Dispatch, FC, SetStateAction, useContext, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 
 import { BsTelephoneFill } from 'react-icons/bs';
+import { useSwipeable } from 'react-swipeable';
+
+import { chatContext } from 'context/chatContext';
+import { getUserFromIds } from 'lib/ids';
+import { userContext } from 'context/userContext';
 
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Flex } from 'components/Simple/Flex';
 import { Header4 } from 'components/Simple/Headers';
 import ChatSettings from './ChatSettings';
-import { chatContext } from 'context/chatContext';
-import { useSwipeable } from 'react-swipeable';
+
+import Spinner from 'components/Spinner';
 
 const ChatTop: FC = () => {
-  const { secondUser, active } = useContext(chatContext);
+  const {
+    user: { _id },
+  } = useContext(userContext);
+  const { active, data } = useContext(chatContext);
 
   const [opened, setOpened] = useState(false);
+  const [secondUser, setSecondUser] = useState<UserType>();
+
+  useEffect(() => {
+    setSecondUser(getUserFromIds(data, _id));
+  }, [data]);
 
   const handlersToOpenSettings = useSwipeable({
     onSwipedDown() {
@@ -34,12 +47,15 @@ const ChatTop: FC = () => {
     },
   });
 
+  if (!secondUser) return <Spinner />;
+
   return (
     <>
       <ChatSettings
         opened={opened}
         setOpened={setOpened}
         handlersToCloseSettings={handlersToCloseSettings}
+        secondUser={secondUser}
       />
 
       <Flex

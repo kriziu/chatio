@@ -1,16 +1,17 @@
 import React, { Dispatch, FC, SetStateAction, useContext } from 'react';
 
 import styled from '@emotion/styled';
+import axios from 'axios';
+import { SwipeableHandlers } from 'react-swipeable';
+
+import { chatContext } from 'context/chatContext';
+import { errToast } from 'lib/toasts';
 
 import { Background } from 'components/Simple/Background';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
-import axios from 'axios';
 import PinnedMessageList from './PinnedMessageList';
-import { errToast } from 'lib/toasts';
-import { chatContext } from 'context/chatContext';
-import { SwipeableHandlers } from 'react-swipeable';
 
 const Settings = styled(Background)<{ opened: boolean }>`
   margin-top: -2rem;
@@ -24,20 +25,17 @@ interface Props {
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
   handlersToCloseSettings: SwipeableHandlers;
+  secondUser: UserType;
 }
 
 const ChatSettings: FC<Props> = ({
   opened,
   setOpened,
+  secondUser,
   handlersToCloseSettings,
 }) => {
-  const {
-    active,
-    secondUser,
-    handlePinnedMessageClick,
-    messages,
-    connectionId,
-  } = useContext(chatContext);
+  const { active, handlePinnedMessageClick, messages, connectionId } =
+    useContext(chatContext);
 
   const pinnedMessages = messages.filter(message => message.pin);
 

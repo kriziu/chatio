@@ -5,7 +5,7 @@ export const chatContext = createContext<{
   loading: boolean;
   active: boolean;
   fetched: boolean;
-  secondUser: UserType;
+  data: CConnectionType;
   messages: MessageType[];
   listRef: RefObject<HTMLUListElement>;
   messagesRef: MutableRefObject<HTMLLIElement[]>;

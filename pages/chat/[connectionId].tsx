@@ -3,21 +3,14 @@ import { useRouter } from 'next/router';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
-import { BiSend } from 'react-icons/bi';
 import useSWR, { mutate } from 'swr';
-import { useSwipeable } from 'react-swipeable';
 import { PresenceChannel } from 'pusher-js';
 
 import { chatContext } from 'context/chatContext';
-import { userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
-import { getUserFromIds } from 'lib/ids';
-import { Button } from 'components/Simple/Button';
+
 import ChatContainer from 'components/Chat/ChatContainer';
-import { Flex } from 'components/Simple/Flex';
 import ChatTop from 'components/Chat/ChatTop';
-import { Input } from 'components/Simple/Input';
-import { Header3 } from 'components/Simple/Headers';
 import Spinner from 'components/Spinner';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
@@ -28,8 +21,6 @@ let fetched = false;
 let oldestMsgId = '';
 
 const Chat: NextPage = () => {
-  const { user } = useContext(userContext);
-  const { _id } = user;
   const { channels } = useContext(connectionsContext);
 
   const router = useRouter();
@@ -37,7 +28,6 @@ const Chat: NextPage = () => {
 
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
 
@@ -227,8 +217,6 @@ const Chat: NextPage = () => {
   if (error) return <div>failed to load</div>;
   if (!data || !messages) return <Spinner />;
 
-  const secondUser = getUserFromIds(data, _id);
-
   const handlePinnedMessageClick = (messageId: string) => {
     const index = messages.findIndex(message => message._id === messageId);
 
@@ -245,7 +233,7 @@ const Chat: NextPage = () => {
         messagesRef,
         messages,
         listRef,
-        secondUser,
+        data,
         active,
         fetched,
         loading,
@@ -255,34 +243,6 @@ const Chat: NextPage = () => {
       <ChatTop />
 
       <ChatContainer />
-
-      {data.blocked.yes ? (
-        <Header3>Blocked</Header3>
-      ) : (
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            message &&
-              axios.post('/api/pusher/send', {
-                connectionId,
-                message,
-                sender: user,
-              });
-            setMessage('');
-          }}
-        >
-          <Flex style={{ paddingTop: '2rem' }}>
-            <Input
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              style={{ marginRight: '1rem', width: '75%' }}
-            />
-            <Button type="submit" icon>
-              <BiSend />
-            </Button>
-          </Flex>
-        </form>
-      )}
     </chatContext.Provider>
   );
 };

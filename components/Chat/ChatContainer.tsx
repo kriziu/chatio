@@ -10,22 +10,26 @@ import React, {
 
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
+import { BiSend } from 'react-icons/bi';
 
 import { userContext } from 'context/userContext';
+import { chatContext } from 'context/chatContext';
 import useWindowSize from 'hooks/useWindowSize';
-import { Button } from 'components/Simple/Button';
+
 import MessageList from './MessageList';
 import { Container, DownContainer } from './ChatContainer.elements';
-import { chatContext } from 'context/chatContext';
+import { Button } from 'components/Simple/Button';
+import { Header3 } from 'components/Simple/Headers';
+import { Flex } from 'components/Simple/Flex';
+import { Input } from 'components/Simple/Input';
 
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages: MessageType[] = [];
 
 const ChatContainer: FC = () => {
-  const {
-    user: { _id },
-  } = useContext(userContext);
-  const { messages, connectionId, listRef, messagesRef, fetched } =
+  const { user } = useContext(userContext);
+  const { _id } = user;
+  const { messages, connectionId, listRef, messagesRef, fetched, data } =
     useContext(chatContext);
 
   const [, windowHeight] = useWindowSize();
@@ -34,6 +38,7 @@ const ChatContainer: FC = () => {
 
   const [shown, setShown] = useState(false);
   const [first, setFirst] = useState(true);
+  const [message, setMessage] = useState('');
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
@@ -135,26 +140,55 @@ const ChatContainer: FC = () => {
   }, [obs, messages, messagesRef]);
 
   return (
-    <Container height={windowHeight}>
-      <MessageList />
+    <>
+      <Container height={windowHeight}>
+        <MessageList />
 
-      <DownContainer shown={shown}>
-        New messages: {counter}
-        <Button
-          onClick={() => {
-            console.log(listRef.current);
-            listRef.current &&
-              listRef.current.scrollTo({
-                top: listRef.current.scrollHeight,
-                behavior: 'smooth',
+        <DownContainer shown={shown}>
+          New messages: {counter}
+          <Button
+            onClick={() => {
+              console.log(listRef.current);
+              listRef.current &&
+                listRef.current.scrollTo({
+                  top: listRef.current.scrollHeight,
+                  behavior: 'smooth',
+                });
+            }}
+            icon
+          >
+            <BsChevronDown />
+          </Button>
+        </DownContainer>
+      </Container>
+      {data.blocked.yes ? (
+        <Header3>Blocked</Header3>
+      ) : (
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            message &&
+              axios.post('/api/pusher/send', {
+                connectionId,
+                message,
+                sender: user,
               });
+            setMessage('');
           }}
-          icon
         >
-          <BsChevronDown />
-        </Button>
-      </DownContainer>
-    </Container>
+          <Flex style={{ paddingTop: '2rem' }}>
+            <Input
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              style={{ marginRight: '1rem', width: '75%' }}
+            />
+            <Button type="submit" icon>
+              <BiSend />
+            </Button>
+          </Flex>
+        </form>
+      )}
+    </>
   );
 };
 

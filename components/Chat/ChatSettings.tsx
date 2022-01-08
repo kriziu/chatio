@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useContext } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -9,6 +9,8 @@ import { Header3 } from 'components/Simple/Headers';
 import axios from 'axios';
 import PinnedMessageList from './PinnedMessageList';
 import { errToast } from 'lib/toasts';
+import { chatContext } from 'context/chatContext';
+import { SwipeableHandlers } from 'react-swipeable';
 
 const Settings = styled(Background)<{ opened: boolean }>`
   margin-top: -2rem;
@@ -21,26 +23,26 @@ const Settings = styled(Background)<{ opened: boolean }>`
 interface Props {
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
-  secondUser: UserType;
-  handlersToClose: any;
-  connectionId: string;
-  active: boolean;
-  pinnedMessages: MessageType[];
-  handlePinnedMessageClick: (messageId: string) => void;
+  handlersToCloseSettings: SwipeableHandlers;
 }
 
 const ChatSettings: FC<Props> = ({
   opened,
-  secondUser,
-  handlersToClose,
   setOpened,
-  connectionId,
-  active,
-  pinnedMessages,
-  handlePinnedMessageClick,
+  handlersToCloseSettings,
 }) => {
+  const {
+    active,
+    secondUser,
+    handlePinnedMessageClick,
+    messages,
+    connectionId,
+  } = useContext(chatContext);
+
+  const pinnedMessages = messages.filter(message => message.pin);
+
   return (
-    <Settings w="100vw" h="100vh" opened={opened} {...handlersToClose}>
+    <Settings w="100vw" h="100vh" opened={opened} {...handlersToCloseSettings}>
       <Flex style={{ marginTop: '2rem' }} onClick={() => setOpened(false)}>
         <AvatarSmall active={active} />
         <Header3

@@ -1,30 +1,22 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import {
-  FocusEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
 import { BiSend } from 'react-icons/bi';
 import useSWR, { mutate } from 'swr';
-import { ClipLoader } from 'react-spinners';
 import { useSwipeable } from 'react-swipeable';
 import { PresenceChannel } from 'pusher-js';
 
-import { Button } from 'components/Simple/Button';
+import { chatContext } from 'context/chatContext';
 import { userContext } from 'context/userContext';
+import { connectionsContext } from 'context/connectionsContext';
+import { getUserFromIds } from 'lib/ids';
+import { Button } from 'components/Simple/Button';
 import ChatContainer from 'components/Chat/ChatContainer';
 import { Flex } from 'components/Simple/Flex';
-import { getUserFromIds } from 'lib/ids';
-import ChatSettings from 'components/Chat/ChatSettings';
 import ChatTop from 'components/Chat/ChatTop';
 import { Input } from 'components/Simple/Input';
-import { connectionsContext } from 'context/connectionsContext';
 import { Header3 } from 'components/Simple/Headers';
 import Spinner from 'components/Spinner';
 
@@ -43,10 +35,10 @@ const Chat: NextPage = () => {
   const router = useRouter();
   const connectionId = router.query.connectionId as string;
 
-  const [settings, setSettings] = useState(false);
   const [active, setActive] = useState(false);
-  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
 
   const listRef = useRef<HTMLUListElement>(null);
@@ -67,9 +59,9 @@ const Chat: NextPage = () => {
         }`
       );
 
-      if (res.data[0]?._id !== oldestMsgId) {
+      if (res.data[0] && res.data[0]?._id !== oldestMsgId) {
         setMessages(prev => [...res.data, ...prev]);
-        if (res.data[0]) oldestMsgId = res.data[0]._id;
+        oldestMsgId = res.data[0]._id;
       }
       return res.data;
     }
@@ -77,8 +69,9 @@ const Chat: NextPage = () => {
 
   useEffect(() => {
     oldestMsgId = '';
+    setLoading(true);
     setMessages([]);
-    getAndSetMessages();
+    getAndSetMessages().then(() => setLoading(false));
   }, [connectionId, getAndSetMessages]);
 
   useEffect(() => {
@@ -193,7 +186,7 @@ const Chat: NextPage = () => {
     return () => {
       list?.removeEventListener('scroll', getMoreMessages);
     };
-  }, [connectionId, messages, getAndSetMessages]);
+  }, [connectionId, messages, getAndSetMessages, loading]);
 
   useEffect(() => {
     const keyboardClb = () => {
@@ -231,26 +224,6 @@ const Chat: NextPage = () => {
     };
   }, [listRef]);
 
-  const handlersToOpen = useSwipeable({
-    onSwipedDown() {
-      setSettings(true);
-    },
-  });
-
-  const handlersToClose = useSwipeable({
-    onSwipedUp(e) {
-      let close = true;
-
-      (e.event as TouchEvent).composedPath().forEach(target => {
-        const tr = target as HTMLElement;
-
-        if (tr.tagName && tr.tagName.toLowerCase() === 'ul') close = false;
-      });
-
-      close && setSettings(false);
-    },
-  });
-
   if (error) return <div>failed to load</div>;
   if (!data || !messages) return <Spinner />;
 
@@ -263,37 +236,25 @@ const Chat: NextPage = () => {
       top: messagesRef.current[index].offsetTop - 100,
       behavior: 'smooth',
     });
-
-    setSettings(false);
   };
 
   return (
-    <>
-      <ChatSettings
-        handlersToClose={handlersToClose}
-        secondUser={secondUser}
-        opened={settings}
-        setOpened={setSettings}
-        connectionId={connectionId}
-        active={active}
-        pinnedMessages={messages.filter(message => message.pin)}
-        handlePinnedMessageClick={handlePinnedMessageClick}
-      />
+    <chatContext.Provider
+      value={{
+        connectionId,
+        messagesRef,
+        messages,
+        listRef,
+        secondUser,
+        active,
+        fetched,
+        loading,
+        handlePinnedMessageClick,
+      }}
+    >
+      <ChatTop />
 
-      <ChatTop
-        secondUser={secondUser}
-        handlersToOpen={handlersToOpen}
-        setOpened={setSettings}
-        active={active}
-      />
-
-      <ChatContainer
-        messages={messages}
-        connectionId={connectionId}
-        listRef={listRef}
-        messagesRef={messagesRef}
-        fetched={fetched}
-      />
+      <ChatContainer />
 
       {data.blocked.yes ? (
         <Header3>Blocked</Header3>
@@ -322,7 +283,7 @@ const Chat: NextPage = () => {
           </Flex>
         </form>
       )}
-    </>
+    </chatContext.Provider>
   );
 };
 

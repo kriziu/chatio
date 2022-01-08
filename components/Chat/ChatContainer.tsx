@@ -16,32 +16,22 @@ import useWindowSize from 'hooks/useWindowSize';
 import { Button } from 'components/Simple/Button';
 import MessageList from './MessageList';
 import { Container, DownContainer } from './ChatContainer.elements';
-
-interface Props {
-  messages: MessageType[];
-  connectionId: string;
-  listRef: RefObject<HTMLUListElement>;
-  messagesRef: MutableRefObject<HTMLLIElement[]>;
-  fetched: boolean;
-}
+import { chatContext } from 'context/chatContext';
 
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages: MessageType[] = [];
 
-const ChatContainer: FC<Props> = ({
-  messages,
-  connectionId,
-  listRef,
-  messagesRef,
-  fetched,
-}) => {
+const ChatContainer: FC = () => {
   const {
     user: { _id },
   } = useContext(userContext);
+  const { messages, connectionId, listRef, messagesRef, fetched } =
+    useContext(chatContext);
+
   const [, windowHeight] = useWindowSize();
 
   const [obs, setObs] = useState<IntersectionObserver>();
-  const [touched, setTouched] = useState(false);
+
   const [shown, setShown] = useState(false);
   const [first, setFirst] = useState(true);
   const [counter, setCounter] = useState(0);
@@ -75,8 +65,6 @@ const ChatContainer: FC<Props> = ({
         }
       )
     );
-
-    console.log(listRef.current);
 
     const newMsg =
       prevMessages.length !== messages.length &&
@@ -123,15 +111,17 @@ const ChatContainer: FC<Props> = ({
     };
 
     if (listRef.current) {
-      const el = listRef.current;
+      const list = listRef.current;
 
-      el.addEventListener('scroll', ifsetShown);
+      list.addEventListener('scroll', ifsetShown);
 
       return () => {
-        el.removeEventListener('scroll', ifsetShown);
+        list.removeEventListener('scroll', ifsetShown);
+        setShown(false);
+        setCounter(0);
       };
     }
-  }, [listRef.current]);
+  }, [listRef.current, listRef]);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {
@@ -145,18 +135,8 @@ const ChatContainer: FC<Props> = ({
   }, [obs, messages, messagesRef]);
 
   return (
-    <Container
-      height={windowHeight}
-      onTouchStart={() => setTouched(true)}
-      onTouchEnd={() => setTouched(false)}
-    >
-      <MessageList
-        touched={touched}
-        messages={messages}
-        messagesRef={messagesRef}
-        setTouched={setTouched}
-        listRef={listRef}
-      />
+    <Container height={windowHeight}>
+      <MessageList />
 
       <DownContainer shown={shown}>
         New messages: {counter}

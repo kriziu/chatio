@@ -25,7 +25,8 @@ const MessageList: FC = () => {
   const {
     user: { _id },
   } = useContext(userContext);
-  const { messages, messagesRef, listRef, loading } = useContext(chatContext);
+  const { messages, messagesRef, listRef, setListRef, loading } =
+    useContext(chatContext);
 
   const [selected, setSelected] = useState(-1);
   const [touched, setTouched] = useState(false);
@@ -105,7 +106,9 @@ const MessageList: FC = () => {
             onTouchMove={() => setSelected(-1)}
             onTouchStart={() => setTouched(true)}
             onTouchEnd={() => setTouched(false)}
-            ref={listRef}
+            ref={newRef =>
+              newRef !== listRef && setListRef(newRef as HTMLUListElement)
+            }
           >
             {messages.map((message, index, arr) => {
               const messageDate = new Date(message.date);

@@ -1,4 +1,9 @@
-import { createContext, MutableRefObject, RefObject } from 'react';
+import {
+  createContext,
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+} from 'react';
 
 export const chatContext = createContext<{
   connectionId: string;
@@ -7,7 +12,8 @@ export const chatContext = createContext<{
   fetched: boolean;
   data: CConnectionType;
   messages: MessageType[];
-  listRef: RefObject<HTMLUListElement>;
+  listRef: HTMLUListElement | undefined;
+  setListRef: Dispatch<SetStateAction<HTMLUListElement | undefined>>;
   messagesRef: MutableRefObject<HTMLLIElement[]>;
   handlePinnedMessageClick: (messageId: string) => void;
 }>(null!);

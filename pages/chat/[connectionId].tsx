@@ -30,8 +30,8 @@ const Chat: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
+  const [listRef, setListRef] = useState<HTMLUListElement>();
 
-  const listRef = useRef<HTMLUListElement>(null);
   const messagesRef = useRef<HTMLLIElement[]>([]);
 
   const { data, error } = useSWR<CConnectionType>(
@@ -162,21 +162,21 @@ const Chat: NextPage = () => {
             : -1;
 
           index !== -1 &&
-            listRef.current?.scrollTo({
+            listRef?.scrollTo({
               top: messagesRef.current[index].offsetTop - 100,
             });
         });
       }
     };
 
-    const list = listRef.current;
+    const list = listRef;
 
     list?.addEventListener('scroll', getMoreMessages);
 
     return () => {
       list?.removeEventListener('scroll', getMoreMessages);
     };
-  }, [connectionId, messages, getAndSetMessages, loading]);
+  }, [connectionId, messages, getAndSetMessages, loading, listRef]);
 
   useEffect(() => {
     const keyboardClb = () => {
@@ -184,23 +184,20 @@ const Chat: NextPage = () => {
         size = window.innerHeight - height;
         setTimeout(
           () =>
-            listRef.current &&
-            listRef.current.scrollTo({
-              top: listRef.current?.scrollTop + height - window.innerHeight,
+            listRef &&
+            listRef.scrollTo({
+              top: listRef?.scrollTop + height - window.innerHeight,
               behavior: 'smooth',
             }),
           100
         );
       } else {
-        if (listRef.current) {
-          const scrolledTop = Math.round(listRef.current?.scrollTop);
+        if (listRef) {
+          const scrolledTop = Math.round(listRef?.scrollTop);
 
-          if (
-            listRef.current?.scrollHeight - scrolledTop >
-            window.innerHeight - 100
-          )
-            listRef.current.scrollTo({
-              top: listRef.current?.scrollTop + size,
+          if (listRef?.scrollHeight - scrolledTop > window.innerHeight - 100)
+            listRef.scrollTo({
+              top: listRef?.scrollTop + size,
             });
           size = 0;
         }
@@ -220,7 +217,7 @@ const Chat: NextPage = () => {
   const handlePinnedMessageClick = (messageId: string) => {
     const index = messages.findIndex(message => message._id === messageId);
 
-    listRef.current?.scrollTo({
+    listRef?.scrollTo({
       top: messagesRef.current[index].offsetTop - 100,
       behavior: 'smooth',
     });
@@ -233,6 +230,7 @@ const Chat: NextPage = () => {
         messagesRef,
         messages,
         listRef,
+        setListRef,
         data,
         active,
         fetched,

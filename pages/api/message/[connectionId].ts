@@ -14,8 +14,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const connection = await connectionModel.findById(connectionId);
 
-    console.log(chunkId);
-
     let forbidden = true;
     connection?.users.forEach(user => {
       if (user._id.toString() === _id) forbidden = false;

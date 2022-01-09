@@ -25,7 +25,7 @@ const ChatTop: FC = () => {
 
   useEffect(() => {
     setSecondUser(getUserFromIds(data, _id));
-  }, [data]);
+  }, [data, _id]);
 
   const handlersToOpenSettings = useSwipeable({
     onSwipedDown() {

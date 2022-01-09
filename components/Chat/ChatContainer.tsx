@@ -66,7 +66,7 @@ const ChatContainer: FC = () => {
           }
         },
         {
-          root: listRef.current,
+          root: listRef,
         }
       )
     );
@@ -77,18 +77,15 @@ const ChatContainer: FC = () => {
     newMsg && !fetched && setCounter(prev => prev + 1);
 
     if (
-      listRef.current &&
+      listRef &&
       !fetched &&
-      (listRef.current.scrollHeight - listRef.current.scrollTop <
-        listRef.current.clientHeight + 200 ||
+      (listRef.scrollHeight - listRef.scrollTop < listRef.clientHeight + 200 ||
         first ||
         messages[messages.length - 1]?.sender._id === _id)
     ) {
-      listRef.current.scrollTo({
-        top: listRef.current.scrollHeight,
+      listRef.scrollTo({
+        top: listRef.scrollHeight,
       });
-    } else if (newMsg) {
-      setShown(true);
     }
 
     prevMessages = messages;
@@ -100,23 +97,21 @@ const ChatContainer: FC = () => {
   useEffect(() => {
     const ifsetShown = () => {
       if (
-        listRef.current &&
-        listRef.current.scrollHeight - listRef.current.scrollTop >
-          listRef.current.clientHeight + 1000
+        listRef &&
+        listRef.scrollHeight - listRef.scrollTop > listRef.clientHeight + 1000
       )
         setShown(true);
       else if (
-        listRef.current &&
-        listRef.current.scrollHeight - listRef.current.scrollTop <=
-          listRef.current.clientHeight
+        listRef &&
+        listRef.scrollHeight - listRef.scrollTop <= listRef.clientHeight
       ) {
         setShown(false);
         setCounter(0);
       }
     };
 
-    if (listRef.current) {
-      const list = listRef.current;
+    if (listRef) {
+      const list = listRef;
 
       list.addEventListener('scroll', ifsetShown);
 
@@ -126,7 +121,7 @@ const ChatContainer: FC = () => {
         setCounter(0);
       };
     }
-  }, [listRef.current, listRef]);
+  }, [listRef]);
 
   useEffect(() => {
     if (obs && messagesRef.current.length) {
@@ -148,10 +143,9 @@ const ChatContainer: FC = () => {
           New messages: {counter}
           <Button
             onClick={() => {
-              console.log(listRef.current);
-              listRef.current &&
-                listRef.current.scrollTo({
-                  top: listRef.current.scrollHeight,
+              listRef &&
+                listRef.scrollTo({
+                  top: listRef.scrollHeight,
                   behavior: 'smooth',
                 });
             }}

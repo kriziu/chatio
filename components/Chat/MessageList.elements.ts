@@ -15,6 +15,8 @@ export const MessageContainer = styled.li<{
   mine: boolean;
   time: string;
   touched: boolean;
+  margin?: boolean;
+  bottom?: boolean;
 }>`
   display: flex;
   align-items: center;
@@ -26,7 +28,10 @@ export const MessageContainer = styled.li<{
   max-width: 80%;
 
   :not(:first-of-type) {
-    margin-top: 2rem;
+    ${({ margin, bottom }) =>
+      bottom
+        ? `margin-bottom: ${margin ? 2 : 0.2}rem; margin-top: 0.2rem`
+        : `margin-top: ${margin ? 2 : 0.2}rem; margin-bottom: 0.2rem`};
   }
 
   ::after {
@@ -38,10 +43,13 @@ export const MessageContainer = styled.li<{
 `;
 
 export const Message = styled.p<{
-  mine?: boolean;
+  margin?: boolean;
+  bottom?: boolean;
+  both?: boolean;
+  mine: boolean;
   read?: boolean;
-  pinned?: boolean;
-  deleted?: boolean;
+  pinned: boolean;
+  deleted: boolean;
 }>`
   color: #eee;
   padding: 1rem 1.5rem;
@@ -49,7 +57,16 @@ export const Message = styled.p<{
     deleted ? 'none' : mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
   border: ${({ pinned }) => (pinned ? 2 : 0)}px solid white;
   width: max-content;
-  border-radius: 2rem;
+  border-radius: ${({ mine, bottom, margin, both }) =>
+    !margin
+      ? mine
+        ? `2rem 0.5rem 0.5rem 2rem`
+        : `0.5rem 2rem 2rem 0.5rem`
+      : both
+      ? '2rem'
+      : mine
+      ? `2rem ${bottom ? '0.5rem 2rem' : '2rem 0.5rem'} 2rem`
+      : `${bottom ? '0.5rem 2rem 2rem 2rem' : '2rem 2rem 2rem 0.5rem'}`};
   word-break: break-all;
   user-select: none;
   background-color: black;
@@ -88,7 +105,7 @@ export const PinContainer = styled.div<{
   top: ${({ top }) => top - 45}px;
 
   ${({ mine, width }) =>
-    !mine ? `left: ${width + 30}px` : `right: ${width + 40}px`};
+    !mine ? `left: ${width - 25}px` : `right: ${width - 15}px`};
 
   p {
     padding: 1rem 0.5rem;

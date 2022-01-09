@@ -1,12 +1,4 @@
-import React, {
-  FC,
-  MutableRefObject,
-  RefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { BsChevronDown } from 'react-icons/bs';
@@ -78,10 +70,12 @@ const ChatContainer: FC = () => {
 
     if (
       listRef &&
-      !fetched &&
-      (listRef.scrollHeight - listRef.scrollTop < listRef.clientHeight + 200 ||
-        first ||
-        messages[messages.length - 1]?.sender._id === _id)
+      (first ||
+        (!fetched &&
+          newMsg &&
+          (listRef.scrollHeight - listRef.scrollTop <
+            listRef.clientHeight + 200 ||
+            messages[messages.length - 1]?.sender._id === _id)))
     ) {
       listRef.scrollTo({
         top: listRef.scrollHeight,
@@ -90,7 +84,7 @@ const ChatContainer: FC = () => {
 
     prevMessages = messages;
 
-    if (messages.length) setFirst(false);
+    if (messages.length && listRef?.id === connectionId) setFirst(false);
     else setFirst(true);
   }, [messages, _id, first, connectionId, listRef, fetched]);
 

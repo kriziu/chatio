@@ -9,7 +9,7 @@ import connectionModel from 'models/connection.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
   const { _id } = jwt.decode(ACCESS) as { _id: string };
-  const { connectionId, latest, chunkId } = req.query;
+  const { connectionId, latest, chunkId, pinned } = req.query;
 
   try {
     const connection = await connectionModel.findById(connectionId);
@@ -20,6 +20,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (forbidden) return res.status(403).end();
+    console.log(pinned);
+    if (pinned) {
+      const messages = await messageModel.find({ connectionId, pin: true });
+
+      return res.status(200).json(messages);
+    }
 
     const message = chunkId
       ? await messageModel.findById(chunkId)

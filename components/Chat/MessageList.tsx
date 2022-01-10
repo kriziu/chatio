@@ -25,7 +25,7 @@ const MessageList: FC = () => {
   const {
     user: { _id },
   } = useContext(userContext);
-  const { messages, messagesRef, listRef, setListRef, loading, connectionId } =
+  const { messages, messagesRef, setListRef, loading, connectionId } =
     useContext(chatContext);
 
   const [selected, setSelected] = useState(-1);
@@ -67,7 +67,7 @@ const MessageList: FC = () => {
                 axios.delete(`/api/pusher/pin?messageId=${selectedMessage._id}`)
               }
             >
-              Pin
+              {selectedMessage.pin ? 'Unpin' : 'Pin'}
             </p>
             <p
               onClick={() =>

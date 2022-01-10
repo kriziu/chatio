@@ -63,7 +63,7 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
               <Circle radius={7} secondary position={{ x: 25, y: 35 }} />
               <Circle radius={3} secondary position={{ x: 75, y: 45 }} />
             </div>
-            <Background w="100vw" h="100vh" />
+            <Background w="100vw" h="100vh" style={{ transition: 'none' }} />
 
             <AnimatePresence exitBeforeEnter>
               <m.div

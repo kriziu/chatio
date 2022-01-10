@@ -3,6 +3,7 @@ import React, { Dispatch, FC, SetStateAction, useContext } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { SwipeableHandlers } from 'react-swipeable';
+import useSWR from 'swr';
 
 import { chatContext } from 'context/chatContext';
 import { errToast } from 'lib/toasts';
@@ -11,6 +12,7 @@ import { Background } from 'components/Simple/Background';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
+import Spinner from 'components/Spinner';
 import PinnedMessageList from './PinnedMessageList';
 
 const Settings = styled(Background)<{ opened: boolean }>`
@@ -28,6 +30,8 @@ interface Props {
   secondUser: UserType;
 }
 
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
+
 const ChatSettings: FC<Props> = ({
   opened,
   setOpened,
@@ -37,7 +41,13 @@ const ChatSettings: FC<Props> = ({
   const { active, handlePinnedMessageClick, messages, connectionId } =
     useContext(chatContext);
 
-  const pinnedMessages = messages.filter(message => message.pin);
+  const { data, error } = useSWR(
+    connectionId ? `/api/message/${connectionId}?pinned=true` : null,
+    fetcher
+  );
+
+  if (error) return <div>failed to load</div>;
+  if (!data || !messages) return <Spinner />;
 
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToCloseSettings}>
@@ -53,7 +63,7 @@ const ChatSettings: FC<Props> = ({
         </Header3>
       </Flex>
       <PinnedMessageList
-        messages={pinnedMessages}
+        messages={data}
         handlePinnedMessageClick={handlePinnedMessageClick}
       />
       <Flex

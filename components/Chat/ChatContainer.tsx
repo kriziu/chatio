@@ -16,7 +16,7 @@ import { Flex } from 'components/Simple/Flex';
 import { Input } from 'components/Simple/Input';
 
 let lastTimeOut: NodeJS.Timeout;
-let prevMessages: MessageType[] = [];
+let prevMessages = { length: 0, conId: '' };
 
 const ChatContainer: FC = () => {
   const { user } = useContext(userContext);
@@ -65,24 +65,30 @@ const ChatContainer: FC = () => {
 
     const newMsg =
       prevMessages.length !== messages.length &&
-      prevMessages[0]?.connectionId === messages[0]?.connectionId;
+      prevMessages.conId === messages[0]?.connectionId;
+
     newMsg && !fetched && setCounter(prev => prev + 1);
 
-    if (
-      listRef &&
-      (first ||
+    if (listRef)
+      if (
+        first ||
         (!fetched &&
           newMsg &&
           (listRef.scrollHeight - listRef.scrollTop <
             listRef.clientHeight + 200 ||
-            messages[messages.length - 1]?.sender._id === _id)))
-    ) {
-      listRef.scrollTo({
-        top: listRef.scrollHeight,
-      });
-    }
+            messages[messages.length - 1]?.sender._id === _id))
+      ) {
+        listRef.scrollTo({
+          top: listRef.scrollHeight,
+        });
+      } else if (
+        newMsg &&
+        listRef.scrollHeight - listRef.scrollTop > listRef.clientHeight + 200
+      )
+        setShown(true);
 
-    prevMessages = messages;
+    prevMessages.length = messages.length;
+    prevMessages.conId = messages[0]?.connectionId;
 
     if (messages.length && listRef?.id === connectionId) setFirst(false);
     else setFirst(true);

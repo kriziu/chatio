@@ -18,7 +18,9 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 let height = 0;
 let size = 0;
 let fetched = false;
-let oldestMsgId = '';
+let top = false;
+let tempTopMsgId = '';
+let tempBotMsgId = '';
 
 const Chat: NextPage = () => {
   const { channels } = useContext(connectionsContext);
@@ -42,23 +44,43 @@ const Chat: NextPage = () => {
   const getAndSetMessages = useCallback(async (): Promise<
     MessageType[] | undefined
   > => {
+    console.log(top);
+    console.log(tempTopMsgId);
+    console.log(tempBotMsgId);
     if (connectionId) {
       const res = await axios.get<MessageType[]>(
         `/api/message/${connectionId}${
-          oldestMsgId ? '?chunkId=' + oldestMsgId : ''
+          top && tempTopMsgId
+            ? '?chunkTopId=' + tempTopMsgId
+            : tempBotMsgId
+            ? '?chunkBotId=' + tempBotMsgId
+            : ''
         }`
       );
 
-      if (res.data[0] && res.data[0]?._id !== oldestMsgId) {
-        setMessages(prev => [...res.data, ...prev]);
-        oldestMsgId = res.data[0]._id;
+      let length = top ? 0 : res.data.length - 1;
+
+      if (
+        res.data[length] &&
+        res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
+      ) {
+        setMessages(prev =>
+          top ? [...res.data, ...prev] : [...prev, ...res.data]
+        );
+
+        if (!tempBotMsgId) tempBotMsgId = tempTopMsgId = res.data[0]._id;
+        if (!tempTopMsgId) tempTopMsgId = res.data[res.data.length - 1]._id;
+
+        if (top) tempTopMsgId = res.data[0]._id;
+        else tempBotMsgId = res.data[res.data.length - 1]._id;
       }
       return res.data;
     }
   }, [connectionId]);
 
   useEffect(() => {
-    oldestMsgId = '';
+    tempTopMsgId = '';
+    tempBotMsgId = '';
     setLoading(true);
     setMessages([]);
     getAndSetMessages().then(() => setLoading(false));
@@ -151,15 +173,26 @@ const Chat: NextPage = () => {
     const getMoreMessages = (e: Event) => {
       const list = e.currentTarget as HTMLElement;
 
-      if (list.scrollTop === 0 && messages.length >= 100) {
+      if (
+        (list.scrollTop === 0 ||
+          list.scrollTop + list.clientHeight === list.scrollHeight) &&
+        messages.length >= 100
+      ) {
+        if (list.scrollTop === 0) top = true;
+        else top = false;
+
         fetched = true;
+
         getAndSetMessages().then(res => {
           fetched = false;
           const index = res
-            ? [...res, ...messages].findIndex(
-                message => message._id === messages[0]._id
+            ? (top ? [...res, ...messages] : [...messages, ...res]).findIndex(
+                message =>
+                  message._id === messages[top ? 0 : messages.length - 1]._id
               )
             : -1;
+
+          console.log(index);
 
           index !== -1 &&
             listRef?.scrollTo({

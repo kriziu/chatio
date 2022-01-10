@@ -9,7 +9,7 @@ import connectionModel from 'models/connection.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
   const { _id } = jwt.decode(ACCESS) as { _id: string };
-  const { connectionId, latest, chunkId, pinned } = req.query;
+  const { connectionId, latest, chunkTopId, chunkBotId, pinned } = req.query;
 
   try {
     const connection = await connectionModel.findById(connectionId);
@@ -20,32 +20,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     if (forbidden) return res.status(403).end();
-    console.log(pinned);
+
     if (pinned) {
       const messages = await messageModel.find({ connectionId, pin: true });
 
       return res.status(200).json(messages);
     }
 
-    const message = chunkId
-      ? await messageModel.findById(chunkId)
+    const message = chunkTopId
+      ? await messageModel.findById(chunkTopId)
+      : chunkBotId
+      ? await messageModel.findById(chunkBotId)
       : await messageModel.findOne({}, {}, { sort: { _id: -1 }, limit: 1 });
 
     if (!message) {
       return res.status(404).end();
     }
 
+    console.log(chunkTopId);
+    console.log(chunkBotId);
+
     const messages = await messageModel.find(
       {
         connectionId,
-        date:
-          latest || !chunkId ? { $lte: message.date } : { $lt: message.date },
+        date: chunkBotId
+          ? { $gt: message.date }
+          : chunkTopId
+          ? { $lt: message.date }
+          : { $lte: message.date },
       },
       {},
-      { sort: { _id: -1 }, limit: latest ? 1 : 100 }
+      { sort: { _id: chunkBotId ? 1 : -1 }, limit: latest ? 1 : 100 }
     );
 
-    messages.reverse();
+    !chunkBotId && messages.reverse();
 
     return res.status(200).json(messages);
   } catch (err) {

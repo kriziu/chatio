@@ -65,14 +65,14 @@ const Chat: NextPage = () => {
         res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
       ) {
         setMessages(prev =>
-          top ? [...res.data, ...prev] : [...prev, ...res.data]
+          top
+            ? [...res.data, ...prev].slice(0, 201)
+            : [
+                ...(prev.length + res.data.length > 200
+                  ? [...prev.slice(res.data.length), ...res.data.slice(1)]
+                  : [...prev, ...res.data]),
+              ]
         );
-
-        if (!tempBotMsgId) tempBotMsgId = tempTopMsgId = res.data[0]._id;
-        if (!tempTopMsgId) tempTopMsgId = res.data[res.data.length - 1]._id;
-
-        if (top) tempTopMsgId = res.data[0]._id;
-        else tempBotMsgId = res.data[res.data.length - 1]._id;
       }
       return res.data;
     }
@@ -169,6 +169,11 @@ const Chat: NextPage = () => {
 
   useEffect(() => {
     height = window.innerHeight;
+
+    if (messages.length) {
+      tempTopMsgId = messages[0]._id;
+      tempBotMsgId = messages[messages.length - 1]._id;
+    }
 
     const getMoreMessages = (e: Event) => {
       const list = e.currentTarget as HTMLElement;

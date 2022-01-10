@@ -6,6 +6,8 @@ import {
 } from 'react';
 
 export const chatContext = createContext<{
+  newestMsgs: boolean;
+  goToNewestMessages: () => void;
   connectionId: string;
   loading: boolean;
   active: boolean;

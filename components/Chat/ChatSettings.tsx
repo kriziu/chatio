@@ -64,7 +64,10 @@ const ChatSettings: FC<Props> = ({
       </Flex>
       <PinnedMessageList
         messages={data}
-        handlePinnedMessageClick={handlePinnedMessageClick}
+        handlePinnedMessageClick={id => {
+          setOpened(false);
+          handlePinnedMessageClick(id);
+        }}
       />
       <Flex
         style={{

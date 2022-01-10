@@ -21,8 +21,16 @@ let prevMessages = { length: 0, conId: '' };
 const ChatContainer: FC = () => {
   const { user } = useContext(userContext);
   const { _id } = user;
-  const { messages, connectionId, listRef, messagesRef, fetched, data } =
-    useContext(chatContext);
+  const {
+    messages,
+    connectionId,
+    listRef,
+    messagesRef,
+    fetched,
+    data,
+    goToNewestMessages,
+    newestMsgs,
+  } = useContext(chatContext);
 
   const [, windowHeight] = useWindowSize();
 
@@ -139,18 +147,9 @@ const ChatContainer: FC = () => {
       <Container height={windowHeight}>
         <MessageList />
 
-        <DownContainer shown={shown}>
+        <DownContainer shown={shown || !newestMsgs}>
           New messages: {counter}
-          <Button
-            onClick={() => {
-              listRef &&
-                listRef.scrollTo({
-                  top: listRef.scrollHeight,
-                  behavior: 'smooth',
-                });
-            }}
-            icon
-          >
+          <Button onClick={goToNewestMessages} icon>
             <BsChevronDown />
           </Button>
         </DownContainer>

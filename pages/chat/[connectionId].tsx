@@ -17,8 +17,10 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 let height = 0;
 let size = 0;
+let prevLength = 0;
+let pinClick = '';
 let fetched = false;
-let top = false;
+let top = true;
 let tempTopMsgId = '';
 let tempBotMsgId = '';
 
@@ -30,6 +32,7 @@ const Chat: NextPage = () => {
 
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [newestMsgs, setNewestMsgs] = useState(true);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
   const [listRef, setListRef] = useState<HTMLUListElement>();
@@ -44,9 +47,6 @@ const Chat: NextPage = () => {
   const getAndSetMessages = useCallback(async (): Promise<
     MessageType[] | undefined
   > => {
-    console.log(top);
-    console.log(tempTopMsgId);
-    console.log(tempBotMsgId);
     if (connectionId) {
       const res = await axios.get<MessageType[]>(
         `/api/message/${connectionId}${
@@ -60,15 +60,23 @@ const Chat: NextPage = () => {
 
       let length = top ? 0 : res.data.length - 1;
 
+      if (!top && !res.data.length) setNewestMsgs(true);
+
       if (
         res.data[length] &&
         res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
       ) {
+        prevLength += res.data.length;
+
+        if (prevLength > 200) setNewestMsgs(false);
+
         setMessages(prev =>
-          top
+          !tempBotMsgId && !tempTopMsgId
+            ? res.data
+            : top
             ? [...res.data, ...prev].slice(0, 201)
             : [
-                ...(prev.length + res.data.length > 200
+                ...(prevLength > 200
                   ? [...prev.slice(res.data.length), ...res.data.slice(1)]
                   : [...prev, ...res.data]),
               ]
@@ -81,6 +89,8 @@ const Chat: NextPage = () => {
   useEffect(() => {
     tempTopMsgId = '';
     tempBotMsgId = '';
+    prevLength = 0;
+    setNewestMsgs(true);
     setLoading(true);
     setMessages([]);
     getAndSetMessages().then(() => setLoading(false));
@@ -179,9 +189,8 @@ const Chat: NextPage = () => {
       const list = e.currentTarget as HTMLElement;
 
       if (
-        (list.scrollTop === 0 ||
-          list.scrollTop + list.clientHeight === list.scrollHeight) &&
-        messages.length >= 100
+        list.scrollTop === 0 ||
+        (list.scrollTop + list.clientHeight === list.scrollHeight && !pinClick)
       ) {
         if (list.scrollTop === 0) top = true;
         else top = false;
@@ -196,8 +205,6 @@ const Chat: NextPage = () => {
                   message._id === messages[top ? 0 : messages.length - 1]._id
               )
             : -1;
-
-          console.log(index);
 
           index !== -1 &&
             listRef?.scrollTo({
@@ -249,14 +256,66 @@ const Chat: NextPage = () => {
     };
   }, [listRef]);
 
+  useEffect(() => {
+    if (pinClick) {
+      tempTopMsgId = messages[0]._id;
+      tempBotMsgId = messages[messages.length - 1]._id;
+      const index = messages.findIndex(message => message._id === pinClick);
+
+      listRef?.scrollTo({
+        top: messagesRef.current[index].offsetTop - 100,
+      });
+    }
+
+    pinClick = '';
+  }, [messages, listRef]);
+
   if (error) return <div>failed to load</div>;
   if (!data || !messages) return <Spinner />;
 
   const handlePinnedMessageClick = (messageId: string) => {
     const index = messages.findIndex(message => message._id === messageId);
 
+    if (index === -1) {
+      setMessages([]);
+      setNewestMsgs(false);
+      axios
+        .get<MessageType[]>(
+          `/api/message/pinnedMessage?connectionId=${connectionId}&messageId=${messageId}`
+        )
+        .then(res => {
+          setMessages(res.data);
+          prevLength = res.data.length;
+
+          pinClick = messageId;
+        });
+    } else
+      listRef?.scrollTo({
+        top: messagesRef.current[index].offsetTop - 100,
+        behavior: 'smooth',
+      });
+  };
+
+  const goToNewestMessages = () => {
+    if (!newestMsgs) {
+      tempTopMsgId = '';
+      tempBotMsgId = '';
+
+      setMessages([]);
+      prevLength = 0;
+
+      getAndSetMessages().then(() =>
+        listRef?.scrollTo({
+          top: listRef.scrollHeight,
+          behavior: 'smooth',
+        })
+      );
+
+      setNewestMsgs(true);
+    }
+
     listRef?.scrollTo({
-      top: messagesRef.current[index].offsetTop - 100,
+      top: listRef.scrollHeight,
       behavior: 'smooth',
     });
   };
@@ -264,6 +323,8 @@ const Chat: NextPage = () => {
   return (
     <chatContext.Provider
       value={{
+        newestMsgs,
+        goToNewestMessages,
         connectionId,
         messagesRef,
         messages,
@@ -277,7 +338,6 @@ const Chat: NextPage = () => {
       }}
     >
       <ChatTop />
-
       <ChatContainer />
     </chatContext.Provider>
   );

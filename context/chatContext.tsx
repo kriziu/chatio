@@ -12,6 +12,10 @@ export const chatContext = createContext<{
   loading: boolean;
   active: boolean;
   fetched: boolean;
+  scrollTo: {
+    behavior: ScrollBehavior;
+    id: string;
+  };
   data: CConnectionType;
   messages: MessageType[];
   listRef: HTMLUListElement | undefined;

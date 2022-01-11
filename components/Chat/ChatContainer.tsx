@@ -15,6 +15,7 @@ import { Header3 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';
 import { Input } from 'components/Simple/Input';
 
+let keyboardSize = 0;
 let lastTimeOut: NodeJS.Timeout;
 let prevMessages = { length: 0, conId: '' };
 
@@ -30,6 +31,7 @@ const ChatContainer: FC = () => {
     data,
     goToNewestMessages,
     newestMsgs,
+    scrollTo,
   } = useContext(chatContext);
 
   const [, windowHeight] = useWindowSize();
@@ -103,6 +105,8 @@ const ChatContainer: FC = () => {
   }, [messages, _id, first, connectionId, listRef, fetched]);
 
   useEffect(() => {
+    const height = window.innerHeight;
+
     const ifsetShown = () => {
       if (
         listRef &&
@@ -118,12 +122,39 @@ const ChatContainer: FC = () => {
       }
     };
 
+    const keyboardResizeClb = () => {
+      if (window.innerHeight < height * 0.9) {
+        keyboardSize = window.innerHeight - height;
+        setTimeout(
+          () =>
+            listRef &&
+            listRef.scrollTo({
+              top: listRef?.scrollTop + height - window.innerHeight,
+              behavior: 'smooth',
+            }),
+          100
+        );
+      } else {
+        if (listRef) {
+          const scrolledTop = Math.round(listRef?.scrollTop);
+
+          if (listRef?.scrollHeight - scrolledTop > window.innerHeight - 100)
+            listRef.scrollTo({
+              top: listRef?.scrollTop + keyboardSize,
+            });
+          keyboardSize = 0;
+        }
+      }
+    };
+
     if (listRef) {
       const list = listRef;
 
+      window.addEventListener('resize', keyboardResizeClb);
       list.addEventListener('scroll', ifsetShown);
 
       return () => {
+        window.removeEventListener('resize', keyboardResizeClb);
         list.removeEventListener('scroll', ifsetShown);
         setShown(false);
         setCounter(0);
@@ -132,6 +163,18 @@ const ChatContainer: FC = () => {
   }, [listRef]);
 
   useEffect(() => {
+    if (scrollTo.id) {
+      const index = messages.findIndex(message => message._id === scrollTo.id);
+
+      listRef?.scrollTo({
+        top: messagesRef.current[index].offsetTop - 100,
+        behavior: scrollTo.behavior,
+      });
+
+      scrollTo.id = '';
+      scrollTo.behavior = 'auto';
+    }
+
     if (obs && messagesRef.current.length) {
       messagesRef.current.forEach(singleMsgRef => {
         obs.observe(singleMsgRef);
@@ -140,7 +183,7 @@ const ChatContainer: FC = () => {
         obs.disconnect();
       };
     }
-  }, [obs, messages, messagesRef]);
+  }, [obs, messages, messagesRef, listRef, scrollTo]);
 
   return (
     <>

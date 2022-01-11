@@ -15,14 +15,15 @@ import Spinner from 'components/Spinner';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
-let height = 0;
-let size = 0;
 let prevLength = 0;
-let pinClick = '';
 let fetched = false;
 let top = true;
 let tempTopMsgId = '';
 let tempBotMsgId = '';
+let scrollTo: { behavior: ScrollBehavior; id: string } = {
+  behavior: 'auto',
+  id: '',
+};
 
 const Chat: NextPage = () => {
   const { channels } = useContext(connectionsContext);
@@ -36,6 +37,8 @@ const Chat: NextPage = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
   const [listRef, setListRef] = useState<HTMLUListElement>();
+
+  const [, rerender] = useState(false);
 
   const messagesRef = useRef<HTMLLIElement[]>([]);
 
@@ -86,6 +89,7 @@ const Chat: NextPage = () => {
     }
   }, [connectionId]);
 
+  // RESET ALL
   useEffect(() => {
     tempTopMsgId = '';
     tempBotMsgId = '';
@@ -104,6 +108,7 @@ const Chat: NextPage = () => {
     });
   }, [connectionId, channels]);
 
+  // PREPARE CHANNEL CALLBACKS
   useEffect(() => {
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
@@ -178,8 +183,6 @@ const Chat: NextPage = () => {
   }, [channel, channel?.members.count, router, connectionId]);
 
   useEffect(() => {
-    height = window.innerHeight;
-
     if (messages.length) {
       tempTopMsgId = messages[0]._id;
       tempBotMsgId = messages[messages.length - 1]._id;
@@ -190,7 +193,8 @@ const Chat: NextPage = () => {
 
       if (
         list.scrollTop === 0 ||
-        (list.scrollTop + list.clientHeight === list.scrollHeight && !pinClick)
+        (list.scrollTop + list.clientHeight === list.scrollHeight &&
+          !scrollTo.id)
       ) {
         if (list.scrollTop === 0) top = true;
         else top = false;
@@ -199,76 +203,21 @@ const Chat: NextPage = () => {
 
         getAndSetMessages().then(res => {
           fetched = false;
-          const index = res
-            ? (top ? [...res, ...messages] : [...messages, ...res]).findIndex(
-                message =>
-                  message._id === messages[top ? 0 : messages.length - 1]._id
-              )
-            : -1;
-
-          index !== -1 &&
-            listRef?.scrollTo({
-              top: messagesRef.current[index].offsetTop - 100,
-            });
+          // warunek zeby nie scrollowalo do gory nawet jak nie ma nowych wiadomosci
+          scrollTo.id = top ? tempTopMsgId : tempBotMsgId;
         });
       }
     };
 
-    const list = listRef;
+    if (listRef) {
+      const list = listRef;
 
-    list?.addEventListener('scroll', getMoreMessages);
-
-    return () => {
-      list?.removeEventListener('scroll', getMoreMessages);
-    };
-  }, [connectionId, messages, getAndSetMessages, loading, listRef]);
-
-  useEffect(() => {
-    const keyboardClb = () => {
-      if (window.innerHeight < height * 0.9) {
-        size = window.innerHeight - height;
-        setTimeout(
-          () =>
-            listRef &&
-            listRef.scrollTo({
-              top: listRef?.scrollTop + height - window.innerHeight,
-              behavior: 'smooth',
-            }),
-          100
-        );
-      } else {
-        if (listRef) {
-          const scrolledTop = Math.round(listRef?.scrollTop);
-
-          if (listRef?.scrollHeight - scrolledTop > window.innerHeight - 100)
-            listRef.scrollTo({
-              top: listRef?.scrollTop + size,
-            });
-          size = 0;
-        }
-      }
-    };
-
-    window.addEventListener('resize', keyboardClb);
-
-    return () => {
-      window.removeEventListener('resize', keyboardClb);
-    };
-  }, [listRef]);
-
-  useEffect(() => {
-    if (pinClick) {
-      tempTopMsgId = messages[0]._id;
-      tempBotMsgId = messages[messages.length - 1]._id;
-      const index = messages.findIndex(message => message._id === pinClick);
-
-      listRef?.scrollTo({
-        top: messagesRef.current[index].offsetTop - 100,
-      });
+      list.addEventListener('scroll', getMoreMessages);
+      return () => {
+        list.removeEventListener('scroll', getMoreMessages);
+      };
     }
-
-    pinClick = '';
-  }, [messages, listRef]);
+  }, [connectionId, messages, getAndSetMessages, loading, listRef]);
 
   if (error) return <div>failed to load</div>;
   if (!data || !messages) return <Spinner />;
@@ -277,7 +226,6 @@ const Chat: NextPage = () => {
     const index = messages.findIndex(message => message._id === messageId);
 
     if (index === -1) {
-      setMessages([]);
       setNewestMsgs(false);
       axios
         .get<MessageType[]>(
@@ -287,13 +235,13 @@ const Chat: NextPage = () => {
           setMessages(res.data);
           prevLength = res.data.length;
 
-          pinClick = messageId;
+          scrollTo.id = messageId;
         });
-    } else
-      listRef?.scrollTo({
-        top: messagesRef.current[index].offsetTop - 100,
-        behavior: 'smooth',
-      });
+    } else {
+      scrollTo.id = messageId;
+      scrollTo.behavior = 'smooth';
+      rerender(prev => !prev);
+    }
   };
 
   const goToNewestMessages = () => {
@@ -304,12 +252,10 @@ const Chat: NextPage = () => {
       setMessages([]);
       prevLength = 0;
 
-      getAndSetMessages().then(() =>
-        listRef?.scrollTo({
-          top: listRef.scrollHeight,
-          behavior: 'smooth',
-        })
-      );
+      setLoading(true);
+      getAndSetMessages().then(() => {
+        setLoading(false);
+      });
 
       setNewestMsgs(true);
     }
@@ -335,6 +281,7 @@ const Chat: NextPage = () => {
         fetched,
         loading,
         handlePinnedMessageClick,
+        scrollTo,
       }}
     >
       <ChatTop />

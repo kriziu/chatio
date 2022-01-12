@@ -32,6 +32,8 @@ const ChatContainer: FC = () => {
     goToNewestMessages,
     newestMsgs,
     scrollTo,
+    counter,
+    top,
   } = useContext(chatContext);
 
   const [, windowHeight] = useWindowSize();
@@ -41,7 +43,6 @@ const ChatContainer: FC = () => {
   const [shown, setShown] = useState(false);
   const [first, setFirst] = useState(true);
   const [message, setMessage] = useState('');
-  const [counter, setCounter] = useState(0);
 
   useEffect(() => {
     setObs(
@@ -76,8 +77,6 @@ const ChatContainer: FC = () => {
     const newMsg =
       prevMessages.length !== messages.length &&
       prevMessages.conId === messages[0]?.connectionId;
-
-    newMsg && !fetched && setCounter(prev => prev + 1);
 
     if (listRef)
       if (
@@ -118,7 +117,6 @@ const ChatContainer: FC = () => {
         listRef.scrollHeight - listRef.scrollTop <= listRef.clientHeight
       ) {
         setShown(false);
-        setCounter(0);
       }
     };
 
@@ -157,22 +155,21 @@ const ChatContainer: FC = () => {
         window.removeEventListener('resize', keyboardResizeClb);
         list.removeEventListener('scroll', ifsetShown);
         setShown(false);
-        setCounter(0);
       };
     }
-  }, [listRef]);
+  }, [listRef, newestMsgs]);
 
   useEffect(() => {
     if (scrollTo.id) {
       const index = messages.findIndex(message => message._id === scrollTo.id);
-
-      listRef?.scrollTo({
-        top: messagesRef.current[index].offsetTop - 100,
-        behavior: scrollTo.behavior,
-      });
-
-      scrollTo.id = '';
-      scrollTo.behavior = 'auto';
+      if (index !== -1) {
+        listRef?.scrollTo({
+          top:
+            messagesRef.current[index].offsetTop -
+            (top ? 100 : listRef?.clientHeight),
+          behavior: scrollTo.behavior,
+        });
+      }
     }
 
     if (obs && messagesRef.current.length) {
@@ -183,7 +180,7 @@ const ChatContainer: FC = () => {
         obs.disconnect();
       };
     }
-  }, [obs, messages, messagesRef, listRef, scrollTo]);
+  }, [obs, messages, messagesRef, listRef, scrollTo.behavior, scrollTo.id]);
 
   return (
     <>
@@ -202,6 +199,7 @@ const ChatContainer: FC = () => {
       ) : (
         <form
           onSubmit={e => {
+            // cos anty spam
             e.preventDefault();
             message &&
               axios.post('/api/pusher/send', {

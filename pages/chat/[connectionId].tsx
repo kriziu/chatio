@@ -7,6 +7,7 @@ import useSWR, { mutate } from 'swr';
 import { PresenceChannel } from 'pusher-js';
 
 import { chatContext } from 'context/chatContext';
+import { userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
 import ChatContainer from 'components/Chat/ChatContainer';
@@ -20,12 +21,11 @@ let fetched = false;
 let top = true;
 let tempTopMsgId = '';
 let tempBotMsgId = '';
-let scrollTo: { behavior: ScrollBehavior; id: string } = {
-  behavior: 'auto',
-  id: '',
-};
 
 const Chat: NextPage = () => {
+  const {
+    user: { _id },
+  } = useContext(userContext);
   const { channels } = useContext(connectionsContext);
 
   const router = useRouter();
@@ -34,11 +34,14 @@ const Chat: NextPage = () => {
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newestMsgs, setNewestMsgs] = useState(true);
+  const [counter, setCounter] = useState(0);
+  const [scrollTo, setScrollTo] = useState<{
+    behavior: ScrollBehavior;
+    id: string;
+  }>({ behavior: 'auto', id: '' });
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [channel, setChannel] = useState<PresenceChannel>();
   const [listRef, setListRef] = useState<HTMLUListElement>();
-
-  const [, rerender] = useState(false);
 
   const messagesRef = useRef<HTMLLIElement[]>([]);
 
@@ -47,10 +50,9 @@ const Chat: NextPage = () => {
     fetcher
   );
 
-  const getAndSetMessages = useCallback(async (): Promise<
-    MessageType[] | undefined
-  > => {
+  const getAndSetMessages = useCallback(async () => {
     if (connectionId) {
+      fetched = true;
       const res = await axios.get<MessageType[]>(
         `/api/message/${connectionId}${
           top && tempTopMsgId
@@ -63,29 +65,52 @@ const Chat: NextPage = () => {
 
       let length = top ? 0 : res.data.length - 1;
 
-      if (!top && !res.data.length) setNewestMsgs(true);
+      if (!top && !res.data.length) {
+        setNewestMsgs(true);
+        setCounter(0);
+      }
 
       if (
         res.data[length] &&
         res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
       ) {
         prevLength += res.data.length;
+        if (prevLength > 200) {
+          setNewestMsgs(false);
+        }
 
-        if (prevLength > 200) setNewestMsgs(false);
+        setScrollTo({
+          behavior: 'auto',
+          id: top ? tempTopMsgId : tempBotMsgId,
+        });
 
-        setMessages(prev =>
-          !tempBotMsgId && !tempTopMsgId
-            ? res.data
-            : top
-            ? [...res.data, ...prev].slice(0, 201)
-            : [
-                ...(prevLength > 200
-                  ? [...prev.slice(res.data.length), ...res.data.slice(1)]
-                  : [...prev, ...res.data]),
-              ]
-        );
-      }
-      return res.data;
+        setMessages(prev => {
+          if (!tempBotMsgId && !tempTopMsgId) return res.data;
+
+          if (top) return [...res.data, ...prev].slice(0, 201);
+
+          if (prevLength > 200) {
+            const messages = [...prev.slice(res.data.length - 1), ...res.data];
+            const seen = new Set();
+
+            const filteredMessages = messages.filter(msg => {
+              const duplicate = seen.has(msg._id);
+              seen.add(msg._id);
+              return !duplicate;
+            });
+
+            return filteredMessages;
+          }
+
+          return [...prev, ...res.data];
+        });
+      } else
+        setScrollTo({
+          behavior: 'auto',
+          id: '',
+        });
+      setLoading(false);
+      fetched = false;
     }
   }, [connectionId]);
 
@@ -97,7 +122,7 @@ const Chat: NextPage = () => {
     setNewestMsgs(true);
     setLoading(true);
     setMessages([]);
-    getAndSetMessages().then(() => setLoading(false));
+    getAndSetMessages();
   }, [connectionId, getAndSetMessages]);
 
   useEffect(() => {
@@ -114,6 +139,21 @@ const Chat: NextPage = () => {
       if (channel.members.count >= 2) setActive(true);
 
       const newMsgClb = (data: MessageType) => {
+        setScrollTo({ id: '', behavior: 'auto' });
+        setCounter(prev => prev + 1);
+
+        if (!newestMsgs) {
+          if (data.sender._id === _id) {
+            setMessages([]);
+            setLoading(true);
+            console.log('no');
+            tempBotMsgId = '';
+            tempTopMsgId = '';
+            getAndSetMessages();
+          }
+
+          return;
+        }
         setMessages(prev => [...prev, data]);
       };
       channel.bind('new_msg', newMsgClb);
@@ -180,7 +220,7 @@ const Chat: NextPage = () => {
         channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, router, connectionId]);
+  }, [channel, channel?.members.count, router, connectionId, newestMsgs]);
 
   useEffect(() => {
     if (messages.length) {
@@ -193,19 +233,11 @@ const Chat: NextPage = () => {
 
       if (
         list.scrollTop === 0 ||
-        (list.scrollTop + list.clientHeight === list.scrollHeight &&
-          !scrollTo.id)
+        list.scrollTop + list.clientHeight === list.scrollHeight
       ) {
         if (list.scrollTop === 0) top = true;
         else top = false;
-
-        fetched = true;
-
-        getAndSetMessages().then(res => {
-          fetched = false;
-          // warunek zeby nie scrollowalo do gory nawet jak nie ma nowych wiadomosci
-          scrollTo.id = top ? tempTopMsgId : tempBotMsgId;
-        });
+        getAndSetMessages();
       }
     };
 
@@ -217,30 +249,39 @@ const Chat: NextPage = () => {
         list.removeEventListener('scroll', getMoreMessages);
       };
     }
-  }, [connectionId, messages, getAndSetMessages, loading, listRef]);
+  }, [
+    connectionId,
+    messages,
+    getAndSetMessages,
+    loading,
+    listRef,
+    scrollTo.id,
+  ]);
 
   if (error) return <div>failed to load</div>;
   if (!data || !messages) return <Spinner />;
 
   const handlePinnedMessageClick = (messageId: string) => {
     const index = messages.findIndex(message => message._id === messageId);
-
+    top = true;
     if (index === -1) {
+      setLoading(true);
       setNewestMsgs(false);
+
       axios
         .get<MessageType[]>(
           `/api/message/pinnedMessage?connectionId=${connectionId}&messageId=${messageId}`
         )
         .then(res => {
+          setLoading(false);
+
+          setScrollTo({ behavior: 'auto', id: messageId });
+
           setMessages(res.data);
           prevLength = res.data.length;
-
-          scrollTo.id = messageId;
         });
     } else {
-      scrollTo.id = messageId;
-      scrollTo.behavior = 'smooth';
-      rerender(prev => !prev);
+      setScrollTo({ behavior: 'smooth', id: messageId });
     }
   };
 
@@ -249,13 +290,15 @@ const Chat: NextPage = () => {
       tempTopMsgId = '';
       tempBotMsgId = '';
 
+      setScrollTo(prev => {
+        return { ...prev, id: '' };
+      });
+
       setMessages([]);
       prevLength = 0;
 
       setLoading(true);
-      getAndSetMessages().then(() => {
-        setLoading(false);
-      });
+      getAndSetMessages();
 
       setNewestMsgs(true);
     }
@@ -282,6 +325,8 @@ const Chat: NextPage = () => {
         loading,
         handlePinnedMessageClick,
         scrollTo,
+        counter,
+        top,
       }}
     >
       <ChatTop />

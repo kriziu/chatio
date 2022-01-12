@@ -12,6 +12,8 @@ export const chatContext = createContext<{
   loading: boolean;
   active: boolean;
   fetched: boolean;
+  top: boolean;
+  counter: number;
   scrollTo: {
     behavior: ScrollBehavior;
     id: string;

@@ -180,7 +180,15 @@ const ChatContainer: FC = () => {
         obs.disconnect();
       };
     }
-  }, [obs, messages, messagesRef, listRef, scrollTo.behavior, scrollTo.id]);
+  }, [
+    obs,
+    messages,
+    messagesRef,
+    listRef,
+    scrollTo.behavior,
+    scrollTo.id,
+    top,
+  ]);
 
   return (
     <>

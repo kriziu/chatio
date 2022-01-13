@@ -33,15 +33,16 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const { mutate } = useSWRConfig();
 
+  const [file, setFile] = useState<File>();
+  const [invites, setInvites] = useState<UserInvited[]>([]);
+  const [yourInvites, setYourInvites] = useState<UserInvited[]>([]);
+
   const { data, error } = useSWR<InviteType[]>(`/api/invite`, fetcher, {
     refreshInterval: 2000,
   });
   const yours = useSWR<InviteType[]>(`/api/invite?your=true`, fetcher, {
     refreshInterval: 2000,
   });
-
-  const [invites, setInvites] = useState<UserInvited[]>([]);
-  const [yourInvites, setYourInvites] = useState<UserInvited[]>([]);
 
   useEffect(() => {
     setInvites([]);
@@ -155,6 +156,29 @@ const Profile: NextPage = () => {
       >
         Log out
       </Button>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          console.log(e);
+          if (!file) return;
+
+          const body = new FormData();
+          body.append('file', file);
+          axios.post('/api/profile/image', body);
+        }}
+      >
+        <input
+          type="file"
+          onChange={e => {
+            if (e.target.files) {
+              console.log(e.target.files[0]);
+              setFile(e.target.files[0]);
+            }
+          }}
+        />
+        <button type="submit">upload</button>
+      </form>
+      {/* {file && <img width={100} height={100} src={URL.createObjectURL(file)} />} */}
     </>
   );
 };

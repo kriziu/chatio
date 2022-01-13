@@ -222,7 +222,15 @@ const Chat: NextPage = () => {
         channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, router, connectionId, newestMsgs]);
+  }, [
+    channel,
+    channel?.members.count,
+    router,
+    connectionId,
+    newestMsgs,
+    _id,
+    getAndSetMessages,
+  ]);
 
   useEffect(() => {
     if (messages.length) {

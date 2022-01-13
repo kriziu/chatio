@@ -49,12 +49,15 @@ const PinnedMessageList: FC<Props> = ({
               time={time}
               touched={true}
               onClick={() => handlePinnedMessageClick(message._id)}
+              margin
             >
               <Message
                 mine={mine}
                 id={message._id}
                 pinned={message.pin}
                 deleted={message.deleted}
+                margin
+                both
               >
                 {message.message}
               </Message>

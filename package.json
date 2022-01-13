@@ -12,6 +12,7 @@
     "@emotion/styled": "^11.6.0",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
+    "cloudinary": "^1.28.1",
     "framer-motion": "^5.3.3",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^8.5.1",

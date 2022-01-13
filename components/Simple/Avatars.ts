@@ -6,6 +6,8 @@ export const AvatarSmall = styled.div<{ active?: boolean }>`
   background-color: gray;
   border-radius: 50%;
   position: relative;
+  background-image: url('https://res.cloudinary.com/kriziuu/image/upload/v1642088240/cld-sample.jpg');
+  background-size: cover;
 
   ::after {
     display: ${({ active }) => (active ? 'block' : 'none')};

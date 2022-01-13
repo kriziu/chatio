@@ -181,6 +181,8 @@ const Chat: NextPage = () => {
       channel.bind('delete_msg', delMsgClb);
 
       const pinMsgClb = (id: string) => {
+        mutate(`/api/message/${connectionId}?pinned=true`);
+        setScrollTo({ id: '', behavior: 'auto' });
         setMessages(prev =>
           prev.map(message =>
             message._id === id ? { ...message, pin: !message.pin } : message
@@ -233,7 +235,7 @@ const Chat: NextPage = () => {
 
       if (
         list.scrollTop === 0 ||
-        list.scrollTop + list.clientHeight === list.scrollHeight
+        list.scrollTop + list.clientHeight > list.scrollHeight - 2
       ) {
         if (list.scrollTop === 0) top = true;
         else top = false;
@@ -245,8 +247,12 @@ const Chat: NextPage = () => {
       const list = listRef;
 
       list.addEventListener('scroll', getMoreMessages);
+
+      const clickClb = () => setScrollTo({ id: '', behavior: 'auto' });
+      list.addEventListener('click', clickClb);
       return () => {
         list.removeEventListener('scroll', getMoreMessages);
+        list.removeEventListener('click', clickClb);
       };
     }
   }, [

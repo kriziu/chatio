@@ -1,11 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+import jwt from 'jsonwebtoken';
+
 import { pusher } from 'lib/pusher';
 import messageModel from 'models/message.model';
 import connectionModel from 'models/connection.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { message, sender, connectionId } = req.body;
+  const { ACCESS } = req.cookies;
+  const { _id } = jwt.decode(ACCESS) as {
+    _id: string;
+  };
+  const { message, connectionId } = req.body;
 
   const connection = await connectionModel.findById(connectionId);
 
@@ -15,12 +21,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const newMessage = new messageModel({
     connectionId,
-    sender,
+    sender: _id,
     message,
     date: new Date(),
   });
 
-  await pusher.trigger(`presence-${connectionId}`, 'new_msg', newMessage);
+  const msg = await newMessage.populate('sender');
+
+  await pusher.trigger(`presence-${connectionId}`, 'new_msg', msg);
   await newMessage.save();
 
   res.json({ message: 'completed' });

@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
-import { userSchema } from './user.model';
+import autopopulate from 'mongoose-autopopulate';
 
 const connectionSchema = new mongoose.Schema<CConnectionType>({
   users: [
     {
-      type: userSchema,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
+      autopopulate: true,
     },
   ],
   group: { type: Boolean, require: true },
@@ -14,6 +16,8 @@ const connectionSchema = new mongoose.Schema<CConnectionType>({
     yes: { type: Boolean, required: true },
   },
 });
+
+connectionSchema.plugin(autopopulate);
 
 const connectionModel =
   (mongoose.models.Connection as mongoose.Model<CConnectionType>) ||

@@ -20,11 +20,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       password: hashedPassword,
       fName,
       lName,
+      imageURL: '-1',
     });
 
     await user.save();
 
-    const token = generateRefresh({ fName, lName, _id: user._id, email });
+    const token = generateRefresh({
+      fName,
+      lName,
+      _id: user._id,
+      email,
+      imageURL: '-1',
+    });
 
     const savedToken = new tokenModel({
       token,

@@ -63,11 +63,11 @@ const MessageList: FC = () => {
 
               const bfDate =
                 arr[index - 1]?.sender._id === senderId
-                  ? new Date(arr[index - 1].date)
+                  ? new Date(arr[index - 1]?.date)
                   : null;
               const afDate =
                 arr[index + 1]?.sender._id === senderId
-                  ? new Date(arr[index + 1].date)
+                  ? new Date(arr[index + 1]?.date)
                   : null;
 
               const before = !bfDate

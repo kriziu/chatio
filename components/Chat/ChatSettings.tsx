@@ -30,29 +30,19 @@ interface Props {
   secondUser: UserType;
 }
 
-const fetcher = (url: string) => axios.get(url).then(res => res.data);
-
 const ChatSettings: FC<Props> = ({
   opened,
   setOpened,
   secondUser,
   handlersToCloseSettings,
 }) => {
-  const { active, handlePinnedMessageClick, messages, connectionId } =
+  const { active, handlePinnedMessageClick, connectionId } =
     useContext(chatContext);
-
-  const { data, error } = useSWR(
-    connectionId ? `/api/message/${connectionId}?pinned=true` : null,
-    fetcher
-  );
-
-  if (error) return <div>failed to load</div>;
-  if (!data || !messages) return <Spinner />;
 
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToCloseSettings}>
       <Flex style={{ marginTop: '2rem' }} onClick={() => setOpened(false)}>
-        <AvatarSmall active={active} />
+        <AvatarSmall active={active} imageURL={secondUser.imageURL} />
         <Header3
           style={{
             textAlign: 'left',
@@ -63,7 +53,6 @@ const ChatSettings: FC<Props> = ({
         </Header3>
       </Flex>
       <PinnedMessageList
-        messages={data}
         handlePinnedMessageClick={id => {
           setOpened(false);
           handlePinnedMessageClick(id);

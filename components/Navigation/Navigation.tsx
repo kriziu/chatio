@@ -15,6 +15,7 @@ import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
 import { ClipLoader } from 'react-spinners';
 
+import { userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
 import { Avatar } from '../Simple/Avatars';
@@ -28,6 +29,9 @@ import NavigationConnection from './NavigationConnection';
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Navigation: FC = () => {
+  const {
+    user: { imageURL },
+  } = useContext(userContext);
   const { setConnections } = useContext(connectionsContext);
 
   const { mutate } = useSWRConfig();
@@ -123,7 +127,7 @@ const Navigation: FC = () => {
                     setOpened(false);
                   }}
                 >
-                  <Avatar />
+                  <Avatar imageURL={imageURL} />
                   <Header2>Your profile</Header2>
                 </Top>
               </a>

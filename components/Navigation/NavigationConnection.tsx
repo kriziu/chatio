@@ -125,7 +125,7 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
           }
           tabIndex={0}
         >
-          <AvatarSmall active={active} />
+          <AvatarSmall active={active} imageURL={user.imageURL} />
           <Flex
             style={{
               flexDirection: 'column',

@@ -34,11 +34,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       : await messageModel.findOne({}, {}, { sort: { _id: -1 }, limit: 1 });
 
     if (!message) {
-      return res.status(404).end();
+      return res.end();
     }
-
-    console.log(chunkTopId);
-    console.log(chunkBotId);
 
     const messages = await messageModel.find(
       {

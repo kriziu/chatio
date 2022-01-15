@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { userSchema } from './user.model';
+import autopopulate from 'mongoose-autopopulate';
 
 const messageSchema = new mongoose.Schema<MessageType>({
   connectionId: {
@@ -7,8 +7,10 @@ const messageSchema = new mongoose.Schema<MessageType>({
     required: true,
   },
   sender: {
-    type: userSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
+    autopopulate: true,
   },
   message: {
     type: String,
@@ -35,6 +37,8 @@ const messageSchema = new mongoose.Schema<MessageType>({
     default: false,
   },
 });
+
+messageSchema.plugin(autopopulate);
 
 const messageModel =
   (mongoose.models.Message as mongoose.Model<MessageType>) ||

@@ -19,6 +19,10 @@ export const userSchema = new mongoose.Schema<UserType>({
     required: true,
     validate: validateEmail,
   },
+  imageURL: {
+    type: String,
+    required: true,
+  },
 });
 
 const userPasswordSchema = new mongoose.Schema<UserModelType>({

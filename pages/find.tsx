@@ -109,7 +109,7 @@ const Find: NextPage = () => {
                     marginBottom: index === users.length - 1 ? '0' : '2rem',
                   }}
                 >
-                  <AvatarSmall />
+                  <AvatarSmall imageURL={user.imageURL} />
                   <Header3 style={{ maxWidth: '20rem' }}>
                     {user.fName} {user.lName}
                   </Header3>

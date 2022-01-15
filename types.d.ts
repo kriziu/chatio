@@ -3,6 +3,7 @@ declare global {
     _id: string;
     fName: string;
     lName: string;
+    imageURL: string;
   }
 
   interface UserType extends FetchedUserType {

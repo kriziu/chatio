@@ -31,9 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           return forbidden ? res.status(403).end() : res.json(connection);
         }
 
-        const connections = await connectionModel.find({
-          'users._id': _id,
-        });
+        const connections = await (connectionModel as any).find({ users: _id }); // DIRTY FIX BECAUSE OF MONGOOSE_AUTOPOPULATE
 
         return res.json(connections);
       // case 'PATCH':

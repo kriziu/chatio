@@ -1,13 +1,18 @@
 import styled from '@emotion/styled';
 
-export const AvatarSmall = styled.div<{ active?: boolean }>`
+export const AvatarSmall = styled.div<{ active?: boolean; imageURL: string }>`
   width: 5rem;
   height: 5rem;
   background-color: gray;
   border-radius: 50%;
   position: relative;
-  background-image: url('https://res.cloudinary.com/kriziuu/image/upload/v1642088240/cld-sample.jpg');
+
+  ${({ imageURL }) =>
+    imageURL === '-1'
+      ? ''
+      : `background-image: url(${imageURL});
   background-size: cover;
+  `}
 
   ::after {
     display: ${({ active }) => (active ? 'block' : 'none')};
@@ -22,12 +27,18 @@ export const AvatarSmall = styled.div<{ active?: boolean }>`
   }
 `;
 
-export const Avatar = styled.div<{ active?: boolean }>`
+export const Avatar = styled.div<{ active?: boolean; imageURL: string }>`
   width: 6rem;
   height: 6rem;
   background-color: gray;
   border-radius: 50%;
   position: relative;
+  ${({ imageURL }) =>
+    imageURL === '-1'
+      ? ''
+      : `background-image: url(${imageURL});
+  background-size: cover;
+  `}
 
   ::after {
     display: ${({ active }) => (active ? 'block' : 'none')};

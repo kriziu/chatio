@@ -45,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const toUser = await userModel.findOne({ _id: inviteFound.to });
 
           const newConnection = new connectionModel({
-            users: [fromUser, toUser],
+            users: [fromUser?._id, toUser?._id],
             group: false,
             blocked: {
               yes: false,

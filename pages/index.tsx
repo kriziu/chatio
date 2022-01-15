@@ -27,13 +27,16 @@ interface UserInvited extends UserType {
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Profile: NextPage = () => {
-  const { setUser } = useContext(userContext);
+  const {
+    setUser,
+    user: { imageURL },
+  } = useContext(userContext);
   const { setConnections } = useContext(connectionsContext);
 
   const router = useRouter();
   const { mutate } = useSWRConfig();
 
-  const [file, setFile] = useState<File>();
+  const [image, setImage] = useState<File>();
   const [invites, setInvites] = useState<UserInvited[]>([]);
   const [yourInvites, setYourInvites] = useState<UserInvited[]>([]);
 
@@ -136,7 +139,7 @@ const Profile: NextPage = () => {
   return (
     <>
       <Flex style={{ padding: '6rem 1rem 1rem 1rem' }}>
-        <Avatar style={{ marginRight: '1rem' }} />
+        <Avatar style={{ marginRight: '1rem' }} imageURL={imageURL} />
         <Header1>Your profile</Header1>
       </Flex>
       <div>
@@ -159,26 +162,31 @@ const Profile: NextPage = () => {
       <form
         onSubmit={e => {
           e.preventDefault();
-          console.log(e);
-          if (!file) return;
+          if (!image) return;
 
           const body = new FormData();
-          body.append('file', file);
-          axios.post('/api/profile/image', body);
+          body.append('image', image);
+          axios.post<{ url: string }>('/api/profile/image', body).then(res => {
+            setUser(prev => {
+              return { ...prev, imageURL: res.data.url };
+            });
+          });
         }}
       >
         <input
           type="file"
+          accept=".jpg, .png, .jpeg"
           onChange={e => {
             if (e.target.files) {
-              console.log(e.target.files[0]);
-              setFile(e.target.files[0]);
+              setImage(e.target.files[0]);
             }
           }}
         />
         <button type="submit">upload</button>
       </form>
-      {/* {file && <img width={100} height={100} src={URL.createObjectURL(file)} />} */}
+      {image && (
+        <img width={100} height={100} src={URL.createObjectURL(image)} />
+      )}
     </>
   );
 };

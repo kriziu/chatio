@@ -17,8 +17,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (await bcrypt.compare(password, user.password)) {
-      const { fName, lName, _id, email } = user;
-      const token = generateRefresh({ fName, lName, _id, email });
+      const { fName, lName, _id, email, imageURL } = user;
+      const token = generateRefresh({ fName, lName, _id, email, imageURL });
 
       const savedToken = new tokenModel({
         token,

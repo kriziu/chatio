@@ -19,6 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const connections = await connectionModel.find({
       'users._id': _id,
     });
+
     const invites = await inviteModel.find({
       $or: [{ to: _id }, { from: _id }],
     });

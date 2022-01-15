@@ -1,50 +1,58 @@
-export {};
-// import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-// import jwt from 'jsonwebtoken';
-// import cloudinary from 'cloudinary';
-// import fs from 'fs';
-// import formidable from 'formidable';
+import jwt from 'jsonwebtoken';
+import formidable from 'formidable';
+import cloudinary from 'cloudinary';
 
-// import connectDB from 'middlewares/connectDB';
-// import userModel from 'models/user.model';
+import connectDB from 'middlewares/connectDB';
+import userModel from 'models/user.model';
 
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-// const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-//   const { ACCESS } = req.cookies;
-//   const { _id } = jwt.decode(ACCESS) as { _id: string };
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { ACCESS } = req.cookies;
+  const { _id } = jwt.decode(ACCESS) as { _id: string };
 
-//   try {
-//     const user = await userModel.findById(_id).select('-email');
+  try {
+    const user = await userModel.findById(_id);
 
-//     if (!user) {
-//       return res.status(404).end();
-//     }
+    if (!user) {
+      return res.status(404).end();
+    }
 
-//     const form = new formidable.IncomingForm();
+    switch (req.method) {
+      case 'POST':
+        const form = new formidable.IncomingForm({
+          keepExtensions: true,
+        });
 
-//     form.parse(req, async (err, fields, files) => {
-//       const file = files.file;
-//       // const data = fs.readFileSync(file.path);
-//       // fs.writeFileSync(`./public/${file.name}`, data);
-//       // await fs.unlinkSync(file.path);
-//       // return;
+        return form.parse(req, async (err, fields, files) => {
+          return await cloudinary.v2.uploader.upload(
+            (files.image as any).filepath,
+            { transformation: { width: 200, height: 200, crop: 'fill' } },
+            async (error: any, result: any) => {
+              if (error) return res.status(500).send({ error });
 
-//       cloudinary.v2.uploader.upload(file);
-//     });
+              const url = result.secure_url;
 
-//     return res.status(200).json(user);
-//   } catch (err) {
-//     const msg = (err as Error).message;
-//     console.log(msg);
-//     if (msg) return res.status(500).send({ error: msg });
-//     res.status(500).end();
-//   }
-// };
+              await user.updateOne({ imageURL: url });
+              return res.json({ url });
+            }
+          );
+        });
+      case 'GET':
+        return res.json({ url: user.imageURL });
+    }
+  } catch (err) {
+    const msg = (err as Error).message;
+    console.log(msg);
+    if (msg) return res.status(500).send({ error: msg });
+    res.status(500).end();
+  }
+};
 
-// export default connectDB(handler);
+export default connectDB(handler);

@@ -1,22 +1,34 @@
 import { FC, useContext } from 'react';
 
+import axios from 'axios';
+import useSWR from 'swr';
+
 import { userContext } from 'context/userContext';
+import { chatContext } from 'context/chatContext';
 
 import { List, Message, MessageContainer } from './MessageList.elements';
 import { Header2 } from 'components/Simple/Headers';
+import Spinner from 'components/Spinner';
 
 interface Props {
-  messages: MessageType[];
   handlePinnedMessageClick: (messageId: string) => void;
 }
 
-const PinnedMessageList: FC<Props> = ({
-  messages,
-  handlePinnedMessageClick,
-}) => {
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
+
+const PinnedMessageList: FC<Props> = ({ handlePinnedMessageClick }) => {
   const {
     user: { _id },
   } = useContext(userContext);
+  const { connectionId } = useContext(chatContext);
+
+  const { data, error } = useSWR<MessageType[]>(
+    connectionId ? `/api/message/${connectionId}?pinned=true` : null,
+    fetcher
+  );
+
+  if (error) return <div>failed to load</div>;
+  if (!data) return <Spinner />;
 
   return (
     <>
@@ -24,7 +36,7 @@ const PinnedMessageList: FC<Props> = ({
         Pinned messages
       </Header2>
       <List style={{ height: '20rem' }}>
-        {messages.map(message => {
+        {data.map(message => {
           const messageDate = new Date(message.date);
 
           const time =

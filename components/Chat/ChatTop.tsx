@@ -68,7 +68,7 @@ const ChatTop: FC = () => {
         {...handlersToOpenSettings}
       >
         <Flex style={{ marginLeft: '4rem' }}>
-          <AvatarSmall active={active} />
+          <AvatarSmall active={active} imageURL={secondUser.imageURL} />
           <Header4
             style={{
               width: 'min-content',

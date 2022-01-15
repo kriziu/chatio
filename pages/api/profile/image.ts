@@ -31,8 +31,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
         return form.parse(req, async (err, fields, files) => {
+          const path = (files.image as any).filepath;
+
+          const oldId = user.imageURL;
+
+          await cloudinary.v2.uploader.destroy(oldId.slice(60, 80));
+
           return await cloudinary.v2.uploader.upload(
-            (files.image as any).filepath,
+            path,
             { transformation: { width: 200, height: 200, crop: 'fill' } },
             async (error: any, result: any) => {
               if (error) return res.status(500).send({ error });

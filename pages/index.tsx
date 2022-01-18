@@ -3,44 +3,34 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
-import useSWR, { useSWRConfig } from 'swr';
-import { BsCheck } from 'react-icons/bs';
-import { MdDelete } from 'react-icons/md';
+import useSWR from 'swr';
 
 import { defaultUser, userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
-import { Header1, Header2, Header3 } from 'components/Simple/Headers';
+import InvitesList from 'components/Profile/InvitesList';
+import { Header1, Header2 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
+import AvatarPicker from 'components/Profile/AvatarPicker';
 
 // TODO:
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)
 // 3. react_devtools_backend.js:2540 Warning: Can't perform a React state update on an unmounted component. This is a no-op.
 
-interface UserInvited extends UserType {
-  inviteDate: Date;
-  inviteId: string;
-}
-
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Profile: NextPage = () => {
-  const {
-    setUser,
-    user: { imageURL },
-  } = useContext(userContext);
+  const { setUser, user } = useContext(userContext);
   const { setConnections } = useContext(connectionsContext);
 
   const router = useRouter();
-  const { mutate } = useSWRConfig();
 
-  const [image, setImage] = useState<File>();
   const [invites, setInvites] = useState<UserInvited[]>([]);
   const [yourInvites, setYourInvites] = useState<UserInvited[]>([]);
 
-  const { data, error } = useSWR<InviteType[]>(`/api/invite`, fetcher, {
+  const { data } = useSWR<InviteType[]>(`/api/invite`, fetcher, {
     refreshInterval: 2000,
   });
   const yours = useSWR<InviteType[]>(`/api/invite?your=true`, fetcher, {
@@ -73,120 +63,42 @@ const Profile: NextPage = () => {
     });
   }, [yours.data]);
 
-  const renderInvites = (): JSX.Element[] | string => {
-    return invites
-      ? invites.map(invite => {
-          return (
-            <Flex style={{ marginTop: '1rem' }} key={invite.inviteId}>
-              <Header3 style={{ marginRight: '1rem' }}>
-                {invite.fName} {invite.lName}
-              </Header3>
-              <Button
-                icon
-                onClick={() =>
-                  axios
-                    .patch<CConnectionType>('/api/invite', {
-                      inviteId: invite.inviteId,
-                    })
-                    .then(res => {
-                      setInvites(prev =>
-                        prev.filter(pre => pre.inviteId !== invite.inviteId)
-                      );
-                      console.log(res.data);
-                      setConnections(prev => [...prev, res.data]);
-                    })
-                }
-              >
-                <BsCheck />
-              </Button>
-            </Flex>
-          );
-        })
-      : 'No invites...';
-  };
-
-  const renderYourInvites = (): JSX.Element[] | string => {
-    return yourInvites
-      ? yourInvites.map(invite => {
-          return (
-            <Flex style={{ marginTop: '1rem' }} key={invite.inviteId}>
-              <Header3 style={{ marginRight: '1rem' }}>
-                {invite.fName} {invite.lName}
-              </Header3>
-              <Button
-                icon
-                onClick={() =>
-                  axios
-                    .delete('/api/invite', {
-                      data: { inviteId: invite.inviteId },
-                    })
-                    .then(() => {
-                      setYourInvites(prev =>
-                        prev.filter(pre => pre.inviteId !== invite.inviteId)
-                      );
-                      mutate('/api/connection');
-                    })
-                }
-              >
-                <MdDelete />
-              </Button>
-            </Flex>
-          );
-        })
-      : '';
-  };
-
   return (
     <>
-      <Flex style={{ padding: '6rem 1rem 1rem 1rem' }}>
-        <Avatar style={{ marginRight: '1rem' }} imageURL={imageURL} />
-        <Header1>Your profile</Header1>
+      <Flex style={{ padding: '3rem 1rem 1rem 1rem' }}>
+        <Avatar imageURL={user.imageURL} />
       </Flex>
-      <div>
-        <Header2>Your Invites</Header2>
-        {renderYourInvites()}
-      </div>
-      <div>
-        <Header2>Invites</Header2>
-        {renderInvites()}
-      </div>
-      <Button
-        onClick={() => {
-          setUser(defaultUser);
-          setConnections([]);
-          axios.post('/api/auth/logout').then(res => router.push('/login'));
+      <Header1>{user.fName + ' ' + user.lName}</Header1>
+      <AvatarPicker />
+      <Flex style={{ flexDirection: 'column' }}>
+        <div>
+          <Header2>Your Invites</Header2>
+          <InvitesList invites={yourInvites} setInvites={setYourInvites} />
+        </div>
+        <div>
+          <Header2>Invites</Header2>
+          <InvitesList invites={invites} setInvites={setInvites} accept />
+        </div>
+      </Flex>
+      <Flex
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          marginLeft: '50%',
+          transform: 'translateX(-50%)',
         }}
       >
-        Log out
-      </Button>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          if (!image) return;
-
-          const body = new FormData();
-          body.append('image', image);
-          axios.post<{ url: string }>('/api/profile/image', body).then(res => {
-            setUser(prev => {
-              return { ...prev, imageURL: res.data.url };
-            });
-          });
-        }}
-      >
-        <input
-          type="file"
-          accept=".jpg, .png, .jpeg"
-          onChange={e => {
-            if (e.target.files) {
-              setImage(e.target.files[0]);
-            }
+        <Button
+          inputSize
+          onClick={() => {
+            setUser(defaultUser);
+            setConnections([]);
+            axios.post('/api/auth/logout').then(res => router.push('/login'));
           }}
-        />
-        <button type="submit">upload</button>
-      </form>
-      {image && (
-        <img width={100} height={100} src={URL.createObjectURL(image)} />
-      )}
+        >
+          Log out
+        </Button>
+      </Flex>
     </>
   );
 };

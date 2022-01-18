@@ -30,18 +30,22 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Navigation: FC = () => {
   const {
-    user: { imageURL },
+    user: { imageURL, _id },
   } = useContext(userContext);
   const { setConnections } = useContext(connectionsContext);
 
-  const { mutate } = useSWRConfig();
   const router = useRouter();
+
   const back = useRef<HTMLDivElement>(null);
 
   const [show, setShow] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [notRead, setNotRead] = useState<{ [x: string]: boolean }[]>([]);
   const [search, setSearch] = useState('');
-  const { data, error } = useSWR<CConnectionType[]>(
+
+  const { mutate } = useSWRConfig();
+  const { data } = useSWR<CConnectionType[]>(
     show ? `/api/connection` : null,
     fetcher,
     {
@@ -87,8 +91,29 @@ const Navigation: FC = () => {
   }, [opened, mutate]);
 
   useEffect(() => {
-    data && setConnections(data);
-  }, [data, setConnections]);
+    if (data) {
+      setConnections(data);
+      const arr: { [x: string]: boolean }[] = [];
+
+      data.forEach(connection => {
+        arr.push({ [connection._id]: false });
+      });
+
+      setNotRead(arr);
+    }
+  }, [data, setConnections, setNotRead]);
+
+  useEffect(() => {
+    let temp = false;
+
+    notRead.forEach(val => {
+      console.log(Object.values(val)[0]);
+      if (Object.values(val)[0]) temp = true;
+    });
+
+    if (temp) setChecked(true);
+    else setChecked(false);
+  }, [notRead]);
 
   const renderConnections = (): JSX.Element[] | JSX.Element => {
     return data ? (
@@ -97,6 +122,7 @@ const Navigation: FC = () => {
           connection={connection}
           setOpened={setOpened}
           key={connection._id}
+          setNotRead={setNotRead}
         />
       ))
     ) : (
@@ -110,7 +136,10 @@ const Navigation: FC = () => {
     <>
       {show && (
         <>
-          <NavBtn onClick={() => setOpened(!opened)}>
+          <NavBtn
+            onClick={() => setOpened(!opened)}
+            active={!opened && checked}
+          >
             <NavBtnIcon opened={opened} />
           </NavBtn>
           <NavBackground

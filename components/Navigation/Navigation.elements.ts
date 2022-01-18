@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Background } from '../Simple/Background';
 import { Flex } from '../Simple/Flex';
 
-export const NavBtn = styled.button`
+export const NavBtn = styled.button<{ active: boolean }>`
   width: 4rem;
   height: 4rem;
   position: fixed;
@@ -19,6 +19,18 @@ export const NavBtn = styled.button`
 
   :hover {
     transform: scale(1.1);
+  }
+
+  ::after {
+    opacity: ${({ active }) => (active ? 1 : 0)};
+    content: ' ';
+    position: absolute;
+    right: 0;
+    bottom: 0.5rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background-color: var(--color-red);
   }
 `;
 

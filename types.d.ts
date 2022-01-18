@@ -10,6 +10,11 @@ declare global {
     email: string;
   }
 
+  interface UserInvited extends UserType {
+    inviteDate: Date;
+    inviteId: string;
+  }
+
   interface InviteType {
     _id: string;
     from: string;

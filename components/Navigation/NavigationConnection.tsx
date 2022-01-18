@@ -1,4 +1,5 @@
 import React, {
+  Dispatch,
   FC,
   SetStateAction,
   useContext,
@@ -32,13 +33,18 @@ const StyledHeader = styled(Header5)`
 interface Props {
   connection: CConnectionType;
   setOpened: React.Dispatch<SetStateAction<boolean>>;
+  setNotRead: Dispatch<SetStateAction<{ [x: string]: boolean }[]>>;
 }
 
 let tempMsg: MessageType;
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
-const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
+const NavigationConnection: FC<Props> = ({
+  connection,
+  setOpened,
+  setNotRead,
+}) => {
   const {
     user: { _id },
   } = useContext(userContext);
@@ -107,6 +113,23 @@ const NavigationConnection: FC<Props> = ({ connection, setOpened }) => {
       tempMsg = data[0];
     }
   }, [data]);
+
+  useEffect(() => {
+    if (message && message[0]?.sender._id !== _id && !message[0]?.read)
+      setNotRead(prev =>
+        prev.map(conn =>
+          conn[connection._id] === undefined ? conn : { [connection._id]: true }
+        )
+      );
+    else
+      setNotRead(prev =>
+        prev.map(conn =>
+          conn[connection._id] === undefined
+            ? conn
+            : { [connection._id]: false }
+        )
+      );
+  }, [message]);
 
   return (
     <li key={user._id}>

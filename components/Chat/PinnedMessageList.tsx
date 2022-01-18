@@ -7,7 +7,7 @@ import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
 
 import { List, Message, MessageContainer } from './MessageList.elements';
-import { Header2 } from 'components/Simple/Headers';
+import { Header2, Header5 } from 'components/Simple/Headers';
 import Spinner from 'components/Spinner';
 
 interface Props {
@@ -35,6 +35,7 @@ const PinnedMessageList: FC<Props> = ({ handlePinnedMessageClick }) => {
       <Header2 style={{ marginTop: '4rem', marginBottom: '2rem' }}>
         Pinned messages
       </Header2>
+      {!data.length && <Header5>No pinned messagess...</Header5>}
       <List style={{ height: '20rem' }}>
         {data.map(message => {
           const messageDate = new Date(message.date);

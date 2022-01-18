@@ -3,11 +3,11 @@ import { FC, useContext, useState } from 'react';
 import axios from 'axios';
 
 import { userContext } from 'context/userContext';
-import { Img } from './AvatarPicker.elements';
 import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
 import { Header4 } from 'components/Simple/Headers';
 import Spinner from 'components/Spinner';
+import { Avatar } from 'components/Simple/Avatars';
 
 const AvatarPicker: FC = () => {
   const { setUser } = useContext(userContext);
@@ -49,7 +49,7 @@ const AvatarPicker: FC = () => {
         }}
       >
         <Flex>
-          <label htmlFor="file1" style={{ marginTop: '2rem' }}>
+          <label htmlFor="file1" style={{ marginTop: '1rem' }}>
             <Header4>Click to select file</Header4>
           </label>
           <input
@@ -72,7 +72,7 @@ const AvatarPicker: FC = () => {
               justifyContent: 'space-around',
             }}
           >
-            <Img src={URL.createObjectURL(image)} width={75} height={75} />
+            <Avatar imageURL={URL.createObjectURL(image)} unoptimized />
             <Button type="submit" inputSize>
               Upload
             </Button>

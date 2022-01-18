@@ -13,24 +13,23 @@ import { useSwipeable } from 'react-swipeable';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
-import { ClipLoader } from 'react-spinners';
 
 import { userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
-import { Avatar } from '../Simple/Avatars';
+import { AvatarSmall } from '../Simple/Avatars';
 import { Button } from '../Simple/Button';
 import { Flex } from '../Simple/Flex';
 import { Header2 } from '../Simple/Headers';
 import { Input } from '../Simple/Input';
 import { NavBackground, NavBtn, NavBtnIcon, Top } from './Navigation.elements';
-import NavigationConnection from './NavigationConnection';
+import ConnectionList from './ConnectionList';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 const Navigation: FC = () => {
   const {
-    user: { imageURL, _id },
+    user: { imageURL },
   } = useContext(userContext);
   const { setConnections } = useContext(connectionsContext);
 
@@ -115,23 +114,6 @@ const Navigation: FC = () => {
     else setChecked(false);
   }, [notRead]);
 
-  const renderConnections = (): JSX.Element[] | JSX.Element => {
-    return data ? (
-      data.map(connection => (
-        <NavigationConnection
-          connection={connection}
-          setOpened={setOpened}
-          key={connection._id}
-          setNotRead={setNotRead}
-        />
-      ))
-    ) : (
-      <Flex style={{ width: '100%', height: '100%', marginTop: '5rem' }}>
-        <ClipLoader color="white" size={50} />
-      </Flex>
-    );
-  };
-
   return (
     <>
       {show && (
@@ -156,7 +138,7 @@ const Navigation: FC = () => {
                     setOpened(false);
                   }}
                 >
-                  <Avatar imageURL={imageURL} />
+                  <AvatarSmall imageURL={imageURL} />
                   <Header2>Your profile</Header2>
                 </Top>
               </a>
@@ -191,7 +173,11 @@ const Navigation: FC = () => {
                 alignItems: 'flex-start',
               }}
             >
-              {renderConnections()}
+              <ConnectionList
+                setNotRead={setNotRead}
+                data={data}
+                setOpened={setOpened}
+              />
             </Flex>
           </NavBackground>
         </>

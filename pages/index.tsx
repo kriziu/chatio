@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import { defaultUser, userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
+import Image from 'next/image';
 import InvitesList from 'components/Profile/InvitesList';
 import { Header1, Header2 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';

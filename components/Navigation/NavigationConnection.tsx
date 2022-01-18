@@ -129,14 +129,14 @@ const NavigationConnection: FC<Props> = ({
             : { [connection._id]: false }
         )
       );
-  }, [message]);
+  }, [message, _id, connection._id, setNotRead]);
 
   return (
-    <li key={user._id}>
+    <li key={user._id} style={{ width: '100%' }}>
       <Link href={`/chat/${connection._id}`} passHref>
         <Flex
           as="a"
-          style={{ marginTop: '2rem' }}
+          style={{ marginTop: '2rem', justifyContent: 'flex-start' }}
           onClick={() => {
             setOpened(false);
           }}

@@ -68,7 +68,10 @@ const ChatTop: FC = () => {
         {...handlersToOpenSettings}
       >
         <Flex style={{ marginLeft: '4rem' }}>
-          <AvatarSmall active={active} imageURL={secondUser.imageURL} />
+          <AvatarSmall
+            active={active}
+            imageURL={data.imageURL ? data.imageURL : secondUser.imageURL}
+          />
           <Header4
             style={{
               width: 'min-content',
@@ -76,7 +79,7 @@ const ChatTop: FC = () => {
               marginLeft: '1rem',
             }}
           >
-            {secondUser.fName} {secondUser.lName}
+            {data.name ? data.name : secondUser.fName + ' ' + secondUser.lName}
           </Header4>
         </Flex>
         <div>

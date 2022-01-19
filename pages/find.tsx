@@ -115,6 +115,7 @@ const Find: NextPage = () => {
                   </Header3>
                   <Button
                     style={{ width: 'max-content' }}
+                    aria-label="Add friend"
                     icon
                     onClick={() => createInvite(user._id)}
                   >

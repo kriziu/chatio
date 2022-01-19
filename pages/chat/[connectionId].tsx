@@ -202,11 +202,14 @@ const Chat: NextPage = () => {
       channel.bind('block_connection', blockConnClb);
 
       const membAddClb = () => {
+        setActive(false); // refresh users
         setActive(true);
       };
       channel.bind('pusher:member_added', membAddClb);
 
       const membRmvClb = () => {
+        setActive(false); // refresh users
+        setActive(true); // refresh users
         if (channel.members.count < 2) setActive(false);
       };
       channel.bind('pusher:member_removed', membRmvClb);
@@ -326,6 +329,7 @@ const Chat: NextPage = () => {
   return (
     <chatContext.Provider
       value={{
+        channel,
         newestMsgs,
         goToNewestMessages,
         connectionId,

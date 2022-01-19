@@ -115,7 +115,12 @@ const NavigationConnection: FC<Props> = ({
   }, [data]);
 
   useEffect(() => {
-    if (message && message[0]?.sender._id !== _id && !message[0]?.read)
+    if (
+      message &&
+      message[0] &&
+      message[0]?.sender._id !== _id &&
+      !message[0]?.read
+    )
       setNotRead(prev =>
         prev.map(conn =>
           conn[connection._id] === undefined ? conn : { [connection._id]: true }
@@ -148,7 +153,10 @@ const NavigationConnection: FC<Props> = ({
           }
           tabIndex={0}
         >
-          <AvatarSmall active={active} imageURL={user.imageURL} />
+          <AvatarSmall
+            active={active}
+            imageURL={connection.imageURL ? connection.imageURL : user.imageURL}
+          />
           <Flex
             style={{
               flexDirection: 'column',
@@ -158,7 +166,9 @@ const NavigationConnection: FC<Props> = ({
             }}
           >
             <Header4>
-              {user.fName} {user.lName}
+              {connection.name
+                ? connection.name
+                : user.fName + ' ' + user.lName}
             </Header4>
             <StyledHeader
               style={
@@ -175,7 +185,11 @@ const NavigationConnection: FC<Props> = ({
                 'Deleted'
               ) : (
                 <>
-                  {message && message[0]?.sender._id === _id ? 'You: ' : ''}{' '}
+                  {message && message[0]?.sender._id === _id
+                    ? 'You: '
+                    : connection.group
+                    ? message && message[0]?.sender.fName + ': '
+                    : ''}{' '}
                   {message && message[0]?.message}
                 </>
               )}

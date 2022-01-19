@@ -8,6 +8,7 @@ import { List, Message, MessageContainer } from './MessageList.elements';
 
 import Spinner from 'components/Spinner';
 import MessageMenu from './MessageMenu';
+import { AvatarVerySmall } from 'components/Simple/Avatars';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
@@ -18,7 +19,7 @@ const MessageList: FC = () => {
   const {
     user: { _id },
   } = useContext(userContext);
-  const { messages, messagesRef, setListRef, loading, connectionId } =
+  const { messages, messagesRef, setListRef, loading, connectionId, channel } =
     useContext(chatContext);
 
   const [selected, setSelected] = useState(-1);
@@ -84,6 +85,10 @@ const MessageList: FC = () => {
                 (before && !after && !afDate && !!bfDate) ||
                 (!bfDate && !afDate);
 
+              const active = Object.keys(channel?.members.members).includes(
+                message.sender._id
+              );
+
               return (
                 <MessageContainer
                   key={message._id}
@@ -95,6 +100,14 @@ const MessageList: FC = () => {
                   margin={before || after || !afDate || !bfDate}
                   bottom={after || !afDate}
                 >
+                  {!mine && (
+                    <div style={{ marginRight: '.5rem' }}>
+                      <AvatarVerySmall
+                        imageURL={message.sender.imageURL}
+                        active={active}
+                      />
+                    </div>
+                  )}
                   <Message
                     margin={before || after || !afDate || !bfDate}
                     bottom={after || !afDate}

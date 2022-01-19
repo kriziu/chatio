@@ -1,3 +1,4 @@
+import { PresenceChannel } from 'pusher-js';
 import {
   createContext,
   Dispatch,
@@ -7,6 +8,7 @@ import {
 
 export const chatContext = createContext<{
   newestMsgs: boolean;
+  channel: PresenceChannel | undefined;
   goToNewestMessages: () => void;
   connectionId: string;
   loading: boolean;

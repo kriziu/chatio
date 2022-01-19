@@ -27,12 +27,10 @@ export const MessageContainer = styled.li<{
   transition: none;
   max-width: 80%;
 
-  :not(:first-of-type) {
-    ${({ margin, bottom }) =>
-      bottom
-        ? `margin-bottom: ${margin ? 2 : 0.2}rem; margin-top: 0.2rem`
-        : `margin-top: ${margin ? 2 : 0.2}rem; margin-bottom: 0.2rem`};
-  }
+  ${({ margin, bottom }) =>
+    bottom
+      ? `margin-bottom: ${margin ? 2 : 0.2}rem; margin-top: 0.2rem`
+      : `margin-top: ${margin ? 2 : 0.2}rem; margin-bottom: 0.2rem`};
 
   ::after {
     margin: 0 1rem;

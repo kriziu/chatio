@@ -3,7 +3,6 @@ import React, { Dispatch, FC, SetStateAction, useContext } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { SwipeableHandlers } from 'react-swipeable';
-import useSWR from 'swr';
 
 import { chatContext } from 'context/chatContext';
 import { errToast } from 'lib/toasts';
@@ -12,7 +11,6 @@ import { Background } from 'components/Simple/Background';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
-import Spinner from 'components/Spinner';
 import PinnedMessageList from './PinnedMessageList';
 
 const Settings = styled(Background)<{ opened: boolean }>`
@@ -36,20 +34,23 @@ const ChatSettings: FC<Props> = ({
   secondUser,
   handlersToCloseSettings,
 }) => {
-  const { active, handlePinnedMessageClick, connectionId } =
+  const { active, handlePinnedMessageClick, connectionId, data } =
     useContext(chatContext);
 
   return (
     <Settings w="100vw" h="100vh" opened={opened} {...handlersToCloseSettings}>
       <Flex style={{ marginTop: '2rem' }} onClick={() => setOpened(false)}>
-        <AvatarSmall active={active} imageURL={secondUser.imageURL} />
+        <AvatarSmall
+          active={active}
+          imageURL={data.imageURL ? data.imageURL : secondUser.imageURL}
+        />
         <Header3
           style={{
             textAlign: 'left',
             marginLeft: '1rem',
           }}
         >
-          {secondUser.fName} {secondUser.lName}
+          {data.name ? data.name : secondUser.fName + ' ' + secondUser.lName}
         </Header3>
       </Flex>
       <PinnedMessageList

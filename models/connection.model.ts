@@ -2,11 +2,24 @@ import mongoose from 'mongoose';
 import autopopulate from 'mongoose-autopopulate';
 
 const connectionSchema = new mongoose.Schema<CConnectionType>({
+  name: {
+    type: String,
+  },
   users: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      autopopulate: true,
+    },
+  ],
+  imageURL: {
+    type: String,
+  },
+  admins: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       autopopulate: true,
     },
   ],

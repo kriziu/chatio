@@ -223,8 +223,9 @@ const ChatContainer: FC = () => {
               value={message}
               onChange={e => setMessage(e.target.value)}
               style={{ marginRight: '1rem', width: '75%' }}
+              name="message input"
             />
-            <Button type="submit" icon>
+            <Button type="submit" icon aria-label="send message">
               <BiSend />
             </Button>
           </Flex>

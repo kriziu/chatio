@@ -24,6 +24,9 @@ declare global {
 
   interface CConnectionType {
     _id: string;
+    imageURL?: string;
+    name?: string;
+    admins?: UserType[];
     users: UserType[];
     group: boolean;
     blocked: {

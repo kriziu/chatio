@@ -49,8 +49,11 @@ const AvatarPicker: FC = () => {
         }}
       >
         <Flex>
-          <label htmlFor="file1" style={{ marginTop: '1rem' }}>
-            <Header4>Click to select file</Header4>
+          <label
+            htmlFor="file1"
+            style={{ marginTop: '1rem', cursor: 'pointer' }}
+          >
+            <Header4>Click to select image</Header4>
           </label>
           <input
             id="file1"

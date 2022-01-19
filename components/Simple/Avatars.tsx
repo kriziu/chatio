@@ -18,14 +18,14 @@ const Container = styled.div<{ size: number; active?: boolean }>`
 
   ::before {
     display: ${({ active }) => (active ? 'block' : 'none')};
-    width: 1.3rem;
-    height: 1.3rem;
+    width: ${({ size }) => size / 35}rem;
+    height: ${({ size }) => size / 35}rem;
     border-radius: 50%;
     background-color: var(--color-green);
     content: '';
     position: absolute;
-    right: 3px;
-    bottom: 3px;
+    right: ${({ size }) => size / 18}px;
+    bottom: ${({ size }) => size / 18}px;
     z-index: 5;
   }
 `;
@@ -62,6 +62,25 @@ export const AvatarSmall: FC<{ imageURL: string; active?: boolean }> = ({
           src={imageURL}
           width={50}
           height={50}
+          alt="Avatar"
+          objectFit="cover"
+        />
+      )}
+    </Container>
+  );
+};
+
+export const AvatarVerySmall: FC<{ imageURL: string; active?: boolean }> = ({
+  imageURL,
+  active,
+}) => {
+  return (
+    <Container size={30} active={active}>
+      {imageURL && imageURL !== '-1' && (
+        <StyledImage
+          src={imageURL}
+          width={30}
+          height={30}
           alt="Avatar"
           objectFit="cover"
         />

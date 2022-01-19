@@ -99,7 +99,7 @@ export const NavBackground = styled(Background)<{ opened: boolean }>`
 
 export const Top = styled(Flex)`
   margin-left: 4rem;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   cursor: pointer;
 
   div {

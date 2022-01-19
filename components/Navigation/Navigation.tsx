@@ -106,7 +106,6 @@ const Navigation: FC = () => {
     let temp = false;
 
     notRead.forEach(val => {
-      console.log(Object.values(val)[0]);
       if (Object.values(val)[0]) temp = true;
     });
 
@@ -121,6 +120,7 @@ const Navigation: FC = () => {
           <NavBtn
             onClick={() => setOpened(!opened)}
             active={!opened && checked}
+            aria-label="Navigation"
           >
             <NavBtnIcon opened={opened} />
           </NavBtn>
@@ -143,7 +143,19 @@ const Navigation: FC = () => {
                 </Top>
               </a>
             </Link>
-
+            <Link href="/group" passHref>
+              <div style={{ marginTop: '1.7rem' }}>
+                <Button
+                  aria-label="Create group"
+                  onClick={() => {
+                    setOpened(false);
+                  }}
+                  as="a"
+                >
+                  Create group
+                </Button>
+              </div>
+            </Link>
             <Flex
               style={{ justifyContent: 'space-between', marginTop: '2rem' }}
             >
@@ -155,6 +167,7 @@ const Navigation: FC = () => {
               />
               <Link href="/find" passHref>
                 <Button
+                  aria-label="Add friend"
                   icon
                   style={{ width: 'max-content' }}
                   onClick={() => {
@@ -166,19 +179,13 @@ const Navigation: FC = () => {
                 </Button>
               </Link>
             </Flex>
-            <Flex
-              as="ul"
-              style={{
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-              }}
-            >
-              <ConnectionList
-                setNotRead={setNotRead}
-                data={data}
-                setOpened={setOpened}
-              />
-            </Flex>
+
+            <ConnectionList
+              search={search}
+              setNotRead={setNotRead}
+              data={data}
+              setOpened={setOpened}
+            />
           </NavBackground>
         </>
       )}

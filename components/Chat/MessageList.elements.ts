@@ -7,8 +7,11 @@ export const List = styled.ul`
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   ${scrollY};
+
+  overflow-x: hidden;
 `;
 
 export const MessageContainer = styled.li<{
@@ -22,15 +25,17 @@ export const MessageContainer = styled.li<{
   align-items: center;
   align-self: ${({ mine }) => (mine ? 'flex-end' : 'flex-start')};
   flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
-  position: relative;
 
   transition: none;
   max-width: 80%;
+  :last-of-type {
+    margin-bottom: 3rem;
+  }
 
   ${({ margin, bottom }) =>
     bottom
-      ? `margin-bottom: ${margin ? 2 : 0.2}rem; margin-top: 0.2rem`
-      : `margin-top: ${margin ? 2 : 0.2}rem; margin-bottom: 0.2rem`};
+      ? `margin-bottom: ${margin ? 1.2 : 0.2}rem; margin-top: 0.2rem`
+      : `margin-top: ${margin ? 1.2 : 0.2}rem; margin-bottom: 0.2rem`};
 
   ::after {
     margin: 0 1rem;
@@ -45,9 +50,9 @@ export const Message = styled.p<{
   bottom?: boolean;
   both?: boolean;
   mine: boolean;
-  read?: boolean;
   pinned: boolean;
   deleted: boolean;
+  avatar?: boolean;
 }>`
   color: #eee;
   padding: 1rem 1.5rem;
@@ -65,25 +70,10 @@ export const Message = styled.p<{
       : mine
       ? `2rem ${bottom ? '0.5rem 2rem' : '2rem 0.5rem'} 2rem`
       : `${bottom ? '0.5rem 2rem 2rem 2rem' : '2rem 2rem 2rem 0.5rem'}`};
+  margin-left: ${({ mine, avatar }) => (!mine ? (avatar ? 0.5 : 3.5) : 0)}rem;
   word-break: break-all;
   user-select: none;
   background-color: black;
-
-  ::after {
-    display: block;
-    content: ' ';
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background-color: ${({ mine, read }) => (read ? 'white' : 'transparent')};
-    position: absolute;
-
-    ${({ mine }) => (mine ? 'right: -1.5rem' : 'left: -1.5rem')};
-
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.2s ease;
-  }
 `;
 
 export const PinContainer = styled.div<{

@@ -4,11 +4,12 @@ import { AnimatePresence, m } from 'framer-motion';
 
 import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
-import { List, Message, MessageContainer } from './MessageList.elements';
+import { getMessageHelpers } from './MessageList.helpers';
 
+import { List, Message, MessageContainer } from './MessageList.elements';
 import Spinner from 'components/Spinner';
 import MessageMenu from './MessageMenu';
-import { AvatarVerySmall } from 'components/Simple/Avatars';
+import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
@@ -49,41 +50,15 @@ const MessageList: FC = () => {
             ref={newRef => setListRef(newRef as HTMLUListElement)}
           >
             {messages.map((message, index, arr) => {
-              const messageDate = new Date(message.date);
-
-              const time =
-                (messageDate.getHours() < 10 ? '0' : '') +
-                messageDate.getHours() +
-                ':' +
-                (messageDate.getMinutes() < 10 ? '0' : '') +
-                messageDate.getMinutes();
-
-              const senderId = message.sender._id;
-
-              const mine = senderId === _id;
-
-              const bfDate =
-                arr[index - 1]?.sender._id === senderId
-                  ? new Date(arr[index - 1]?.date)
-                  : null;
-              const afDate =
-                arr[index + 1]?.sender._id === senderId
-                  ? new Date(arr[index + 1]?.date)
-                  : null;
-
-              const before = !bfDate
-                ? false
-                : messageDate.getTime() - bfDate.getTime() > 300_000;
-
-              const after = !afDate
-                ? false
-                : afDate.getTime() - messageDate.getTime() > 300_000;
-
-              const both =
-                (before && after) ||
-                (!before && after && !!afDate && !bfDate) ||
-                (before && !after && !afDate && !!bfDate) ||
-                (!bfDate && !afDate);
+              const [
+                margin,
+                marginMessage,
+                bottom,
+                both,
+                mine,
+                showAvatar,
+                time,
+              ] = getMessageHelpers(_id, message, arr, index);
 
               const active = Object.keys(channel?.members.members).includes(
                 message.sender._id
@@ -97,24 +72,23 @@ const MessageList: FC = () => {
                   time={time}
                   touched={touched}
                   ref={el => el && (messagesRef.current[index] = el)}
-                  margin={before || after || !afDate || !bfDate}
-                  bottom={after || !afDate}
+                  margin={margin}
+                  bottom={bottom}
                 >
-                  {!mine && (
-                    <div style={{ marginRight: '.5rem' }}>
-                      <AvatarVerySmall
-                        imageURL={message.sender.imageURL}
-                        active={active}
-                      />
-                    </div>
+                  {showAvatar && (
+                    <AvatarVerySmall
+                      imageURL={message.sender.imageURL}
+                      active={active}
+                    />
                   )}
+
                   <Message
-                    margin={before || after || !afDate || !bfDate}
-                    bottom={after || !afDate}
+                    margin={marginMessage}
+                    bottom={bottom}
                     both={both}
                     mine={mine}
-                    read={arr[index + 1]?.read ? false : message.read}
                     pinned={message.pin}
+                    avatar={showAvatar}
                     onClick={() => {
                       if (!message.deleted) {
                         setTouched(false);
@@ -138,6 +112,11 @@ const MessageList: FC = () => {
                   >
                     {!message.deleted ? message.message : 'Deleted'}
                   </Message>
+                  <AvatarIcon
+                    imageURL={message.sender.imageURL}
+                    read={arr[index + 1]?.read ? false : message.read}
+                    height={messagesRef.current[index]?.clientHeight}
+                  />
                 </MessageContainer>
               );
             })}

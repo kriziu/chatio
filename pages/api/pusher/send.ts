@@ -24,9 +24,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     sender: _id,
     message,
     date: new Date(),
+    read: [_id],
   });
 
   const msg = await newMessage.populate('sender');
+  await msg.populate('read');
 
   await pusher.trigger(`presence-${connectionId}`, 'new_msg', msg);
   await newMessage.save();

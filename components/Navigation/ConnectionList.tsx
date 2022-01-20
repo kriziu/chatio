@@ -60,7 +60,9 @@ const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
           return (
             user.fName.toLowerCase() +
             ' ' +
-            user.lName.toLowerCase()
+            user.lName.toLowerCase() +
+            ' ' +
+            connection.name
           ).includes(search.toLowerCase());
         })
         .map(connection => (

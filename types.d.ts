@@ -40,7 +40,7 @@ declare global {
     message: string;
     connectionId: string;
     date: Date;
-    read: boolean;
+    read: UserType[];
     pin: boolean;
     _id: string;
     deleted: boolean;

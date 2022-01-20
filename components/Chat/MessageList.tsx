@@ -1,4 +1,4 @@
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
 
@@ -13,6 +13,7 @@ import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
+const usersRead: Map<string, number> = new Map();
 
 const MotionList = m(List);
 
@@ -25,6 +26,14 @@ const MessageList: FC = () => {
 
   const [selected, setSelected] = useState(-1);
   const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    messages.forEach((message, index) => {
+      for (const user of message.read) {
+        usersRead.set(user._id, index);
+      }
+    });
+  }, [messages]);
 
   return (
     <>
@@ -64,6 +73,11 @@ const MessageList: FC = () => {
                 message.sender._id
               );
 
+              let additionalMargin = false;
+              for (const [, value] of usersRead) {
+                if (value === index) additionalMargin = true;
+              }
+
               return (
                 <MessageContainer
                   key={message._id}
@@ -72,8 +86,8 @@ const MessageList: FC = () => {
                   time={time}
                   touched={touched}
                   ref={el => el && (messagesRef.current[index] = el)}
-                  margin={margin}
-                  bottom={bottom}
+                  margin={margin || additionalMargin}
+                  bottom={bottom || additionalMargin}
                 >
                   {showAvatar && (
                     <AvatarVerySmall
@@ -81,7 +95,6 @@ const MessageList: FC = () => {
                       active={active}
                     />
                   )}
-
                   <Message
                     margin={marginMessage}
                     bottom={bottom}
@@ -112,12 +125,26 @@ const MessageList: FC = () => {
                   >
                     {!message.deleted ? message.message : 'Deleted'}
                   </Message>
-                  <AvatarIcon
-                    imageURL={message.sender.imageURL}
-                    read={arr[index + 1]?.read ? false : message.read}
-                    height={messagesRef.current[index]?.clientHeight}
-                  />
                 </MessageContainer>
+              );
+            })}
+            {Array.from(usersRead).map(([key, value]) => {
+              const message = messages[value];
+              const { read } = message;
+
+              const user = read.find(pre => pre._id === key);
+
+              return (
+                <AvatarIcon
+                  key={user?._id}
+                  imageURL={!user ? '-1' : user?.imageURL}
+                  height={
+                    !messagesRef.current[value]
+                      ? 0
+                      : messagesRef.current[value]?.offsetTop +
+                        messagesRef.current[value]?.clientHeight
+                  }
+                />
               );
             })}
           </MotionList>

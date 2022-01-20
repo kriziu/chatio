@@ -161,9 +161,7 @@ const Chat: NextPage = () => {
       const readMsgClb = (data: MessageType) => {
         setMessages(prev => {
           return prev.map(pre => {
-            return new Date(pre.date).getTime() <= new Date(data.date).getTime()
-              ? { ...pre, read: true }
-              : pre;
+            return pre._id === data._id ? { ...pre, read: data.read } : pre;
           });
         });
       };

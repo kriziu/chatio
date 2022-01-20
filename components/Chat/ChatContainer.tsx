@@ -53,7 +53,13 @@ const ChatContainer: FC = () => {
               prev => prev._id === e[e.length - 1].target.id
             )[0];
 
-            if (msg && !msg?.read && msg?.sender._id !== _id) {
+            let isReadByMe = false;
+
+            msg.read.forEach(tempUs => {
+              if (tempUs._id === _id) isReadByMe = true;
+            });
+
+            if (msg && !isReadByMe && msg?.sender._id !== _id) {
               clearTimeout(lastTimeOut);
 
               lastTimeOut = setTimeout(() => {

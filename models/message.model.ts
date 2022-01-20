@@ -21,11 +21,14 @@ const messageSchema = new mongoose.Schema<MessageType>({
     type: Date,
     required: true,
   },
-  read: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
+  read: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      autopopulate: true,
+    },
+  ],
   pin: {
     type: Boolean,
     required: true,

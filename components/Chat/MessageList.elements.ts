@@ -34,8 +34,8 @@ export const MessageContainer = styled.li<{
 
   ${({ margin, bottom }) =>
     bottom
-      ? `margin-bottom: ${margin ? 1.2 : 0.2}rem; margin-top: 0.2rem`
-      : `margin-top: ${margin ? 1.2 : 0.2}rem; margin-bottom: 0.2rem`};
+      ? `margin-bottom: ${margin ? 2 : 0.2}rem; margin-top: 0.2rem`
+      : `margin-top: ${margin ? 2 : 0.2}rem; margin-bottom: 0.2rem`};
 
   ::after {
     margin: 0 1rem;

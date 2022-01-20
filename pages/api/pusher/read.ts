@@ -16,9 +16,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const connection = await connectionModel.findById(connectionId);
 
+    let userToFind = connection?.users[0];
     let forbidden = true;
     connection?.users.forEach(user => {
-      if (user._id.toString() === _id) forbidden = false;
+      if (user._id.toString() === _id) {
+        userToFind = user;
+        forbidden = false;
+      }
     });
 
     if (forbidden || message.sender._id === _id) return res.status(403).end();
@@ -27,22 +31,32 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       {
         connectionId,
         date: { $lte: message.date },
-        read: false,
+        read: { $ne: userToFind },
       },
-      { read: true }
+      {
+        $push: {
+          read: _id,
+        },
+      }
     );
 
     if (!messages.acknowledged) {
       return res.status(500).end();
     }
 
-    const readMessage = {
-      ...message,
-      read: true,
-    };
+    const readMessages = await messageModel.find({
+      connectionId,
+      date: { $lte: message.date },
+    });
 
-    await pusher.trigger(`presence-${connectionId}`, 'read_msg', readMessage);
-    return res.status(200).json(readMessage);
+    console.log('read');
+
+    await pusher.trigger(
+      `presence-${connectionId}`,
+      'read_msg',
+      readMessages[readMessages.length - 1]
+    );
+    return res.status(200).json(readMessages[readMessages.length - 1]);
   } catch (err) {
     const msg = (err as Error).message;
     console.log(msg);

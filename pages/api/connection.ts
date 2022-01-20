@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from 'middlewares/connectDB';
 import jwt from 'jsonwebtoken';
 import connectionModel from 'models/connection.model';
-import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -21,7 +20,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         let forbidden = true;
 
         if (connId) {
-          const connection = await connectionModel.findById(connId);
+          const connection = await connectionModel
+            .findById(connId)
+            .populate('User');
 
           if (!connection) return res.status(404).end();
 

@@ -5,7 +5,6 @@ import { pusher } from 'lib/pusher';
 
 import connectDB from 'middlewares/connectDB';
 import messageModel from 'models/message.model';
-import connectionModel from 'models/connection.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -14,24 +13,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const message: MessageType = req.body.msg;
 
   try {
-    const connection = await connectionModel.findById(connectionId);
-
-    let userToFind = connection?.users[0];
-    let forbidden = true;
-    connection?.users.forEach(user => {
-      if (user._id.toString() === _id) {
-        userToFind = user;
-        forbidden = false;
-      }
-    });
-
-    if (forbidden || message.sender._id === _id) return res.status(403).end();
+    if (message.sender._id === _id) return res.status(403).end();
 
     const messages = await messageModel.updateMany(
       {
         connectionId,
         date: { $lte: message.date },
-        read: { $ne: userToFind },
+        read: { $ne: _id },
       },
       {
         $push: {
@@ -44,12 +32,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(500).end();
     }
 
-    const readMessages = await messageModel.find({
-      connectionId,
-      date: { $lte: message.date },
-    });
+    const readMessages = await messageModel
+      .find({
+        connectionId,
+        date: { $lte: message.date },
+      })
+      .populate('sender');
 
     console.log('read');
+
+    console.log(readMessages);
 
     await pusher.trigger(
       `presence-${connectionId}`,

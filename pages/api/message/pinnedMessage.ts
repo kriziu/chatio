@@ -16,36 +16,37 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const connection = await connectionModel.findById(connectionId);
 
-    let forbidden = true;
-    connection?.users.forEach(user => {
-      if (user._id.toString() === _id) forbidden = false;
-    });
+    if (!connection?.users.includes(_id)) return res.status(403).end();
 
-    if (forbidden) return res.status(403).end();
-
-    const message = await messageModel.findById(messageId);
+    const message = await messageModel
+      .findById(messageId)
+      .populate('sender read');
 
     if (!message) {
       return res.status(404).end();
     }
 
-    const bottomMessages = await messageModel.find(
-      {
-        connectionId,
-        date: { $gt: message.date },
-      },
-      {},
-      { sort: { _id: 1 }, limit: 50 }
-    );
+    const bottomMessages = await messageModel
+      .find(
+        {
+          connectionId,
+          date: { $gt: message.date },
+        },
+        {},
+        { sort: { _id: 1 }, limit: 50 }
+      )
+      .populate('sender read');
 
-    const topMessages = await messageModel.find(
-      {
-        connectionId,
-        date: { $lt: message.date },
-      },
-      {},
-      { sort: { _id: -1 }, limit: 49 }
-    );
+    const topMessages = await messageModel
+      .find(
+        {
+          connectionId,
+          date: { $lt: message.date },
+        },
+        {},
+        { sort: { _id: -1 }, limit: 49 }
+      )
+      .populate('sender read');
     topMessages.reverse();
 
     const messages = [...topMessages, message, ...bottomMessages];

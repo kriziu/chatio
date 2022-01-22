@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const message = await messageModel.findById(messageId);
 
-  if (message?.sender._id.toString() !== _id) {
+  if (message?.sender.toString() !== _id) {
     return res.status(403).end();
   }
 

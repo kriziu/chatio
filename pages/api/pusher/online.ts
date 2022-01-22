@@ -11,7 +11,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   };
 
   await pusher.trigger(`presence-${connectionId}`, 'online', _id);
-  console.log(1);
   res.json({ message: 'completed' });
 };
 

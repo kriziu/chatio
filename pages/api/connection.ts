@@ -17,23 +17,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     switch (req.method) {
       case 'GET':
-        let forbidden = true;
-
         if (connId) {
-          const connection = await connectionModel
-            .findById(connId)
-            .populate('User');
+          const connection = await connectionModel.findById(connId);
 
           if (!connection) return res.status(404).end();
 
-          connection.users.forEach(user => {
-            if (user._id.toString() === _id) forbidden = false;
-          });
+          if (!connection?.users?.includes(_id)) return res.status(403).end();
 
-          return forbidden ? res.status(403).end() : res.json(connection);
+          await connection.populate('users admins');
+
+          return res.json(connection);
         }
 
-        const connections = await (connectionModel as any).find({ users: _id }); // DIRTY FIX BECAUSE OF MONGOOSE_AUTOPOPULATE
+        const connections = await connectionModel
+          .find({ users: _id })
+          .populate('users admins');
 
         return res.json(connections);
       // case 'PATCH':

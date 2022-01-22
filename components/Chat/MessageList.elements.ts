@@ -104,3 +104,15 @@ export const PinContainer = styled.div<{
     }
   }
 `;
+
+export const AvatarsContainer = styled.ul<{ height: number }>`
+  position: absolute;
+  z-index: 999;
+  display: flex;
+  right: 1rem;
+  margin-top: ${({ height }) => height}px;
+
+  li {
+    margin-left: 0.3rem;
+  }
+`;

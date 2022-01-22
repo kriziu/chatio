@@ -14,12 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const connection = await connectionModel.findById(connectionId);
 
-    let forbidden = true;
-    connection?.users.forEach(user => {
-      if (user._id.toString() === _id) forbidden = false;
-    });
-
-    if (forbidden) return res.status(403).end();
+    if (!connection?.users.includes(_id)) return res.status(403).end();
 
     if (pinned) {
       const messages = await messageModel.find({ connectionId, pin: true });
@@ -37,18 +32,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.end();
     }
 
-    const messages = await messageModel.find(
-      {
-        connectionId,
-        date: chunkBotId
-          ? { $gt: message.date }
-          : chunkTopId
-          ? { $lt: message.date }
-          : { $lte: message.date },
-      },
-      {},
-      { sort: { _id: chunkBotId ? 1 : -1 }, limit: latest ? 1 : 100 }
-    );
+    const messages = await messageModel
+      .find(
+        {
+          connectionId,
+          date: chunkBotId
+            ? { $gt: message.date }
+            : chunkTopId
+            ? { $lt: message.date }
+            : { $lte: message.date },
+        },
+        {},
+        { sort: { _id: chunkBotId ? 1 : -1 }, limit: latest ? 1 : 100 }
+      )
+      .populate('sender read');
 
     !chunkBotId && messages.reverse();
 

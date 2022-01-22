@@ -89,22 +89,11 @@ export const AvatarVerySmall: FC<{ imageURL: string; active?: boolean }> = ({
   );
 };
 
-const Icon = styled(Container)<{ height: number }>`
-  border-radius: 50%;
-  position: absolute;
-  z-index: 999;
-
-  right: 1rem;
-  margin-top: ${({ height }) => height}px;
-`;
-
 export const AvatarIcon: FC<{
   imageURL: string;
-  active?: boolean;
-  height: number;
-}> = ({ imageURL, active, height }) => {
+}> = ({ imageURL }) => {
   return (
-    <Icon size={15} active={active} height={height}>
+    <Container size={15} as="li">
       {imageURL && imageURL !== '-1' && (
         <StyledImage
           src={imageURL}
@@ -114,6 +103,6 @@ export const AvatarIcon: FC<{
           objectFit="cover"
         />
       )}
-    </Icon>
+    </Container>
   );
 };

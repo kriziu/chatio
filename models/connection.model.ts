@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
-import autopopulate from 'mongoose-autopopulate';
 
-const connectionSchema = new mongoose.Schema<CConnectionType>({
+type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
+  users: string[];
+  admins: string[];
+};
+
+const connectionSchema = new mongoose.Schema<ConnectionModelType>({
   name: {
     type: String,
   },
@@ -10,7 +14,6 @@ const connectionSchema = new mongoose.Schema<CConnectionType>({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      autopopulate: true,
     },
   ],
   imageURL: {
@@ -20,7 +23,6 @@ const connectionSchema = new mongoose.Schema<CConnectionType>({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      autopopulate: true,
     },
   ],
   group: { type: Boolean, require: true },
@@ -30,10 +32,8 @@ const connectionSchema = new mongoose.Schema<CConnectionType>({
   },
 });
 
-connectionSchema.plugin(autopopulate);
-
 const connectionModel =
-  (mongoose.models.Connection as mongoose.Model<CConnectionType>) ||
-  mongoose.model<CConnectionType>('Connection', connectionSchema);
+  (mongoose.models.Connection as mongoose.Model<ConnectionModelType>) ||
+  mongoose.model<ConnectionModelType>('Connection', connectionSchema);
 
 export default connectionModel;

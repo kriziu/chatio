@@ -1,7 +1,11 @@
-import mongoose from 'mongoose';
-import autopopulate from 'mongoose-autopopulate';
+import mongoose, { ObjectId } from 'mongoose';
 
-const messageSchema = new mongoose.Schema<MessageType>({
+type MessageModelType = Omit<MessageType, 'sender' | 'read'> & {
+  sender: ObjectId;
+  read: string[];
+};
+
+const messageSchema = new mongoose.Schema<MessageModelType>({
   connectionId: {
     type: String,
     required: true,
@@ -10,7 +14,6 @@ const messageSchema = new mongoose.Schema<MessageType>({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    autopopulate: true,
   },
   message: {
     type: String,
@@ -26,7 +29,6 @@ const messageSchema = new mongoose.Schema<MessageType>({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      autopopulate: true,
     },
   ],
   pin: {
@@ -41,10 +43,8 @@ const messageSchema = new mongoose.Schema<MessageType>({
   },
 });
 
-messageSchema.plugin(autopopulate);
-
 const messageModel =
-  (mongoose.models.Message as mongoose.Model<MessageType>) ||
-  mongoose.model<MessageType>('Message', messageSchema);
+  (mongoose.models.Message as mongoose.Model<MessageModelType>) ||
+  mongoose.model<MessageModelType>('Message', messageSchema);
 
 export default messageModel;

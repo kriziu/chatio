@@ -6,7 +6,12 @@ import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
 import { getMessageHelpers } from './MessageList.helpers';
 
-import { List, Message, MessageContainer } from './MessageList.elements';
+import {
+  AvatarsContainer,
+  List,
+  Message,
+  MessageContainer,
+} from './MessageList.elements';
 import Spinner from 'components/Spinner';
 import MessageMenu from './MessageMenu';
 import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
@@ -14,6 +19,7 @@ import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
 let hover = false;
 let timeout: NodeJS.Timeout;
 const usersRead: Map<string, number> = new Map();
+const readPositions: number[] = [];
 
 const MotionList = m(List);
 
@@ -32,6 +38,10 @@ const MessageList: FC = () => {
       for (const user of message.read) {
         usersRead.set(user._id, index);
       }
+    });
+
+    Array.from(usersRead).forEach(([key, value]) => {
+      if (!readPositions.includes(value)) readPositions.push(value);
     });
   }, [messages]);
 
@@ -128,23 +138,37 @@ const MessageList: FC = () => {
                 </MessageContainer>
               );
             })}
-            {Array.from(usersRead).map(([key, value]) => {
-              const message = messages[value];
-              const { read } = message;
-
-              const user = read.find(pre => pre._id === key);
-
+            {readPositions.map(position => {
               return (
-                <AvatarIcon
-                  key={user?._id}
-                  imageURL={!user ? '-1' : user?.imageURL}
+                <AvatarsContainer
+                  key={position}
                   height={
-                    !messagesRef.current[value]
+                    !messagesRef.current[position]
                       ? 0
-                      : messagesRef.current[value]?.offsetTop +
-                        messagesRef.current[value]?.clientHeight
+                      : messagesRef.current[position]?.offsetTop +
+                        messagesRef.current[position]?.clientHeight
                   }
-                />
+                >
+                  {Array.from(usersRead).map(([key, value], index, arr) => {
+                    const message = messages[value];
+                    const read = message?.read;
+
+                    if (!read || value !== position || index > 7) return;
+
+                    if (index === 0 && arr.length > 7) {
+                      return <li>...</li>;
+                    }
+
+                    const user = read.find(pre => pre._id === key);
+
+                    return (
+                      <AvatarIcon
+                        key={index}
+                        imageURL={!user ? '-1' : user?.imageURL}
+                      />
+                    );
+                  })}
+                </AvatarsContainer>
               );
             })}
           </MotionList>

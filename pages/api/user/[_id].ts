@@ -6,8 +6,6 @@ import userModel from 'models/user.model';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { _id } = req.query;
 
-  console.log(_id);
-
   try {
     const user = await userModel.findById(_id).select('-email');
 

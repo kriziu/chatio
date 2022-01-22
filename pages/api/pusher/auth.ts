@@ -27,10 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       (channel_name as string).slice(9)
     );
 
-    let access = false;
-    connection?.users.forEach(user => {
-      if (user._id.toString() === _id) access = true;
-    });
+    let access = connection?.users.includes(_id);
 
     if (access) {
       const auth = pusher.authenticate(socket_id, channel_name, presenceData);

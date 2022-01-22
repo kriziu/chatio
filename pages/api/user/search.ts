@@ -53,18 +53,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       ) => {
         let toReturn = !(_id === user._id.toString());
 
+        console.log(toReturn);
+
+        //COS TU NIE DZIALA BO DA SIE ZAPROSIC OSOBY JUZ DODANE
         if (toReturn)
           connections.forEach(connection => {
+            console.log(connection);
             connection.users.forEach(userCon => {
-              if (
-                user.equals(
-                  userCon as Document<any, any, UserType> &
-                    UserType & {
-                      _id: string;
-                    }
-                )
-              )
-                toReturn = false;
+              console.log(userCon);
+              if (user._id.toString() === userCon) toReturn = false;
             });
           });
 

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import userModel from './user.model';
 
 type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
   users: string[];

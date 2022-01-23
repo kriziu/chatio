@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from 'middlewares/connectDB';
 import jwt from 'jsonwebtoken';
 import connectionModel from 'models/connection.model';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -24,14 +25,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           if (!connection?.users?.includes(_id)) return res.status(403).end();
 
-          await connection.populate('users admins');
+          await connection.populate({ path: 'users admins', model: userModel });
 
           return res.json(connection);
         }
 
         const connections = await connectionModel
           .find({ users: _id })
-          .populate('users admins');
+          .populate({ path: 'users admins', model: userModel });
 
         return res.json(connections);
       // case 'PATCH':

@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from 'middlewares/connectDB';
 import messageModel from 'models/message.model';
 import connectionModel from 'models/connection.model';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -20,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const message = await messageModel
       .findById(messageId)
-      .populate('sender read');
+      .populate({ path: 'sender read', model: userModel });
 
     if (!message) {
       return res.status(404).end();
@@ -35,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         {},
         { sort: { _id: 1 }, limit: 50 }
       )
-      .populate('sender read');
+      .populate({ path: 'sender read', model: userModel });
 
     const topMessages = await messageModel
       .find(
@@ -46,7 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         {},
         { sort: { _id: -1 }, limit: 49 }
       )
-      .populate('sender read');
+      .populate({ path: 'sender read', model: userModel });
     topMessages.reverse();
 
     const messages = [...topMessages, message, ...bottomMessages];

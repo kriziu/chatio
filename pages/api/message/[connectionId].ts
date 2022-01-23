@@ -45,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         {},
         { sort: { _id: chunkBotId ? 1 : -1 }, limit: latest ? 1 : 100 }
       )
-      .populate('sender read');
+      .populate({ path: 'sender read', model: userModel });
 
     !chunkBotId && messages.reverse();
 

@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from 'middlewares/connectDB';
 import messageModel from 'models/message.model';
 import connectionModel from 'models/connection.model';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;

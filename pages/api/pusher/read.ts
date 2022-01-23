@@ -5,6 +5,7 @@ import { pusher } from 'lib/pusher';
 
 import connectDB from 'middlewares/connectDB';
 import messageModel from 'models/message.model';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -37,11 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         connectionId,
         date: { $lte: message.date },
       })
-      .populate('sender');
-
-    console.log('read');
-
-    console.log(readMessages);
+      .populate({ path: 'sender read', model: userModel });
 
     await pusher.trigger(
       `presence-${connectionId}`,

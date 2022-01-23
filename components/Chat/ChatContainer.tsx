@@ -14,6 +14,7 @@ import { Button } from 'components/Simple/Button';
 import { Header3 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';
 import { Input } from 'components/Simple/Input';
+import { isReadByMe } from 'lib/isReadByMe';
 
 let keyboardSize = 0;
 let lastTimeOut: NodeJS.Timeout;
@@ -53,13 +54,9 @@ const ChatContainer: FC = () => {
               prev => prev._id === e[e.length - 1].target.id
             )[0];
 
-            let isReadByMe = false;
+            let isRead = isReadByMe(msg, _id);
 
-            msg.read.forEach(tempUs => {
-              if (tempUs._id === _id) isReadByMe = true;
-            });
-
-            if (msg && !isReadByMe && msg?.sender._id !== _id) {
+            if (msg && !isRead && msg?.sender._id !== _id) {
               clearTimeout(lastTimeOut);
 
               lastTimeOut = setTimeout(() => {

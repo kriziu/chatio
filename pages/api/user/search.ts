@@ -55,10 +55,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         if (toReturn)
           connections.forEach(connection => {
-            connection.users.forEach(userCon => {
-              console.log(userCon.toString());
-              if (user._id.equals(userCon)) toReturn = false;
-            });
+            !connection.group &&
+              connection.users.forEach(userCon => {
+                if (user._id.equals(userCon)) toReturn = false;
+              });
           });
 
         if (toReturn) {

@@ -161,7 +161,7 @@ const Chat: NextPage = () => {
       const readMsgClb = (data: MessageType) => {
         setMessages(prev => {
           return prev.map(pre => {
-            return pre._id === data._id ? { ...pre, read: data.read } : pre;
+            return pre._id === data._id ? data : pre;
           });
         });
       };

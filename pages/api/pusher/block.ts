@@ -11,9 +11,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const connection = await connectionModel.findById(connectionId);
 
-  console.log(connection?.admins);
-  console.log(connection?.admins?.includes(_id));
-
   if (!connection) return res.status(404).end();
   if (!connection.admins?.includes(_id)) return res.status(403).end();
 

@@ -22,6 +22,7 @@ import { getUserFromIds } from 'lib/ids';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header4, Header5 } from 'components/Simple/Headers';
+import { isReadByMe } from 'lib/isReadByMe';
 
 const StyledHeader = styled(Header5)`
   text-overflow: ellipsis;
@@ -115,11 +116,14 @@ const NavigationConnection: FC<Props> = ({
   }, [data]);
 
   useEffect(() => {
+    if (!message) return;
+
+    const listOfIdsRead = message[0]?.read.map(msg => msg._id);
+
     if (
-      message &&
       message[0] &&
       message[0]?.sender._id !== _id &&
-      !message[0]?.read
+      !listOfIdsRead.includes(_id)
     )
       setNotRead(prev =>
         prev.map(conn =>
@@ -174,7 +178,7 @@ const NavigationConnection: FC<Props> = ({
               style={
                 message
                   ? message[0]?.sender._id !== _id
-                    ? !message[0]?.read
+                    ? !isReadByMe(message[0], _id)
                       ? { color: 'white', fontWeight: 500 }
                       : {}
                     : {}

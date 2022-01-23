@@ -1,4 +1,5 @@
 import mongoose, { ObjectId } from 'mongoose';
+import userModel from './user.model';
 
 type MessageModelType = Omit<MessageType, 'sender' | 'read'> & {
   sender: ObjectId;

@@ -17,7 +17,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     let users = [];
 
     const connections = await connectionModel.find({
-      'users._id': _id,
+      users: _id,
     });
 
     const invites = await inviteModel.find({
@@ -53,15 +53,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       ) => {
         let toReturn = !(_id === user._id.toString());
 
-        console.log(toReturn);
-
-        //COS TU NIE DZIALA BO DA SIE ZAPROSIC OSOBY JUZ DODANE
         if (toReturn)
           connections.forEach(connection => {
-            console.log(connection);
             connection.users.forEach(userCon => {
-              console.log(userCon);
-              if (user._id.toString() === userCon) toReturn = false;
+              console.log(userCon.toString());
+              if (user._id.equals(userCon)) toReturn = false;
             });
           });
 

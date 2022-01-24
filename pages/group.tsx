@@ -14,11 +14,6 @@ import { Form } from 'components/Simple/Form';
 import FriendList from 'components/Group/FriendList';
 import CheckedFriends from 'components/Group/CheckedFriends';
 
-export interface CheckedFriendsType {
-  _id: string;
-  imageURL: string;
-}
-
 const Group: NextPage = () => {
   const {
     user: { _id },
@@ -31,9 +26,7 @@ const Group: NextPage = () => {
   });
   const { name } = formData;
 
-  const [checkedFriends, setCheckedFriends] = useState<CheckedFriendsType[]>(
-    []
-  );
+  const [checkedFriends, setCheckedFriends] = useState<UserType[]>([]);
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,6 +43,10 @@ const Group: NextPage = () => {
       .then(res => {
         router.push(`/chat/${res.data._id}`);
       });
+  };
+
+  const handleFriendClick = (_id: string) => {
+    setCheckedFriends(prev => prev.filter(pre => pre._id !== _id));
   };
 
   return (
@@ -78,10 +75,10 @@ const Group: NextPage = () => {
       </Form>
       <CheckedFriends
         checkedFriends={checkedFriends}
-        setCheckedFriends={setCheckedFriends}
+        onClick={handleFriendClick}
       />
 
-      <Header3 style={{ marginTop: '2rem' }}>Check friends</Header3>
+      <Header3 style={{ marginTop: '2rem' }}>Add users to group</Header3>
       <FriendList
         setCheckedFriends={setCheckedFriends}
         checkedFriends={checkedFriends}

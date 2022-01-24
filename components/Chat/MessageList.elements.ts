@@ -107,7 +107,7 @@ export const PinContainer = styled.div<{
 
 export const AvatarsContainer = styled.ul<{ height: number }>`
   position: absolute;
-  z-index: 999;
+  z-index: 5;
   display: flex;
   right: 1rem;
   margin-top: ${({ height }) => height}px;

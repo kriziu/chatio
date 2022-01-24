@@ -33,6 +33,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       case 'POST':
         const { to } = req.body;
 
+        const found = await inviteModel.findOne({ from: _id, to });
+        const foundConnection = await connectionModel.findOne({
+          users: { $all: [_id, to] },
+          group: false,
+        });
+
+        if (found || foundConnection) return res.status(200).end();
+
         const invite = new inviteModel({ from: _id, to });
         await invite.save();
 

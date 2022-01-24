@@ -7,6 +7,7 @@ import { AiOutlineUserAdd } from 'react-icons/ai';
 
 import useForm from 'hooks/useForm';
 import { validateEmail } from 'lib/validators';
+import { successToast } from 'lib/toasts';
 
 import { Header1, Header2, Header3 } from 'components/Simple/Headers';
 import { Input } from 'components/Simple/Input';
@@ -53,8 +54,10 @@ const Find: NextPage = () => {
   };
 
   const createInvite = (to: string) => {
-    axios.post('/api/invite', { to }).then(res => console.log(res.data));
-    setUsers(prev => prev.filter(pre => pre._id !== to));
+    axios.post('/api/invite', { to }).then(() => {
+      successToast('Invite sent!');
+      setUsers(prev => prev.filter(pre => pre._id !== to));
+    });
   };
 
   return (

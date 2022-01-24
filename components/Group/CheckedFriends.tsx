@@ -1,16 +1,19 @@
 import { Dispatch, FC, SetStateAction } from 'react';
 
+import styled from '@emotion/styled';
+
+import { scrollY } from 'styles/scroll';
+
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Flex } from 'components/Simple/Flex';
-import { CheckedFriendsType } from 'pages/group';
-import styled from '@emotion/styled';
-import { scrollY } from 'styles/scroll';
-import { Header3 } from 'components/Simple/Headers';
+import { Header3, Header5 } from 'components/Simple/Headers';
 
 const List = styled.ul`
   list-style: none;
   display: flex;
   width: 25rem;
+
+  align-items: center;
 
   padding-top: 2rem;
   padding-bottom: 0.3rem;
@@ -29,30 +32,30 @@ const List = styled.ul`
 `;
 
 const CheckedFriends: FC<{
-  checkedFriends: CheckedFriendsType[];
-  setCheckedFriends: Dispatch<SetStateAction<CheckedFriendsType[]>>;
-}> = ({ checkedFriends, setCheckedFriends }) => {
+  checkedFriends: UserType[];
+  onClick: (_id: string) => void;
+}> = ({ checkedFriends, onClick }) => {
   return (
     <div style={{ height: '10rem' }}>
       <Header3 style={{ marginTop: '2rem' }}>List of friends in group</Header3>
-      <List onTouchStart={e => e.stopPropagation()}>
-        {checkedFriends.map(friend => {
-          return (
-            <Flex
-              as="li"
-              key={friend._id}
-              tabIndex={0}
-              onClick={() =>
-                setCheckedFriends(prev =>
-                  prev.filter(pre => friend._id !== pre._id)
-                )
-              }
-            >
-              <AvatarSmall imageURL={friend.imageURL} />
-            </Flex>
-          );
-        })}
-      </List>
+      {!checkedFriends.length ? (
+        <Header5 style={{ marginTop: '1rem' }}>Looks empty...</Header5>
+      ) : (
+        <List onTouchStart={e => e.stopPropagation()}>
+          {checkedFriends.map(friend => {
+            return (
+              <Flex
+                as="li"
+                key={friend._id}
+                tabIndex={0}
+                onClick={() => onClick(friend._id)}
+              >
+                <AvatarSmall imageURL={friend.imageURL} />
+              </Flex>
+            );
+          })}
+        </List>
+      )}
     </div>
   );
 };

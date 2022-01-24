@@ -22,6 +22,8 @@ export const Header4 = styled.h4`
   font-size: 1.7rem;
   font-weight: 400;
   text-align: center;
+  background: none;
+  border: none;
 `;
 
 export const Header5 = styled.h5`

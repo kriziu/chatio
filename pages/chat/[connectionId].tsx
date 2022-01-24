@@ -16,11 +16,11 @@ import Spinner from 'components/Spinner';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
-let prevLength = 0;
-let fetched = false;
-let top = true;
-let tempTopMsgId = '';
-let tempBotMsgId = '';
+let prevLength = 0,
+  fetched = false,
+  top = true,
+  tempTopMsgId = '',
+  tempBotMsgId = '';
 
 const Chat: NextPage = () => {
   const {
@@ -47,7 +47,8 @@ const Chat: NextPage = () => {
 
   const { data, error } = useSWR<CConnectionType>(
     connectionId && `/api/connection?id=${connectionId}`,
-    fetcher
+    fetcher,
+    { refreshInterval: 10000 }
   );
 
   const getAndSetMessages = useCallback(async () => {

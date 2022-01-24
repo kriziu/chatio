@@ -16,9 +16,9 @@ import { Flex } from 'components/Simple/Flex';
 import { Input } from 'components/Simple/Input';
 import { isReadByMe } from 'lib/isReadByMe';
 
-let keyboardSize = 0;
-let lastTimeOut: NodeJS.Timeout;
-let prevMessages = { length: 0, conId: '' };
+let keyboardSize = 0,
+  lastTimeOut: NodeJS.Timeout,
+  prevMessages = { length: 0, conId: '' };
 
 const ChatContainer: FC = () => {
   const { user } = useContext(userContext);

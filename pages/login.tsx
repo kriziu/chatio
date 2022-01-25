@@ -40,10 +40,7 @@ const Login: NextPage = () => {
         password: password.value,
       })
       .then(res => {
-        if (res.status === 200) {
-          console.log('1');
-          router.push('/');
-        }
+        if (res.status === 200) router.push('/');
       })
       .catch(err => {
         if (err.response.status === 403) {

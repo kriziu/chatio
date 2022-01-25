@@ -1,17 +1,22 @@
 import { FC, useContext, useEffect, useState } from 'react';
 
+import axios from 'axios';
+import { useSWRConfig } from 'swr';
+import { MdOutlineClose } from 'react-icons/md';
+
+import useForm from 'hooks/useForm';
+import useAdminGroup from 'hooks/useAdminGroup';
+import useSpinner from 'hooks/useSpinner';
 import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
 
 import { Settings } from '../Chat/ChatSettings';
 import FriendList from 'components/Group/FriendList';
-import { Form } from 'components/Simple/Form';
 import { Header3 } from 'components/Simple/Headers';
 import { Input } from 'components/Simple/Input';
 import CheckedFriends from 'components/Group/CheckedFriends';
 import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
-import { MdOutlineClose } from 'react-icons/md';
 import UserModal from './UserModal';
 
 const GroupManagment: FC<{
@@ -23,8 +28,18 @@ const GroupManagment: FC<{
   } = useContext(userContext);
   const { data } = useContext(chatContext);
 
+  const [formData, , , handleInputChange] = useForm({
+    name: { value: '', required: false },
+  });
+  const { name } = formData;
+
   const [activeUser, setActiveUser] = useState<UserType>();
   const [groupUsers, setGroupUsers] = useState<UserType[]>([]);
+
+  const [RenderSpinner, setLoading] = useSpinner();
+  const isAdmin = useAdminGroup();
+
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
     setGroupUsers(data.users.filter(user => user._id !== _id));
@@ -38,8 +53,38 @@ const GroupManagment: FC<{
     setActiveUser(groupUsers[userIndex]);
   };
 
+  const handleGroupSave = () => {
+    const dataUsers = data.users.map(user => user._id);
+    const fromGroupUsers = groupUsers.map(user => user._id);
+
+    const idsToAdd = groupUsers
+      .filter(user => !dataUsers.includes(user._id))
+      .map(user => user._id);
+
+    const idsToRemove = data.users
+      .filter(user => !fromGroupUsers.includes(user._id))
+      .filter(user => !idsToAdd.includes(user._id))
+      .filter(user => user._id !== _id)
+      .map(user => user._id);
+
+    setLoading(true);
+    axios
+      .patch('/api/group/edit', {
+        idsToAdd,
+        idsToRemove,
+        name: name.value,
+        connectionId: data._id,
+      })
+      .then(() => {
+        mutate(`/api/connection?id=${data._id}`);
+        setOpened(false);
+        setLoading(false);
+      });
+  };
+
   return (
     <>
+      <RenderSpinner />
       <UserModal
         user={activeUser}
         setUser={setActiveUser}
@@ -62,12 +107,26 @@ const GroupManagment: FC<{
             <MdOutlineClose />
           </Button>
         </Flex>
-        <Form>
-          <label htmlFor="name">
-            <Header3>Edit group name</Header3>
-          </label>
-          <Input placeholder="Empty to no changes" id="name" />
-        </Form>
+        {!isAdmin ? (
+          ''
+        ) : (
+          <Flex style={{ flexDirection: 'column' }}>
+            <label htmlFor="name">
+              <Header3 style={{ marginBottom: '2rem' }}>
+                Edit group name
+              </Header3>
+            </label>
+            <Input
+              placeholder="Empty to no changes"
+              id="name"
+              name="name"
+              value={name.value}
+              onChange={handleInputChange}
+            />
+          </Flex>
+        )}
+
+        <Header3 style={{ marginTop: '2rem' }}>List of users in group</Header3>
         <CheckedFriends
           checkedFriends={groupUsers}
           onClick={handleFriendClick}
@@ -85,8 +144,8 @@ const GroupManagment: FC<{
             transform: 'translateX(-50%)',
           }}
         >
-          <Button inputSize onClick={() => {}}>
-            Save
+          <Button inputSize onClick={handleGroupSave}>
+            {isAdmin ? 'Save' : 'Add friends'}
           </Button>
         </Flex>
       </Settings>

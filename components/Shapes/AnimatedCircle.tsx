@@ -17,8 +17,8 @@ const AnimatedCircle: FC<{
     <Circle
       {...props}
       secondary={props.secondary ? 1 : 0}
-      //animate={{ x, y }}
-      //transition={{ ease: 'linear', duration, repeat: Infinity }}
+      animate={{ x, y }}
+      transition={{ ease: 'linear', duration, repeat: Infinity }}
     />
   );
 };

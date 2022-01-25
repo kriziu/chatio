@@ -10,6 +10,7 @@ import { scrollY } from 'styles/scroll';
 import { Header5 } from 'components/Simple/Headers';
 import NavigationConnection from './NavigationConnection';
 import { Flex } from 'components/Simple/Flex';
+import Spinner from 'components/Spinner';
 
 const List = styled.ul`
   display: flex;
@@ -46,9 +47,9 @@ const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
 
   if (!data)
     return (
-      <Flex style={{ width: '100%', height: '100%', marginTop: '5rem' }}>
-        <ClipLoader color="white" size={50} />
-      </Flex>
+      <div style={{ marginTop: '10rem' }}>
+        <Spinner />
+      </div>
     );
 
   return (

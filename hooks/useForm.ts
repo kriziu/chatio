@@ -25,7 +25,7 @@ const useForm = (
   const [formData, setFormData] = useState(newState);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const checked = formData[e.target.name].required
+    const checked = formData[e.target.name]?.required
       ? e.target.value
         ? false
         : true

@@ -49,9 +49,7 @@ const Register: NextPage = () => {
         password: password.value,
       })
       .then(res => {
-        if (res.status === 201) {
-          router.push('/');
-        }
+        if (res.status === 201) router.push('/');
       })
       .catch(() => {
         errToast('Account with that email already exists!');

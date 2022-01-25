@@ -70,12 +70,13 @@ export const AvatarSmall: FC<{ imageURL: string; active?: boolean }> = ({
   );
 };
 
-export const AvatarVerySmall: FC<{ imageURL: string; active?: boolean }> = ({
-  imageURL,
-  active,
-}) => {
+export const AvatarVerySmall: FC<{
+  imageURL: string;
+  active?: boolean;
+  onClick?: () => void;
+}> = ({ imageURL, active, onClick }) => {
   return (
-    <Container size={30} active={active}>
+    <Container size={30} active={active} onClick={onClick}>
       {imageURL && imageURL !== '-1' && (
         <StyledImage
           src={imageURL}

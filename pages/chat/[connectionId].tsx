@@ -275,7 +275,12 @@ const Chat: NextPage = () => {
   ]);
 
   if (error) return <div>failed to load</div>;
-  if (!data || !messages) return <Spinner />;
+  if (!data || !messages)
+    return (
+      <div style={{ width: '100vw', height: '100vh' }}>
+        <Spinner />
+      </div>
+    );
 
   const handlePinnedMessageClick = (messageId: string) => {
     const index = messages.findIndex(message => message._id === messageId);

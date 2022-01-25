@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction } from 'react';
+import { FC } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -6,7 +6,7 @@ import { scrollY } from 'styles/scroll';
 
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Flex } from 'components/Simple/Flex';
-import { Header3, Header5 } from 'components/Simple/Headers';
+import { Header5 } from 'components/Simple/Headers';
 
 const List = styled.ul`
   list-style: none;
@@ -37,7 +37,6 @@ const CheckedFriends: FC<{
 }> = ({ checkedFriends, onClick }) => {
   return (
     <div style={{ height: '10rem' }}>
-      <Header3 style={{ marginTop: '2rem' }}>List of friends in group</Header3>
       {!checkedFriends.length ? (
         <Header5 style={{ marginTop: '1rem' }}>Looks empty...</Header5>
       ) : (

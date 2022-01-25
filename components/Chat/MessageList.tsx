@@ -15,6 +15,7 @@ import {
 import Spinner from 'components/Spinner';
 import MessageMenu from './MessageMenu';
 import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
+import UserModal from 'components/Group/UserModal';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
@@ -32,6 +33,7 @@ const MessageList: FC = () => {
 
   const [selected, setSelected] = useState(-1);
   const [touched, setTouched] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserType>();
 
   useEffect(() => {
     messages.forEach((message, index) => {
@@ -47,6 +49,7 @@ const MessageList: FC = () => {
 
   return (
     <>
+      <UserModal user={selectedUser} setUser={setSelectedUser} instantDelete />
       <MessageMenu
         selected={selected}
         hover={hover}
@@ -103,6 +106,7 @@ const MessageList: FC = () => {
                     <AvatarVerySmall
                       imageURL={message.sender.imageURL}
                       active={active}
+                      onClick={() => setSelectedUser(message.sender)}
                     />
                   )}
                   <Message

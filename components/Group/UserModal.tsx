@@ -10,6 +10,8 @@ import {
 import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
 
+import useSpinner from 'hooks/useSpinner';
+import useAdminGroup from 'hooks/useAdminGroup';
 import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
 import { getUserFromIds } from 'lib/ids';
@@ -27,28 +29,39 @@ const fetcher = (url: string) => axios.get(url).then(res => res.data);
 interface Props {
   user: UserType | undefined;
   setUser: Dispatch<SetStateAction<UserType | undefined>>;
-  setGroupUsers: Dispatch<SetStateAction<UserType[]>>;
+  setGroupUsers?: Dispatch<SetStateAction<UserType[]>>;
+  instantDelete?: boolean;
 }
 
-const UserModal: FC<Props> = ({ user, setUser, setGroupUsers }) => {
+const UserModal: FC<Props> = ({
+  user,
+  setUser,
+  setGroupUsers,
+  instantDelete,
+}) => {
   const {
     user: { _id },
   } = useContext(userContext);
   const { data } = useContext(chatContext);
 
   const [isFriend, setIsFriend] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const [notInGroup, setNotInGroup] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
 
   const friends = useSWR<CConnectionType[]>(`/api/connection`, fetcher, {
     refreshInterval: 30000,
   });
   const { mutate } = useSWRConfig();
 
+  const isAdmin = useAdminGroup();
+  const [RenderSpinner, setLoading] = useSpinner();
+
   useEffect(() => {
     let found = false,
       isUsAd = false,
-      isAdmin = false;
+      isInGr = false,
+      canBeDeleted = false;
 
     user &&
       friends.data?.forEach(connection => {
@@ -60,17 +73,37 @@ const UserModal: FC<Props> = ({ user, setUser, setGroupUsers }) => {
       });
 
     data.admins?.forEach(admin => {
-      if (admin._id === _id) isAdmin = true;
       if (admin._id === user?._id) isUsAd = true;
     });
 
+    const tempData = data.users?.map(user => user._id);
+    if (user && !tempData.includes(user._id)) {
+      canBeDeleted = true;
+      if (instantDelete) isInGr = true;
+    }
+    setCanDelete(canBeDeleted);
     setIsFriend(found);
+    setNotInGroup(isInGr);
     setIsUserAdmin(isUsAd);
-    setIsAdmin(isAdmin);
   }, [friends, data]);
 
   const handleDelete = () => {
-    setGroupUsers(prev => prev.filter(pre => pre._id !== user?._id));
+    setGroupUsers &&
+      setGroupUsers(prev => prev.filter(pre => pre._id !== user?._id));
+    if (instantDelete) {
+      setLoading(true);
+      axios
+        .patch('/api/group/edit', {
+          idsToAdd: [],
+          idsToRemove: [user?._id],
+          name: '',
+          connectionId: data._id,
+        })
+        .then(() => {
+          mutate(`/api/connection?id=${data._id}`);
+          setLoading(false);
+        });
+    }
     setUser(undefined);
   };
 
@@ -94,6 +127,7 @@ const UserModal: FC<Props> = ({ user, setUser, setGroupUsers }) => {
 
   return (
     <Portal>
+      <RenderSpinner />
       <Background
         w="100vw"
         h="100vh"
@@ -117,21 +151,31 @@ const UserModal: FC<Props> = ({ user, setUser, setGroupUsers }) => {
                 Add to friends
               </Header4>
             )}
-            {!isAdmin ? (
-              ''
+            {notInGroup ? (
+              <Header5 style={{ marginTop: '2rem' }}>Not in group</Header5>
             ) : (
-              <Header4 as="button" onClick={handleMakeAdmin}>
-                {isUserAdmin ? 'Remove admin' : 'Make group admin'}
-              </Header4>
-            )}
+              <>
+                {!isAdmin ? (
+                  ''
+                ) : (
+                  <Header4 as="button" onClick={handleMakeAdmin}>
+                    {isUserAdmin ? 'Remove admin' : 'Make group admin'}
+                  </Header4>
+                )}
 
-            <Header4
-              as="button"
-              style={{ color: 'var(--color-red)' }}
-              onClick={handleDelete}
-            >
-              Delete from group
-            </Header4>
+                {!isAdmin && !canDelete ? (
+                  ''
+                ) : (
+                  <Header4
+                    as="button"
+                    style={{ color: 'var(--color-red)' }}
+                    onClick={handleDelete}
+                  >
+                    Delete from group
+                  </Header4>
+                )}
+              </>
+            )}
           </Options>
         </Container>
       </Background>

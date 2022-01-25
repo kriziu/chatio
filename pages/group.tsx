@@ -73,12 +73,13 @@ const Group: NextPage = () => {
           Create group
         </Button>
       </Form>
+      <Header3 style={{ marginTop: '2rem' }}>List of friends in group</Header3>
       <CheckedFriends
         checkedFriends={checkedFriends}
         onClick={handleFriendClick}
       />
 
-      <Header3 style={{ marginTop: '2rem' }}>Add users to group</Header3>
+      <Header3 style={{ marginTop: '2rem' }}>Add friends to group</Header3>
       <FriendList
         setCheckedFriends={setCheckedFriends}
         checkedFriends={checkedFriends}

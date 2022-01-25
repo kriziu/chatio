@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import { SwipeableHandlers } from 'react-swipeable';
 
+import useAdminGroup from 'hooks/useAdminGroup';
 import { chatContext } from 'context/chatContext';
 import { errToast } from 'lib/toasts';
 
@@ -46,6 +47,7 @@ const ChatSettings: FC<Props> = ({
     useContext(chatContext);
 
   const [managment, setManagment] = useState(false);
+  const isAdmin = useAdminGroup();
 
   return (
     <>
@@ -73,7 +75,7 @@ const ChatSettings: FC<Props> = ({
         </Flex>
         <Flex style={{ marginTop: '3rem' }}>
           <Button width="15rem" onClick={() => setManagment(true)}>
-            Manage group
+            {isAdmin ? 'Manage group' : 'Check users'}
           </Button>
         </Flex>
 

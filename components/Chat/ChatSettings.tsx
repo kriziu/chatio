@@ -81,11 +81,13 @@ const ChatSettings: FC<Props> = ({
               : secondUser?.fName + ' ' + secondUser?.lName}
           </Header3>
         </Flex>
-        <Flex style={{ marginTop: '3rem' }}>
-          <Button width="15rem" onClick={() => setManagment(true)}>
-            {isAdmin ? 'Manage group' : 'Check users'}
-          </Button>
-        </Flex>
+        {data.group && (
+          <Flex style={{ marginTop: '3rem' }}>
+            <Button width="15rem" onClick={() => setManagment(true)}>
+              {isAdmin ? 'Manage group' : 'Check users'}
+            </Button>
+          </Flex>
+        )}
 
         <PinnedMessageList
           handlePinnedMessageClick={id => {

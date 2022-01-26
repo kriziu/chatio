@@ -18,6 +18,7 @@ import CheckedFriends from 'components/Group/CheckedFriends';
 import { Flex } from 'components/Simple/Flex';
 import { Button } from 'components/Simple/Button';
 import UserModal from './UserModal';
+import AvatarPicker from 'components/Profile/AvatarPicker';
 
 const GroupManagment: FC<{
   opened: boolean;
@@ -33,6 +34,7 @@ const GroupManagment: FC<{
   });
   const { name } = formData;
 
+  const [image, setImage] = useState<File>();
   const [activeUser, setActiveUser] = useState<UserType>();
   const [groupUsers, setGroupUsers] = useState<UserType[]>([]);
 
@@ -43,7 +45,7 @@ const GroupManagment: FC<{
 
   useEffect(() => {
     setGroupUsers(data.users.filter(user => user._id !== _id));
-  }, [data]);
+  }, [_id, data]);
 
   const handleFriendClick = (_id: string) => {
     const userIndex = groupUsers.findIndex(user => user._id === _id);
@@ -67,7 +69,8 @@ const GroupManagment: FC<{
       .filter(user => user._id !== _id)
       .map(user => user._id);
 
-    if (!idsToRemove.length && !idsToAdd.length && !name.value) return;
+    if (!idsToRemove.length && !idsToAdd.length && !name.value && !image)
+      return;
 
     setLoading(true);
     axios
@@ -78,9 +81,21 @@ const GroupManagment: FC<{
         connectionId: data._id,
       })
       .then(() => {
-        mutate(`/api/connection?id=${data._id}`);
-        setOpened(false);
-        setLoading(false);
+        if (image) {
+          const body = new FormData();
+          body.append('image', image);
+
+          axios
+            .post(`/api/group/image?connectionId=${data._id}`, body)
+            .then(() => {
+              setOpened(false);
+              setLoading(false);
+              setImage(undefined);
+            });
+        } else {
+          setOpened(false);
+          setLoading(false);
+        }
       });
   };
 
@@ -125,6 +140,7 @@ const GroupManagment: FC<{
               value={name.value}
               onChange={handleInputChange}
             />
+            <AvatarPicker group setImageUp={setImage} />
           </Flex>
         )}
 

@@ -35,7 +35,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const oldId = user.imageURL;
 
-          if (oldId) await cloudinary.v2.uploader.destroy(oldId.slice(60, 80));
+          if (oldId !== '-1' && oldId)
+            await cloudinary.v2.uploader.destroy(oldId.slice(60, 80));
 
           return await cloudinary.v2.uploader.upload(
             path,

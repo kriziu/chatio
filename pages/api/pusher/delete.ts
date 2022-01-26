@@ -13,7 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const connection = await connectionModel.findById(connectionId);
 
-  if (!connection?.admins?.includes(_id)) res.status(403).end();
+  if (!connection?.admins?.includes(_id) && connection?.group)
+    res.status(403).end();
 
   await connection?.delete();
   await messageModel.deleteMany({ connectionId });

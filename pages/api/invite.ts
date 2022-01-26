@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import inviteModel from 'models/invite.model';
 import connectionModel from 'models/connection.model';
 import userModel from 'models/user.model';
+import messageModel from 'models/message.model';
+import { pusher } from 'lib/pusher';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -60,6 +62,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               by: null,
             },
           });
+
+          const newMessage = new messageModel({
+            administrate: true,
+            connectionId: newConnection._id,
+            sender: _id,
+            message: 'created conversation',
+            date: new Date(),
+            read: [_id],
+          });
+
+          await (
+            await newMessage.save()
+          ).populate({ path: 'sender', model: userModel });
+
+          await pusher.trigger(
+            `presence-${newConnection._id}`,
+            'new_msg',
+            newMessage
+          );
 
           await newConnection.save();
           await inviteFound.delete();

@@ -12,7 +12,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const connection = await connectionModel.findById(connectionId);
 
   if (!connection) return res.status(404).end();
-  if (!connection.admins?.includes(_id)) return res.status(403).end();
+  if (!connection.admins?.includes(_id) && connection.group)
+    return res.status(403).end();
 
   if (connection.blocked.yes) {
     if (connection.blocked.by === _id) {

@@ -119,7 +119,7 @@ const NavigationConnection: FC<Props> = ({
     console.log('change');
     if (data) {
       setSorted(prev => {
-        prev.set(connection._id, new Date(data[0].date).getTime());
+        prev.set(connection._id, new Date(data[0]?.date).getTime());
 
         return prev;
       });
@@ -202,6 +202,7 @@ const NavigationConnection: FC<Props> = ({
                 'Deleted'
               ) : (
                 <>
+                  {/* POCZATKOWA WIADOMOSC */}
                   {message && message[0]?.sender._id === _id
                     ? `You${message[0]?.administrate ? '' : ':'} `
                     : connection.group

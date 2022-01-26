@@ -85,7 +85,7 @@ const UserModal: FC<Props> = ({
     setIsFriend(found);
     setNotInGroup(isInGr);
     setIsUserAdmin(isUsAd);
-  }, [friends, data]);
+  }, [friends, data, user, _id, instantDelete]);
 
   const handleDelete = () => {
     setGroupUsers &&

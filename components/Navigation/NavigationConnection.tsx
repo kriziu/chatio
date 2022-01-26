@@ -35,6 +35,7 @@ interface Props {
   connection: CConnectionType;
   setOpened: React.Dispatch<SetStateAction<boolean>>;
   setNotRead: Dispatch<SetStateAction<{ [x: string]: boolean }[]>>;
+  setSorted: Dispatch<SetStateAction<Map<string, number>>>;
 }
 
 let tempMsg: MessageType;
@@ -45,6 +46,7 @@ const NavigationConnection: FC<Props> = ({
   connection,
   setOpened,
   setNotRead,
+  setSorted,
 }) => {
   const {
     user: { _id },
@@ -73,9 +75,14 @@ const NavigationConnection: FC<Props> = ({
     if (channel) {
       if (channel.members.count >= 2) setActive(true);
 
-      const msgClb = (data: MessageType) => {
-        setMessage([data]);
-        tempMsg = data;
+      const msgClb = (msg: MessageType) => {
+        setMessage([msg]);
+        setSorted(prev => {
+          prev.set(connection._id, new Date(msg.date).getTime());
+
+          return prev;
+        });
+        tempMsg = msg;
       };
       channel.bind('new_msg', msgClb);
       channel.bind('read_msg', msgClb);
@@ -106,14 +113,20 @@ const NavigationConnection: FC<Props> = ({
         channel.unbind('pusher:member_removed', membRmvClb);
       };
     }
-  }, [channel, channel?.members.count, message]);
+  }, [channel, channel?.members.count, connection._id, message, setSorted]);
 
   useEffect(() => {
+    console.log('change');
     if (data) {
+      setSorted(prev => {
+        prev.set(connection._id, new Date(data[0].date).getTime());
+
+        return prev;
+      });
       setMessage(data);
       tempMsg = data[0];
     }
-  }, [data]);
+  }, [connection._id, data, setSorted]);
 
   useEffect(() => {
     if (!message) return;

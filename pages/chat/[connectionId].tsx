@@ -71,9 +71,8 @@ const Chat: NextPage = () => {
             console.log(err);
           });
 
-        console.log(i);
         if (!res?.data) {
-          if (i === 3) return;
+          if (i === 2) return;
           await getAndSetMessages(i ? i + 1 : 1);
           return;
         }
@@ -147,8 +146,8 @@ const Chat: NextPage = () => {
   }, [connectionId, getAndSetMessages]);
 
   useEffect(() => {
-    getAndSetMessages(0);
-  }, [data]);
+    error && getAndSetMessages(0);
+  }, [data, error, getAndSetMessages]);
 
   useEffect(() => {
     channels.forEach(channel1 => {
@@ -258,6 +257,7 @@ const Chat: NextPage = () => {
     newestMsgs,
     _id,
     getAndSetMessages,
+    mutate,
   ]);
 
   useEffect(() => {

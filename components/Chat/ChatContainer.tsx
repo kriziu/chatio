@@ -210,7 +210,6 @@ const ChatContainer: FC = () => {
       ) : (
         <form
           onSubmit={e => {
-            // cos anty spam
             e.preventDefault();
             message &&
               axios.post('/api/pusher/send', {

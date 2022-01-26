@@ -1,4 +1,11 @@
-import { Dispatch, FC, SetStateAction, useContext } from 'react';
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from '@emotion/styled';
 
@@ -29,21 +36,28 @@ interface Props {
       }[]
     >
   >;
-  data: CConnectionType[] | undefined;
+  listOfConnections: CConnectionType[] | undefined;
   search: string;
 }
 
-const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
+const ConnectionList: FC<Props> = ({
+  listOfConnections,
+  setNotRead,
+  setOpened,
+  search,
+}) => {
   const {
     user: { _id },
   } = useContext(userContext);
 
-  if (data && !data.length)
+  const [sorted, setSorted] = useState<Map<string, number>>(new Map());
+
+  if (listOfConnections && !listOfConnections.length)
     return (
       <Header5 style={{ marginTop: '1rem' }}>No friends at the time...</Header5>
     );
 
-  if (!data)
+  if (!listOfConnections)
     return (
       <div style={{ marginTop: '10rem' }}>
         <Spinner />
@@ -52,7 +66,7 @@ const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
 
   return (
     <List>
-      {data
+      {listOfConnections
         .filter(connection => {
           const user = getUserFromIds(connection, _id);
 
@@ -64,12 +78,21 @@ const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
             connection.name
           ).includes(search.toLowerCase());
         })
+        .sort((a, b) => {
+          const first = sorted.get(a._id);
+          const second = sorted.get(b._id);
+
+          if (!first || !second) return 0;
+
+          return second - first;
+        })
         .map(connection => (
           <NavigationConnection
             connection={connection}
             setOpened={setOpened}
             key={connection._id}
             setNotRead={setNotRead}
+            setSorted={setSorted}
           />
         ))}
     </List>

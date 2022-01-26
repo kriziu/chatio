@@ -183,7 +183,7 @@ const Navigation: FC = () => {
             <ConnectionList
               search={search}
               setNotRead={setNotRead}
-              data={data}
+              listOfConnections={data}
               setOpened={setOpened}
             />
           </NavBackground>

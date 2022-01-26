@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
-import useSWR, { mutate } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { PresenceChannel } from 'pusher-js';
 
 import { chatContext } from 'context/chatContext';
@@ -13,6 +13,7 @@ import { connectionsContext } from 'context/connectionsContext';
 import ChatContainer from 'components/Chat/ChatContainer';
 import ChatTop from 'components/Chat/ChatTop';
 import Spinner from 'components/Spinner';
+import { Header3 } from 'components/Simple/Headers';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
@@ -45,75 +46,94 @@ const Chat: NextPage = () => {
 
   const messagesRef = useRef<HTMLLIElement[]>([]);
 
+  const { mutate } = useSWRConfig();
   const { data, error } = useSWR<CConnectionType>(
     connectionId && `/api/connection?id=${connectionId}`,
     fetcher,
     { refreshInterval: 10000 }
   );
 
-  const getAndSetMessages = useCallback(async () => {
-    if (connectionId) {
-      fetched = true;
-      const res = await axios.get<MessageType[]>(
-        `/api/message/${connectionId}${
-          top && tempTopMsgId
-            ? '?chunkTopId=' + tempTopMsgId
-            : tempBotMsgId
-            ? '?chunkBotId=' + tempBotMsgId
-            : ''
-        }`
-      );
+  const getAndSetMessages = useCallback(
+    async (i?: number) => {
+      if (connectionId) {
+        fetched = true;
+        const res = await axios
+          .get<MessageType[]>(
+            `/api/message/${connectionId}${
+              top && tempTopMsgId
+                ? '?chunkTopId=' + tempTopMsgId
+                : tempBotMsgId
+                ? '?chunkBotId=' + tempBotMsgId
+                : ''
+            }`
+          )
+          .catch(err => {
+            console.log(err);
+          });
 
-      let length = top ? 0 : res.data.length - 1;
-
-      if (!top && !res.data.length) {
-        setNewestMsgs(true);
-        setCounter(0);
-      }
-
-      if (
-        res.data[length] &&
-        res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
-      ) {
-        prevLength += res.data.length;
-        if (prevLength > 200) {
-          setNewestMsgs(false);
+        console.log(i);
+        if (!res?.data) {
+          if (i === 3) return;
+          await getAndSetMessages(i ? i + 1 : 1);
+          return;
         }
 
-        setScrollTo({
-          behavior: 'auto',
-          id: top ? tempTopMsgId : tempBotMsgId,
-        });
+        let length = top ? 0 : res.data.length - 1;
 
-        setMessages(prev => {
-          if (!tempBotMsgId && !tempTopMsgId) return res.data;
+        if (!top && !res.data.length) {
+          setNewestMsgs(true);
+          setCounter(0);
+        }
 
-          if (top) return [...res.data, ...prev].slice(0, 201);
-
+        if (
+          res.data[length] &&
+          res.data[length]?._id !== (top ? tempTopMsgId : tempBotMsgId)
+        ) {
+          prevLength += res.data.length;
           if (prevLength > 200) {
-            const messages = [...prev.slice(res.data.length - 1), ...res.data];
-            const seen = new Set();
-
-            const filteredMessages = messages.filter(msg => {
-              const duplicate = seen.has(msg._id);
-              seen.add(msg._id);
-              return !duplicate;
-            });
-
-            return filteredMessages;
+            setNewestMsgs(false);
           }
 
-          return [...prev, ...res.data];
-        });
-      } else
-        setScrollTo({
-          behavior: 'auto',
-          id: '',
-        });
-      setLoading(false);
-      fetched = false;
-    }
-  }, [connectionId]);
+          setScrollTo({
+            behavior: 'auto',
+            id: top ? tempTopMsgId : tempBotMsgId,
+          });
+
+          setMessages(prev => {
+            if (!tempBotMsgId && !tempTopMsgId) return res.data;
+
+            if (top) return [...res.data, ...prev].slice(0, 201);
+
+            if (prevLength > 200) {
+              const messages = [
+                ...prev.slice(res.data.length - 1),
+                ...res.data,
+              ];
+              const seen = new Set();
+
+              const filteredMessages = messages.filter(msg => {
+                const duplicate = seen.has(msg._id);
+                seen.add(msg._id);
+                return !duplicate;
+              });
+
+              return filteredMessages;
+            }
+
+            return [...prev, ...res.data];
+          });
+        } else
+          setScrollTo({
+            behavior: 'auto',
+            id: '',
+          });
+        setLoading(false);
+
+        fetched = false;
+      }
+    },
+    [connectionId]
+  );
 
   // RESET ALL
   useEffect(() => {
@@ -125,6 +145,10 @@ const Chat: NextPage = () => {
     setMessages([]);
     getAndSetMessages();
   }, [connectionId, getAndSetMessages]);
+
+  useEffect(() => {
+    getAndSetMessages(0);
+  }, [data]);
 
   useEffect(() => {
     channels.forEach(channel1 => {
@@ -142,6 +166,8 @@ const Chat: NextPage = () => {
       const newMsgClb = (data: MessageType) => {
         setScrollTo({ id: '', behavior: 'auto' });
         setCounter(prev => prev + 1);
+
+        if (data?.administrate) mutate(`/api/connection?id=${connectionId}`);
 
         if (!newestMsgs) {
           if (data.sender._id === _id) {
@@ -274,7 +300,10 @@ const Chat: NextPage = () => {
     scrollTo.id,
   ]);
 
-  if (error) return <div>failed to load</div>;
+  if (error) {
+    return <Header3 style={{ marginTop: '3rem' }}>Failed to load</Header3>;
+  }
+
   if (!data || !messages)
     return (
       <div style={{ width: '100vw', height: '100vh' }}>

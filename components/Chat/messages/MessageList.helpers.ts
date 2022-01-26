@@ -17,11 +17,15 @@ export const getMessageHelpers = (
       ? new Date(arr[index + 1]?.date)
       : null;
 
-  const before = !bfDate
+  const before = arr[index - 1]?.administrate
+    ? true
+    : !bfDate
     ? false
     : messageDate.getTime() - bfDate.getTime() > 300_000;
 
-  const after = !afDate
+  const after = arr[index + 1]?.administrate
+    ? true
+    : !afDate
     ? false
     : afDate.getTime() - messageDate.getTime() > 300_000;
 

@@ -18,7 +18,7 @@ import { Background } from 'components/Simple/Background';
 import { Flex } from 'components/Simple/Flex';
 import { AvatarSmall } from 'components/Simple/Avatars';
 import { Header3 } from 'components/Simple/Headers';
-import PinnedMessageList from './PinnedMessageList';
+import PinnedMessageList from './messages/PinnedMessageList';
 import { Button } from 'components/Simple/Button';
 import GroupManagment from '../Group/GroupManagment';
 
@@ -34,7 +34,7 @@ interface Props {
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
   handlersToCloseSettings: SwipeableHandlers;
-  secondUser: UserType;
+  secondUser?: UserType;
 }
 
 const ChatSettings: FC<Props> = ({
@@ -62,7 +62,13 @@ const ChatSettings: FC<Props> = ({
         <Flex style={{ marginTop: '2rem' }} onClick={() => setOpened(false)}>
           <AvatarSmall
             active={active}
-            imageURL={data.imageURL ? data.imageURL : secondUser.imageURL}
+            imageURL={
+              data.imageURL
+                ? data.imageURL
+                : secondUser
+                ? secondUser.imageURL
+                : '-1'
+            }
           />
           <Header3
             style={{
@@ -70,7 +76,9 @@ const ChatSettings: FC<Props> = ({
               marginLeft: '1rem',
             }}
           >
-            {data.name ? data.name : secondUser.fName + ' ' + secondUser.lName}
+            {data.name
+              ? data.name
+              : secondUser?.fName + ' ' + secondUser?.lName}
           </Header3>
         </Flex>
         <Flex style={{ marginTop: '3rem' }}>

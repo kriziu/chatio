@@ -36,6 +36,7 @@ declare global {
   }
 
   interface MessageType {
+    administrate?: boolean;
     sender: UserType;
     message: string;
     connectionId: string;

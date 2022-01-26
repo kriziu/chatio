@@ -10,6 +10,9 @@ const messageSchema = new mongoose.Schema<MessageModelType>({
     type: String,
     required: true,
   },
+  administrate: {
+    type: Boolean,
+  },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

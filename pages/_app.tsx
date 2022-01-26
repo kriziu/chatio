@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion';
+import { SWRConfig } from 'swr';
 
 import UserProvider from 'context/userContext';
 import ConnectionsProvider from 'context/connectionsContext';
@@ -13,6 +14,7 @@ import { GlobalStyles } from 'styles/GlobalStyles';
 import { Background } from 'components/Simple/Background';
 import Circle from 'components/Shapes/AnimatedCircle';
 import Navigation from 'components/Navigation/Navigation';
+import axios from 'axios';
 
 const animation = {
   variants: {
@@ -38,54 +40,60 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
     <UserProvider>
       <GlobalStyles />
       <ConnectionsProvider>
-        <div style={{ overflow: 'hidden', width: '100vw' }}>
-          <ToastContainer
-            position="top-center"
-            toastStyle={{
-              backgroundColor: 'var(--color-black)',
-              color: 'var(--color-white)',
-            }}
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            closeButton={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-          <LazyMotion features={domAnimation}>
-            <div>
-              <Circle radius={9} position={{ x: 40, y: 20 }} />
-              <Circle radius={16} position={{ x: 75, y: 58 }} />
-              <Circle radius={10} secondary position={{ x: 80, y: 35 }} />
-              <Circle radius={5} secondary position={{ x: 55, y: 75 }} />
-              <Circle radius={7} secondary position={{ x: 25, y: 35 }} />
-              <Circle radius={3} secondary position={{ x: 75, y: 45 }} />
-            </div>
-            <Background w="100vw" h="100vh" style={{ transition: 'none' }} />
+        <SWRConfig
+          value={{
+            onError: () => {},
+          }}
+        >
+          <div style={{ overflow: 'hidden', width: '100vw' }}>
+            <ToastContainer
+              position="top-center"
+              toastStyle={{
+                backgroundColor: 'var(--color-black)',
+                color: 'var(--color-white)',
+              }}
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              closeButton={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+            <LazyMotion features={domAnimation}>
+              <div>
+                <Circle radius={9} position={{ x: 40, y: 20 }} />
+                <Circle radius={16} position={{ x: 75, y: 58 }} />
+                <Circle radius={10} secondary position={{ x: 80, y: 35 }} />
+                <Circle radius={5} secondary position={{ x: 55, y: 75 }} />
+                <Circle radius={7} secondary position={{ x: 25, y: 35 }} />
+                <Circle radius={3} secondary position={{ x: 75, y: 45 }} />
+              </div>
+              <Background w="100vw" h="100vh" style={{ transition: 'none' }} />
 
-            <AnimatePresence exitBeforeEnter>
-              <m.div
-                key={router.route}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={animation.variants}
-                transition={animation.transition}
-              >
-                <Navigation />
-                <div
-                  style={{
-                    padding: '2rem 0',
-                  }}
+              <AnimatePresence exitBeforeEnter>
+                <m.div
+                  key={router.route}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  variants={animation.variants}
+                  transition={animation.transition}
                 >
-                  <Component {...pageProps} />
-                </div>
-              </m.div>
-            </AnimatePresence>
-          </LazyMotion>
-        </div>
+                  <Navigation />
+                  <div
+                    style={{
+                      padding: '2rem 0',
+                    }}
+                  >
+                    <Component {...pageProps} />
+                  </div>
+                </m.div>
+              </AnimatePresence>
+            </LazyMotion>
+          </div>
+        </SWRConfig>
       </ConnectionsProvider>
     </UserProvider>
   );

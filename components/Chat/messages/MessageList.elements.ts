@@ -110,7 +110,7 @@ export const AvatarsContainer = styled.ul<{ height: number }>`
   z-index: 5;
   display: flex;
   right: 1rem;
-  margin-top: ${({ height }) => height}px;
+  margin-top: ${({ height }) => height + 3}px;
 
   li {
     margin-left: 0.3rem;

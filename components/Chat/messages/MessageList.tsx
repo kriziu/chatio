@@ -16,6 +16,7 @@ import Spinner from 'components/Spinner';
 import MessageMenu from './MessageMenu';
 import { AvatarIcon, AvatarVerySmall } from 'components/Simple/Avatars';
 import UserModal from 'components/Group/UserModal';
+import { Header5 } from 'components/Simple/Headers';
 
 let hover = false;
 let timeout: NodeJS.Timeout;
@@ -38,11 +39,11 @@ const MessageList: FC = () => {
   useEffect(() => {
     messages.forEach((message, index) => {
       for (const user of message.read) {
-        usersRead.set(user._id, index);
+        if (user._id) usersRead.set(user._id, index);
       }
     });
 
-    Array.from(usersRead).forEach(([key, value]) => {
+    Array.from(usersRead).forEach(([, value]) => {
       if (!readPositions.includes(value)) readPositions.push(value);
     });
   }, [messages]);
@@ -90,6 +91,20 @@ const MessageList: FC = () => {
               for (const [, value] of usersRead) {
                 if (value === index) additionalMargin = true;
               }
+
+              if (message.administrate)
+                return (
+                  <li
+                    key={message._id}
+                    id={message._id}
+                    ref={el => el && (messagesRef.current[index] = el)}
+                    style={{ margin: '1rem 0' }}
+                  >
+                    <Header5>
+                      {message.sender.fName} {message.message}
+                    </Header5>
+                  </li>
+                );
 
               return (
                 <MessageContainer

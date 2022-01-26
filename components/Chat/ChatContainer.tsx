@@ -8,7 +8,7 @@ import { userContext } from 'context/userContext';
 import { chatContext } from 'context/chatContext';
 import useWindowSize from 'hooks/useWindowSize';
 
-import MessageList from './MessageList';
+import MessageList from './messages/MessageList';
 import { Container, DownContainer } from './ChatContainer.elements';
 import { Button } from 'components/Simple/Button';
 import { Header3 } from 'components/Simple/Headers';

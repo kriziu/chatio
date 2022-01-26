@@ -36,7 +36,7 @@ const FriendList: FC<{
     let returning = true;
 
     checkedFriends.forEach(friend => {
-      if (friend._id === user._id) returning = false;
+      if (friend?._id === user?._id) returning = false;
     });
 
     return !connection.group && returning;

@@ -3,6 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from 'middlewares/connectDB';
 import jwt from 'jsonwebtoken';
 import connectionModel from 'models/connection.model';
+import messageModel from 'models/message.model';
+import { pusher } from 'lib/pusher';
+import userModel from 'models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;
@@ -23,6 +26,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (!connection.admins.includes(_id)) return res.status(403).end();
 
+    const newMessage = new messageModel({
+      administrate: true,
+      connectionId,
+      sender: _id,
+      message: 'made changes to the group',
+      date: new Date(),
+      read: [_id],
+    });
+
+    await (
+      await newMessage.save()
+    ).populate({ path: 'sender', model: userModel });
+    await pusher.trigger(`presence-${connectionId}`, 'new_msg', newMessage);
+
     if (connection.admins.includes(adminId)) {
       await connection.updateOne({ $pull: { admins: adminId } });
 
@@ -30,6 +47,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     await connection.updateOne({ $push: { admins: adminId } });
+
+    await newMessage.save();
 
     return res.json(connection);
   } catch (err) {

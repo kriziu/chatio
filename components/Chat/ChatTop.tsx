@@ -47,7 +47,7 @@ const ChatTop: FC = () => {
     },
   });
 
-  if (!secondUser) return <Spinner />;
+  if (!secondUser && !data.group) return <Spinner />;
 
   return (
     <>
@@ -70,7 +70,13 @@ const ChatTop: FC = () => {
         <Flex style={{ marginLeft: '4rem' }}>
           <AvatarSmall
             active={active}
-            imageURL={data.imageURL ? data.imageURL : secondUser.imageURL}
+            imageURL={
+              data.imageURL
+                ? data.imageURL
+                : secondUser
+                ? secondUser.imageURL
+                : '-1'
+            }
           />
           <Header4
             style={{
@@ -79,7 +85,9 @@ const ChatTop: FC = () => {
               marginLeft: '1rem',
             }}
           >
-            {data.name ? data.name : secondUser.fName + ' ' + secondUser.lName}
+            {data.name
+              ? data.name
+              : secondUser?.fName + ' ' + secondUser?.lName}
           </Header4>
         </Flex>
         <div>

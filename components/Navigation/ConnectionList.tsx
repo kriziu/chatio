@@ -1,6 +1,5 @@
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 
-import { ClipLoader } from 'react-spinners';
 import styled from '@emotion/styled';
 
 import { userContext } from 'context/userContext';
@@ -9,7 +8,6 @@ import { scrollY } from 'styles/scroll';
 
 import { Header5 } from 'components/Simple/Headers';
 import NavigationConnection from './NavigationConnection';
-import { Flex } from 'components/Simple/Flex';
 import Spinner from 'components/Spinner';
 
 const List = styled.ul`
@@ -59,9 +57,9 @@ const ConnectionList: FC<Props> = ({ data, setNotRead, setOpened, search }) => {
           const user = getUserFromIds(connection, _id);
 
           return (
-            user.fName.toLowerCase() +
+            user?.fName.toLowerCase() +
             ' ' +
-            user.lName.toLowerCase() +
+            user?.lName.toLowerCase() +
             ' ' +
             connection.name
           ).includes(search.toLowerCase());

@@ -67,6 +67,8 @@ const GroupManagment: FC<{
       .filter(user => user._id !== _id)
       .map(user => user._id);
 
+    if (!idsToRemove.length && !idsToAdd.length && !name.value) return;
+
     setLoading(true);
     axios
       .patch('/api/group/edit', {

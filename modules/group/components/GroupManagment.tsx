@@ -109,7 +109,11 @@ const GroupManagment: FC<{
       />
       <Managment w="100vw" h={windowHeight + 'px'} opened={opened}>
         <Flex className="close">
-          <Button onClick={() => setOpened(false)} icon>
+          <Button
+            onClick={() => setOpened(false)}
+            icon
+            aria-label="Close group managment"
+          >
             <MdOutlineClose />
           </Button>
         </Flex>
@@ -142,7 +146,7 @@ const GroupManagment: FC<{
           setCheckedFriends={setGroupUsers}
         />
         <Flex className="save">
-          <Button inputSize onClick={handleGroupSave}>
+          <Button inputSize onClick={handleGroupSave} aria-label="Save group">
             {isAdmin ? 'Save' : 'Add friends'}
           </Button>
         </Flex>

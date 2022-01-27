@@ -8,9 +8,9 @@ export const List = styled.ul`
 
   div {
     margin-top: 1rem;
+  }
 
-    h2 {
-      margin-right: 1rem;
-    }
+  h2 {
+    margin-right: 1rem;
   }
 `;

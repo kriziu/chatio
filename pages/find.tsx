@@ -2,19 +2,24 @@ import type { NextPage } from 'next';
 import { useState } from 'react';
 
 import axios from 'axios';
-import ClipLoader from 'react-spinners/ClipLoader';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
 import useForm from 'common/hooks/useForm';
 import { validateEmail } from 'common/lib/validators';
 import { successToast } from 'common/lib/toasts';
 
-import { Header1, Header2, Header3 } from 'common/components/Headers';
+import { Header2, Header3 } from 'common/components/Headers';
 import { Input } from 'common/components/Input';
 import { Flex } from 'common/components/Flex';
 import { Button } from 'common/components/Button';
-import { Form } from 'common/components/Form';
 import { AvatarSmall } from 'common/components/Avatars';
+import {
+  FoundList,
+  SpinnerContainer,
+  TopHeader,
+} from 'modules/_pages/find.elements';
+import Spinner from 'common/components/Spinner';
+import { Form } from 'common/components/Form';
 
 const Find: NextPage = () => {
   const [formData, , toggleChecked, handleInputChange] = useForm(
@@ -62,19 +67,9 @@ const Find: NextPage = () => {
 
   return (
     <>
-      <Header1 style={{ padding: '6rem 1rem 1rem 1rem' }}>
-        Search for friend
-      </Header1>
+      <TopHeader>Search for friend</TopHeader>
 
-      <Form
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-        onSubmit={searchUsers}
-        noValidate
-      >
+      <Form onSubmit={searchUsers} noValidate>
         <Input
           placeholder="Email"
           value={emailInput.value}
@@ -95,29 +90,23 @@ const Find: NextPage = () => {
           Search
         </Button>
       </Form>
-      <Flex style={{ height: '40%', display: loading ? 'flex' : 'none' }}>
-        <ClipLoader color="white" size={100} />
-      </Flex>
 
-      <Flex style={{ flexDirection: 'column', marginTop: '4rem' }} as="ul">
+      {loading && (
+        <SpinnerContainer>
+          <Spinner />
+        </SpinnerContainer>
+      )}
+
+      <FoundList as="ul">
         {users.length && !loading
           ? users.map((user, index) => {
               return (
-                <Flex
-                  as="li"
-                  key={user._id}
-                  style={{
-                    width: '31rem',
-                    justifyContent: 'space-between',
-                    marginBottom: index === users.length - 1 ? '0' : '2rem',
-                  }}
-                >
+                <Flex as="li" key={user._id}>
                   <AvatarSmall imageURL={user.imageURL} />
-                  <Header3 style={{ maxWidth: '20rem' }}>
+                  <Header3>
                     {user.fName} {user.lName}
                   </Header3>
                   <Button
-                    style={{ width: 'max-content' }}
                     aria-label="Add friend"
                     icon
                     onClick={() => createInvite(user._id)}
@@ -128,7 +117,7 @@ const Find: NextPage = () => {
               );
             })
           : ''}
-      </Flex>
+      </FoundList>
     </>
   );
 };

@@ -14,6 +14,7 @@ import { GlobalStyles } from 'common/styles/GlobalStyles';
 import { Background } from 'common/components/Background';
 import Circle from 'common/components/Shapes/AnimatedCircle';
 import Navigation from 'modules/navigation/components/Navigation';
+import Head from 'next/head';
 
 const animation = {
   variants: {
@@ -37,6 +38,9 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
 
   return (
     <UserProvider>
+      <Head>
+        <title>Chatio</title>
+      </Head>
       <GlobalStyles />
       <ConnectionsProvider>
         <SWRConfig

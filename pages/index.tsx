@@ -14,6 +14,11 @@ import { Flex } from 'common/components/Flex';
 import { Avatar } from 'common/components/Avatars';
 import { Button } from 'common/components/Button';
 import AvatarPicker from 'common/components/AvatarPicker/AvatarPicker';
+import {
+  AvatarCenter,
+  BottomButton,
+  ColFlex,
+} from 'modules/_pages/index.elements';
 
 // TODO:
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)
@@ -65,12 +70,12 @@ const Profile: NextPage = () => {
 
   return (
     <>
-      <Flex style={{ padding: '3rem 1rem 1rem 1rem' }}>
+      <AvatarCenter>
         <Avatar imageURL={user.imageURL} />
-      </Flex>
+      </AvatarCenter>
       <Header1>{user.fName + ' ' + user.lName}</Header1>
       <AvatarPicker />
-      <Flex style={{ flexDirection: 'column' }}>
+      <ColFlex>
         <div>
           <Header2>Your Invites</Header2>
           <InvitesList invites={yourInvites} setInvites={setYourInvites} />
@@ -79,15 +84,8 @@ const Profile: NextPage = () => {
           <Header2>Invites</Header2>
           <InvitesList invites={invites} setInvites={setInvites} accept />
         </div>
-      </Flex>
-      <Flex
-        style={{
-          position: 'fixed',
-          bottom: '2rem',
-          marginLeft: '50%',
-          transform: 'translateX(-50%)',
-        }}
-      >
+      </ColFlex>
+      <BottomButton>
         <Button
           inputSize
           onClick={() => {
@@ -98,7 +96,7 @@ const Profile: NextPage = () => {
         >
           Log out
         </Button>
-      </Flex>
+      </BottomButton>
     </>
   );
 };

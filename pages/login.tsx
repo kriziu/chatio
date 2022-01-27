@@ -13,6 +13,7 @@ import { Header1 } from 'common/components/Headers';
 import { Button } from 'common/components/Button';
 import { Flex } from 'common/components/Flex';
 import { Form } from 'common/components/Form';
+import { PageContainer } from 'modules/_pages/login.elements';
 
 const Login: NextPage = () => {
   const router = useRouter();
@@ -53,14 +54,8 @@ const Login: NextPage = () => {
   };
 
   return (
-    <Flex
-      style={{
-        width: '100vw',
-        height: '85vh',
-        flexDirection: 'column',
-      }}
-    >
-      <Header1 style={{ marginBottom: '1rem' }}>Sign in</Header1>
+    <PageContainer>
+      <Header1>Sign in</Header1>
       <Form onSubmit={handleLogin} noValidate>
         <Input
           placeholder="Email"
@@ -80,25 +75,15 @@ const Login: NextPage = () => {
         />
         <Button type="submit">Login</Button>
       </Form>
-      <Flex
-        style={{
-          width: '25rem',
-          justifyContent: 'space-between',
-          marginTop: '.5rem',
-        }}
-      >
+      <Flex className="both">
         <Link href="/login">
-          <a
-            style={{ color: 'var(--color-gray)', textDecoration: 'underline' }}
-          >
-            Lost password
-          </a>
+          <a className="gray">Lost password</a>
         </Link>
         <Link href="/register">
-          <a style={{ textDecoration: 'underline' }}>Register</a>
+          <a>Register</a>
         </Link>
       </Flex>
-    </Flex>
+    </PageContainer>
   );
 };
 

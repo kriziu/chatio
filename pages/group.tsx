@@ -4,15 +4,15 @@ import { FormEvent, useContext, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
-import { userContext } from 'context/userContext';
-import useForm from 'hooks/useForm';
+import { userContext } from 'common/context/userContext';
+import useForm from 'common/hooks/useForm';
 
-import { Header1, Header3 } from 'components/Simple/Headers';
-import { Input } from 'components/Simple/Input';
-import { Button } from 'components/Simple/Button';
-import { Form } from 'components/Simple/Form';
-import FriendList from 'components/Group/FriendList/FriendList';
-import CheckedFriends from 'components/Group/CheckedFriends/CheckedFriends';
+import { Header1, Header3 } from 'common/components/Headers';
+import { Input } from 'common/components/Input';
+import { Button } from 'common/components/Button';
+import { Form } from 'common/components/Form';
+import FriendList from 'modules/group/components/FriendList';
+import CheckedFriends from 'modules/group/components/CheckedFriends';
 
 const Group: NextPage = () => {
   const {

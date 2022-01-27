@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import connectDB from 'middlewares/connectDB';
+import connectDB from 'backend/middlewares/connectDB';
 import jwt from 'jsonwebtoken';
-import connectionModel from 'models/connection.model';
-import messageModel from 'models/message.model';
-import { pusher } from 'lib/pusher';
-import userModel from 'models/user.model';
+import connectionModel from 'backend/models/connection.model';
+import messageModel from 'backend/models/message.model';
+import { pusher } from 'common/lib/pusher';
+import userModel from 'backend/models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ACCESS } = req.cookies;

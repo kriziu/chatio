@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Document } from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-import connectDB from 'middlewares/connectDB';
-import userModel from 'models/user.model';
-import connectionModel from 'models/connection.model';
-import inviteModel from 'models/invite.model';
+import connectDB from 'backend/middlewares/connectDB';
+import userModel from 'backend/models/user.model';
+import connectionModel from 'backend/models/connection.model';
+import inviteModel from 'backend/models/invite.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let { email, name } = req.query;

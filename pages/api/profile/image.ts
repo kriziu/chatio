@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
 
-import connectDB from 'middlewares/connectDB';
-import userModel from 'models/user.model';
+import connectDB from 'backend/middlewares/connectDB';
+import userModel from 'backend/models/user.model';
 
 export const config = {
   api: {

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { pusher } from 'lib/pusher';
+import { pusher } from 'common/lib/pusher';
 import jwt from 'jsonwebtoken';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -5,15 +5,15 @@ import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import useSWR from 'swr';
 
-import { defaultUser, userContext } from 'context/userContext';
-import { connectionsContext } from 'context/connectionsContext';
+import { defaultUser, userContext } from 'common/context/userContext';
+import { connectionsContext } from 'common/context/connectionsContext';
 
-import InvitesList from 'components/Profile/InvitesList/InvitesList';
-import { Header1, Header2 } from 'components/Simple/Headers';
-import { Flex } from 'components/Simple/Flex';
-import { Avatar } from 'components/Simple/Avatars';
-import { Button } from 'components/Simple/Button';
-import AvatarPicker from 'components/Profile/AvatarPicker/AvatarPicker';
+import InvitesList from 'modules/profile/components/InvitesList';
+import { Header1, Header2 } from 'common/components/Headers';
+import { Flex } from 'common/components/Flex';
+import { Avatar } from 'common/components/Avatars';
+import { Button } from 'common/components/Button';
+import AvatarPicker from 'common/components/AvatarPicker/AvatarPicker';
 
 // TODO:
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)

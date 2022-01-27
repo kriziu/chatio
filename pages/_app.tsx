@@ -7,13 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion';
 import { SWRConfig } from 'swr';
 
-import UserProvider from 'context/userContext';
-import ConnectionsProvider from 'context/connectionsContext';
-import { GlobalStyles } from 'styles/GlobalStyles';
+import UserProvider from 'common/context/userContext';
+import ConnectionsProvider from 'common/context/connectionsContext';
+import { GlobalStyles } from 'common/styles/GlobalStyles';
 
-import { Background } from 'components/Simple/Background';
-import Circle from 'components/Shapes/AnimatedCircle';
-import Navigation from 'components/Navigation/Navigation/Navigation';
+import { Background } from 'common/components/Background';
+import Circle from 'common/components/Shapes/AnimatedCircle';
+import Navigation from 'modules/navigation/components/Navigation';
 
 const animation = {
   variants: {

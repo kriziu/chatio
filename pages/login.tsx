@@ -4,15 +4,15 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-import useForm from 'hooks/useForm';
-import { validateEmail } from 'lib/validators';
-import { errToast } from 'lib/toasts';
+import useForm from 'common/hooks/useForm';
+import { validateEmail } from 'common/lib/validators';
+import { errToast } from 'common/lib/toasts';
 
-import { Input } from 'components/Simple/Input';
-import { Header1 } from 'components/Simple/Headers';
-import { Button } from 'components/Simple/Button';
-import { Flex } from 'components/Simple/Flex';
-import { Form } from 'components/Simple/Form';
+import { Input } from 'common/components/Input';
+import { Header1 } from 'common/components/Headers';
+import { Button } from 'common/components/Button';
+import { Flex } from 'common/components/Flex';
+import { Form } from 'common/components/Form';
 
 const Login: NextPage = () => {
   const router = useRouter();

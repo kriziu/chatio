@@ -6,14 +6,14 @@ import axios from 'axios';
 import useSWR, { useSWRConfig } from 'swr';
 import { PresenceChannel } from 'pusher-js';
 
-import { chatContext } from 'context/chatContext';
-import { userContext } from 'context/userContext';
-import { connectionsContext } from 'context/connectionsContext';
+import { chatContext } from 'modules/chat/context/chatContext';
+import { userContext } from 'common/context/userContext';
+import { connectionsContext } from 'common/context/connectionsContext';
 
-import ChatContainer from 'components/Chat/ChatContainer/ChatContainer';
-import ChatTop from 'components/Chat/ChatTop/ChatTop';
-import Spinner from 'components/Spinner';
-import { Header3 } from 'components/Simple/Headers';
+import ChatContainer from 'modules/chat/components/ChatContainer';
+import ChatTop from 'modules/chat/components/ChatTop';
+import Spinner from 'common/components/Spinner';
+import { Header3 } from 'common/components/Headers';
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import connectDB from 'middlewares/connectDB';
-import tokenModel from 'models/token.model';
+import connectDB from 'backend/middlewares/connectDB';
+import tokenModel from 'backend/models/token.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { refresh } = req.query;

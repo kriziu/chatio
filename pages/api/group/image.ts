@@ -4,11 +4,11 @@ import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
 
-import connectDB from 'middlewares/connectDB';
-import connectionModel from 'models/connection.model';
-import messageModel from 'models/message.model';
-import userModel from 'models/user.model';
-import { pusher } from 'lib/pusher';
+import connectDB from 'backend/middlewares/connectDB';
+import connectionModel from 'backend/models/connection.model';
+import messageModel from 'backend/models/message.model';
+import userModel from 'backend/models/user.model';
+import { pusher } from 'common/lib/pusher';
 
 export const config = {
   api: {

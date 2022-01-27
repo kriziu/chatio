@@ -2,9 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import jwt from 'jsonwebtoken';
 
-import { pusher } from 'lib/pusher';
-import connectDB from 'middlewares/connectDB';
-import connectionModel from 'models/connection.model';
+import { pusher } from 'common/lib/pusher';
+import connectDB from 'backend/middlewares/connectDB';
+import connectionModel from 'backend/models/connection.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { socket_id, channel_name } = req.body;

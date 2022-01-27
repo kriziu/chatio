@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { pusher } from 'lib/pusher';
-import messageModel from 'models/message.model';
-import connectionModel from 'models/connection.model';
+import { pusher } from 'common/lib/pusher';
+import messageModel from 'backend/models/message.model';
+import connectionModel from 'backend/models/connection.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { messageId } = req.query;

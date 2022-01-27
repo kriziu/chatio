@@ -5,16 +5,16 @@ import axios from 'axios';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 
-import useForm from 'hooks/useForm';
-import { validateEmail } from 'lib/validators';
-import { successToast } from 'lib/toasts';
+import useForm from 'common/hooks/useForm';
+import { validateEmail } from 'common/lib/validators';
+import { successToast } from 'common/lib/toasts';
 
-import { Header1, Header2, Header3 } from 'components/Simple/Headers';
-import { Input } from 'components/Simple/Input';
-import { Flex } from 'components/Simple/Flex';
-import { Button } from 'components/Simple/Button';
-import { Form } from 'components/Simple/Form';
-import { AvatarSmall } from 'components/Simple/Avatars';
+import { Header1, Header2, Header3 } from 'common/components/Headers';
+import { Input } from 'common/components/Input';
+import { Flex } from 'common/components/Flex';
+import { Button } from 'common/components/Button';
+import { Form } from 'common/components/Form';
+import { AvatarSmall } from 'common/components/Avatars';
 
 const Find: NextPage = () => {
   const [formData, , toggleChecked, handleInputChange] = useForm(

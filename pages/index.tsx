@@ -8,12 +8,12 @@ import useSWR from 'swr';
 import { defaultUser, userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
-import InvitesList from 'components/Profile/InvitesList';
+import InvitesList from 'components/Profile/InvitesList/InvitesList';
 import { Header1, Header2 } from 'components/Simple/Headers';
 import { Flex } from 'components/Simple/Flex';
 import { Avatar } from 'components/Simple/Avatars';
 import { Button } from 'components/Simple/Button';
-import AvatarPicker from 'components/Profile/AvatarPicker';
+import AvatarPicker from 'components/Profile/AvatarPicker/AvatarPicker';
 
 // TODO:
 // 6. LIMIT ZAPROSZEN NA STRONE I WIADOMOSCI (PRZYCISK ZEBY WYSWIETLIC WIECEJ)

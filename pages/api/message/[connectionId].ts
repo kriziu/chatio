@@ -18,7 +18,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!connection?.users.includes(_id)) return res.status(403).end();
 
     if (pinned) {
-      const messages = await messageModel.find({ connectionId, pin: true });
+      const messages = await messageModel
+        .find({ connectionId, pin: true })
+        .populate({ path: 'sender', model: userModel });
 
       return res.status(200).json(messages);
     }

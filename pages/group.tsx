@@ -11,8 +11,8 @@ import { Header1, Header3 } from 'components/Simple/Headers';
 import { Input } from 'components/Simple/Input';
 import { Button } from 'components/Simple/Button';
 import { Form } from 'components/Simple/Form';
-import FriendList from 'components/Group/FriendList';
-import CheckedFriends from 'components/Group/CheckedFriends';
+import FriendList from 'components/Group/FriendList/FriendList';
+import CheckedFriends from 'components/Group/CheckedFriends/CheckedFriends';
 
 const Group: NextPage = () => {
   const {

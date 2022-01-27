@@ -10,8 +10,8 @@ import { chatContext } from 'context/chatContext';
 import { userContext } from 'context/userContext';
 import { connectionsContext } from 'context/connectionsContext';
 
-import ChatContainer from 'components/Chat/ChatContainer';
-import ChatTop from 'components/Chat/ChatTop';
+import ChatContainer from 'components/Chat/ChatContainer/ChatContainer';
+import ChatTop from 'components/Chat/ChatTop/ChatTop';
 import Spinner from 'components/Spinner';
 import { Header3 } from 'components/Simple/Headers';
 

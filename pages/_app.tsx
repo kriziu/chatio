@@ -13,8 +13,7 @@ import { GlobalStyles } from 'styles/GlobalStyles';
 
 import { Background } from 'components/Simple/Background';
 import Circle from 'components/Shapes/AnimatedCircle';
-import Navigation from 'components/Navigation/Navigation';
-import axios from 'axios';
+import Navigation from 'components/Navigation/Navigation/Navigation';
 
 const animation = {
   variants: {

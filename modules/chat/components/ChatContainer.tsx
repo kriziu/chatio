@@ -17,11 +17,12 @@ import {
 import { Button } from 'common/components/Button';
 import { Header3 } from 'common/components/Headers';
 import { Input } from 'common/components/Input';
-import { isReadByMe } from 'common/lib/isReadByMe';
+import {
+  handleNewMessages,
+  setUpObserver,
+} from '../helpers/ChatContainer.helpers';
 
-let keyboardSize = 0,
-  lastTimeOut: NodeJS.Timeout,
-  prevMessages = { length: 0, conId: '' };
+let keyboardSize = 0;
 
 const ChatContainer: FC = () => {
   const { user } = useContext(userContext);
@@ -49,70 +50,21 @@ const ChatContainer: FC = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    // OBSERVE READ MESSAGES
-    setObs(
-      new IntersectionObserver(
-        e => {
-          if (e[e.length - 1].isIntersecting) {
-            const msg = messages.filter(
-              prev => prev._id === e[e.length - 1].target.id
-            )[0];
+    setUpObserver(messages, setObs, _id, connectionId, listRef);
 
-            let isRead = isReadByMe(msg, _id);
-
-            if (msg && !isRead && msg?.sender._id !== _id) {
-              clearTimeout(lastTimeOut);
-
-              lastTimeOut = setTimeout(() => {
-                axios.post(
-                  `/api/pusher/read?connectionId=${connectionId}`,
-                  {
-                    msg,
-                  },
-                  { withCredentials: true }
-                );
-              }, 500);
-            }
-          }
-        },
-        {
-          root: listRef,
-        }
-      )
+    handleNewMessages(
+      messages,
+      listRef,
+      setShown,
+      first,
+      setFirst,
+      fetched,
+      _id,
+      connectionId
     );
-
-    const newMsg =
-      prevMessages.length !== messages.length &&
-      prevMessages.conId === messages[0]?.connectionId;
-
-    if (listRef)
-      if (
-        first ||
-        (!fetched &&
-          newMsg &&
-          (listRef.scrollHeight - listRef.scrollTop <
-            listRef.clientHeight + 200 ||
-            messages[messages.length - 1]?.sender._id === _id))
-      ) {
-        listRef.scrollTo({
-          top: listRef.scrollHeight,
-        });
-      } else if (
-        newMsg &&
-        listRef.scrollHeight - listRef.scrollTop > listRef.clientHeight + 200
-      )
-        setShown(true);
-
-    prevMessages.length = messages.length;
-    prevMessages.conId = messages[0]?.connectionId;
-
-    if (messages.length && listRef?.id === connectionId) setFirst(false);
-    else setFirst(true);
   }, [messages, _id, first, connectionId, listRef, fetched]);
 
   useEffect(() => {
-    const height = window.innerHeight;
-
     const ifsetShown = () => {
       if (
         listRef &&
@@ -126,6 +78,21 @@ const ChatContainer: FC = () => {
         setShown(false);
       }
     };
+
+    if (listRef) {
+      const list = listRef;
+
+      list.addEventListener('scroll', ifsetShown);
+
+      return () => {
+        list.removeEventListener('scroll', ifsetShown);
+        setShown(false);
+      };
+    }
+  }, [listRef]);
+
+  useEffect(() => {
+    const height = window.innerHeight;
 
     // FIX TO PHONES
     const keyboardResizeClb = () => {
@@ -153,18 +120,11 @@ const ChatContainer: FC = () => {
       }
     };
 
-    if (listRef) {
-      const list = listRef;
+    window.addEventListener('resize', keyboardResizeClb);
 
-      window.addEventListener('resize', keyboardResizeClb);
-      list.addEventListener('scroll', ifsetShown);
-
-      return () => {
-        window.removeEventListener('resize', keyboardResizeClb);
-        list.removeEventListener('scroll', ifsetShown);
-        setShown(false);
-      };
-    }
+    return () => {
+      window.removeEventListener('resize', keyboardResizeClb);
+    };
   }, [listRef, newestMsgs]);
 
   useEffect(() => {
@@ -179,7 +139,9 @@ const ChatContainer: FC = () => {
         });
       }
     }
+  }, [messages, messagesRef, listRef, scrollTo.behavior, scrollTo.id, top]);
 
+  useEffect(() => {
     if (obs && messagesRef.current.length) {
       messagesRef.current.forEach(singleMsgRef => {
         obs.observe(singleMsgRef);
@@ -188,15 +150,7 @@ const ChatContainer: FC = () => {
         obs.disconnect();
       };
     }
-  }, [
-    obs,
-    messages,
-    messagesRef,
-    listRef,
-    scrollTo.behavior,
-    scrollTo.id,
-    top,
-  ]);
+  }, [obs, messagesRef]);
 
   return (
     <>

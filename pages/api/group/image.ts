@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
 
 import connectDB from 'backend/middlewares/connectDB';
-import connectionModel from 'backend/models/connection.model';
 import messageModel from 'backend/models/message.model';
 import userModel from 'backend/models/user.model';
 import { pusher } from 'common/lib/pusher';
+import checkAdmin from 'backend/middlewares/checkAdmin';
+import getUserId from 'backend/middlewares/getUserId';
 
 export const config = {
   api: {
@@ -17,20 +17,12 @@ export const config = {
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
   const { connectionId } = req.query;
 
-  console.log(connectionId);
-
   try {
-    const connection = await connectionModel.findOne({
-      group: true,
-      _id: connectionId,
-    });
-
-    if (!connection) return res.status(400).end();
-    if (!connection.admins.includes(_id)) return res.status(403).end();
+    const connection = await checkAdmin(req, connectionId as string);
+    if (!connection) return res.status(403).end();
 
     const form = new formidable.IncomingForm({
       keepExtensions: true,

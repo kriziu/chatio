@@ -1,15 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import jwt from 'jsonwebtoken';
-
 import connectDB from 'backend/middlewares/connectDB';
 import messageModel from 'backend/models/message.model';
 import connectionModel from 'backend/models/connection.model';
 import userModel from 'backend/models/user.model';
+import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
   const { connectionId, messageId } = req.query;
 
   console.log(messageId);

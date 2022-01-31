@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import connectDB from 'backend/middlewares/connectDB';
-import jwt from 'jsonwebtoken';
 import connectionModel from 'backend/models/connection.model';
 import userModel from 'backend/models/user.model';
+import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
 
   if (!_id) {
     return res.status(400).end();

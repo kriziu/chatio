@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
 import cloudinary from 'cloudinary';
 
 import connectDB from 'backend/middlewares/connectDB';
 import userModel from 'backend/models/user.model';
+import getUserId from 'backend/middlewares/getUserId';
 
 export const config = {
   api: {
@@ -14,8 +14,7 @@ export const config = {
 };
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
 
   try {
     const user = await userModel.findById(_id);

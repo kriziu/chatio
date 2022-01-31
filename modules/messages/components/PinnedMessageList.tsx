@@ -48,6 +48,7 @@ const PinnedMessageList: FC<Props> = ({ handlePinnedMessageClick }) => {
               touched={true}
               onClick={() => handlePinnedMessageClick(message._id)}
               margin
+              style={{ cursor: 'pointer' }}
             >
               <MessageP
                 mine={mine}

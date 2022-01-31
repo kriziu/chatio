@@ -5,7 +5,7 @@ import { Flex } from 'common/components/Flex';
 export const Settings = styled(Background)<{ opened: boolean }>`
   overflow: hidden;
   margin-top: -2rem;
-  padding: 4rem 0;
+  padding-bottom: 4rem;
   z-index: 15;
   transition: transform 0.4s ease;
   transform: ${({ opened }) =>
@@ -16,8 +16,14 @@ export const Settings = styled(Background)<{ opened: boolean }>`
   }
 `;
 
+export const Top = styled(Flex)`
+  cursor: pointer;
+  padding-top: 4rem;
+  padding-bottom: 1rem;
+`;
+
 export const BtnContainer = styled(Flex)`
-  margin-top: 3rem;
+  margin-top: 1rem;
 `;
 
 export const OptionsContainer = styled(Flex)`
@@ -28,5 +34,13 @@ export const OptionsContainer = styled(Flex)`
   h2 {
     color: var(--color-red);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    svg {
+      fill: var(--color-red);
+      margin-right: 0.5rem;
+    }
   }
 `;

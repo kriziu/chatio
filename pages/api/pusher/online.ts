@@ -1,14 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { pusher } from 'common/lib/pusher';
-import jwt from 'jsonwebtoken';
+import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { connectionId } = req.body;
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as {
-    _id: string;
-  };
+  const _id = getUserId(req);
 
   await pusher.trigger(`presence-${connectionId}`, 'online', _id);
   res.json({ message: 'completed' });

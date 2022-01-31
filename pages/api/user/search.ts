@@ -1,17 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { Document } from 'mongoose';
-import jwt from 'jsonwebtoken';
 
 import connectDB from 'backend/middlewares/connectDB';
 import userModel from 'backend/models/user.model';
 import connectionModel from 'backend/models/connection.model';
 import inviteModel from 'backend/models/invite.model';
+import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let { email, name } = req.query;
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
 
   try {
     let users = [];

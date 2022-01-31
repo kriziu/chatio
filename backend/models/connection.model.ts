@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
+export type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
   users: string[];
   admins: string[];
 };

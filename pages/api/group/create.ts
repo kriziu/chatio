@@ -1,17 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import connectDB from 'backend/middlewares/connectDB';
-import jwt from 'jsonwebtoken';
 import connectionModel from 'backend/models/connection.model';
+import getUserId from 'backend/middlewares/getUserId';
+import messageModel from 'backend/models/message.model';
+import userModel from 'backend/models/user.model';
+import { pusher } from 'common/lib/pusher';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { ACCESS } = req.cookies;
-  const { _id } = jwt.decode(ACCESS) as { _id: string };
+  const _id = getUserId(req);
   const { ids, name } = req.body;
-
-  if (!_id) {
-    return res.status(400).end();
-  }
 
   try {
     const newConnection = new connectionModel({
@@ -25,6 +23,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         by: null,
       },
     });
+
+    const newMessage = new messageModel({
+      administrate: true,
+      connectionId: newConnection._id,
+      sender: _id,
+      message: 'created group',
+      date: new Date(),
+      read: [_id],
+    });
+
+    await (
+      await newMessage.save()
+    ).populate({ path: 'sender', model: userModel });
+
+    await pusher.trigger(
+      `presence-${newConnection._id}`,
+      'new_msg',
+      newMessage
+    );
 
     await newConnection.save();
 

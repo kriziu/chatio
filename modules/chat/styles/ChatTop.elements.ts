@@ -6,6 +6,7 @@ export const Top = styled(Flex)`
   width: 100%;
   justify-content: space-between;
   padding: 0 3rem;
+  cursor: pointer;
 
   div {
     margin-left: 2rem;

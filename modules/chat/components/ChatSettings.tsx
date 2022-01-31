@@ -8,12 +8,13 @@ import React, {
 
 import axios from 'axios';
 import { SwipeableHandlers } from 'react-swipeable';
+import { MdDeleteForever } from 'react-icons/md';
+import { BiBlock } from 'react-icons/bi';
 
 import useAdminGroup from 'modules/group/hooks/useAdminGroup';
 import { chatContext } from 'modules/chat/context/chatContext';
 import { errToast } from 'common/lib/toasts';
 
-import { Flex } from 'common/components/Flex';
 import { AvatarSmall } from 'common/components/Avatars';
 import { Header3 } from 'common/components/Headers';
 import PinnedMessageList from 'modules/messages/components/PinnedMessageList';
@@ -23,6 +24,7 @@ import {
   BtnContainer,
   OptionsContainer,
   Settings,
+  Top,
 } from '../styles/ChatSettings.elements';
 
 interface Props {
@@ -54,7 +56,7 @@ const ChatSettings: FC<Props> = ({
         opened={opened}
         {...handlersToCloseSettings}
       >
-        <Flex onClick={() => setOpened(false)}>
+        <Top onClick={() => setOpened(false)}>
           <AvatarSmall
             active={active}
             imageURL={
@@ -70,9 +72,9 @@ const ChatSettings: FC<Props> = ({
               ? data.name
               : secondUser?.fName + ' ' + secondUser?.lName}
           </Header3>
-        </Flex>
+        </Top>
         {data.group && (
-          <BtnContainer style={{ marginTop: '3rem' }}>
+          <BtnContainer>
             <Button width="15rem" onClick={() => setManagment(true)}>
               {isAdmin ? 'Manage group' : 'Check users'}
             </Button>
@@ -97,6 +99,7 @@ const ChatSettings: FC<Props> = ({
               setOpened(false);
             }}
           >
+            <BiBlock />
             Block
           </Header3>
           <Header3
@@ -104,6 +107,7 @@ const ChatSettings: FC<Props> = ({
               axios.delete('/api/pusher/delete?connectionId=' + connectionId)
             }
           >
+            <MdDeleteForever />
             Delete
           </Header3>
         </OptionsContainer>

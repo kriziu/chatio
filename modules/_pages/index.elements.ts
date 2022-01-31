@@ -12,6 +12,6 @@ export const ColFlex = styled(Flex)`
 export const BottomButton = styled(Flex)`
   position: fixed;
   bottom: 2rem;
-  marginleft: 50%;
+  margin-left: 50%;
   transform: translateX(-50%);
 `;

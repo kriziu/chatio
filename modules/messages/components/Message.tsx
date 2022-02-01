@@ -44,7 +44,7 @@ const Message: FC<Props> = ({
   const [time, mine, margin, marginMessage, bottom, both, showAvatar] =
     getMessageHelpers(_id, message, array, index);
 
-  const active = Object.keys(channel?.members.members).includes(
+  const active = Object.keys(!channel ? {} : channel.members.members).includes(
     message.sender._id
   );
 

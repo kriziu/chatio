@@ -60,7 +60,7 @@ const Chat: FC = () => {
   const getAndSetMessages = useCallback(
     async (reset?: boolean) =>
       await getAndSetMessagesHelper(
-        messages,
+        !reset ? messages : [],
         setNewestMsgs,
         setFetched,
         setCounter,
@@ -79,14 +79,14 @@ const Chat: FC = () => {
     setNewestMsgs(true);
     setLoading(true);
     setMessages([]);
-    getAndSetMessages();
+    getAndSetMessages(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionId]);
 
-  useEffect(() => {
-    error && getAndSetMessages(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, error]);
+  // useEffect(() => {
+  //   error && getAndSetMessages();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [data, error]);
 
   useEffect(() => {
     channels.forEach(channel1 => {

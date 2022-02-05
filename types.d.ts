@@ -1,4 +1,4 @@
-declare global {
+export declare global {
   interface FetchedUserType {
     _id: string;
     fName: string;
@@ -47,5 +47,3 @@ declare global {
     deleted: boolean;
   }
 }
-
-export {};

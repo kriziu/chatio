@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 
 export type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
-  users: string[];
-  admins: string[];
+  users: ObjectId[];
+  admins: ObjectId[];
 };
 
 const connectionSchema = new mongoose.Schema<ConnectionModelType>({

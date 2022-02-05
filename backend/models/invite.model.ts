@@ -1,12 +1,18 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 
-const inviteSchema = new mongoose.Schema<InviteType>({
+interface InviteModelType {
+  from: ObjectId;
+  to: ObjectId;
+  date: Date;
+}
+
+const inviteSchema = new mongoose.Schema<InviteModelType>({
   from: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   to: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   date: {
@@ -17,7 +23,7 @@ const inviteSchema = new mongoose.Schema<InviteType>({
 });
 
 const inviteModel =
-  (mongoose.models.Invite as mongoose.Model<InviteType>) ||
-  mongoose.model<InviteType>('Invite', inviteSchema);
+  (mongoose.models.Invite as mongoose.Model<InviteModelType>) ||
+  mongoose.model<InviteModelType>('Invite', inviteSchema);
 
 export default inviteModel;

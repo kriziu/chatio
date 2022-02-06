@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import connectDB from 'backend/middlewares/connectDB';
 import inviteModel from 'backend/models/invite.model';
 import connectionModel from 'backend/models/connection.model';
-import userModel from 'backend/models/user.model';
 import messageModel from 'backend/models/message.model';
 import { pusher } from 'common/lib/pusher';
 import getUserId from 'backend/middlewares/getUserId';
+import userModel from 'backend/models/user.model';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const _id = getUserId(req);
@@ -43,11 +43,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         return res.status(201).json(invite);
       case 'PATCH':
-        if (inviteFound?.to.toString() === _id) {
-          const fromUser = await userModel.findOne({
-            _id: inviteFound.from,
-          });
-          const toUser = await userModel.findOne({ _id: inviteFound.to });
+        if (inviteFound?.to.equals(_id)) {
+          await (
+            await inviteFound.populate({ path: 'to', model: userModel })
+          ).populate({ path: 'from', model: userModel });
+
+          const fromUser = inviteFound.from;
+          const toUser = inviteFound.to;
 
           const newConnection = new connectionModel({
             users: [fromUser?._id, toUser?._id],
@@ -86,10 +88,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(400).end();
 
       case 'DELETE':
-        if (
-          inviteFound?.to.toString() === _id ||
-          inviteFound?.from.toString() === _id
-        ) {
+        if (inviteFound?.to.equals(_id) || inviteFound?.from.equals(_id)) {
           await inviteFound.delete();
 
           return res.end();

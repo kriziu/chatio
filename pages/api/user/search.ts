@@ -50,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             _id: string;
           }
       ) => {
-        let toReturn = !(_id === user._id.toString());
+        let toReturn = !_id.equals(user._id);
 
         if (toReturn)
           connections.forEach(connection => {
@@ -62,10 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         if (toReturn) {
           invites.forEach(invite => {
-            if (
-              invite.to === user._id.toString() ||
-              invite.from === user._id.toString()
-            )
+            if (invite.to.equals(user._id) || invite.from.equals(user._id))
               toReturn = false;
           });
         }

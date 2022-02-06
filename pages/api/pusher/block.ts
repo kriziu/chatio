@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!connection) return res.status(403).end();
 
   if (connection.blocked.yes) {
-    if (connection.blocked.by === _id) {
+    if (connection.blocked.by?.equals(_id)) {
       await connection.updateOne({
         blocked: { yes: false, by: null },
       });

@@ -7,7 +7,6 @@ import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { connectionId } = req.query;
-  const _id = getUserId(req);
 
   const connection = await checkAdmin(req, connectionId as string);
   if (!connection) return res.status(403).end();

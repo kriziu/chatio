@@ -5,18 +5,19 @@ import jwt from 'jsonwebtoken';
 import { pusher } from 'common/lib/pusher';
 import connectDB from 'backend/middlewares/connectDB';
 import connectionModel from 'backend/models/connection.model';
+import getUserId from 'backend/middlewares/getUserId';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { socket_id, channel_name } = req.body;
   const { ACCESS } = req.cookies;
-  const { _id, fName, lName } = jwt.decode(ACCESS) as {
-    _id: string;
+  const _id = getUserId(req);
+  const { fName, lName } = jwt.decode(ACCESS) as {
     fName: string;
     lName: string;
   };
 
   const presenceData = {
-    user_id: _id,
+    user_id: _id.toString(),
     user_info: {
       username: fName + ' ' + lName,
     },

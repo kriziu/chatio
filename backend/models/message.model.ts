@@ -1,8 +1,8 @@
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 
 type MessageModelType = Omit<MessageType, 'sender' | 'read'> & {
-  sender: ObjectId;
-  read: string[];
+  sender: mongoose.Types.ObjectId;
+  read: mongoose.Types.ObjectId[];
 };
 
 const messageSchema = new mongoose.Schema<MessageModelType>({

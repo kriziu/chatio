@@ -1,8 +1,8 @@
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 
 interface InviteModelType {
-  from: ObjectId;
-  to: ObjectId;
+  from: mongoose.Types.ObjectId;
+  to: mongoose.Types.ObjectId;
   date: Date;
 }
 

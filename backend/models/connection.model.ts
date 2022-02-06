@@ -1,8 +1,15 @@
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 
-export type ConnectionModelType = Omit<CConnectionType, 'users' | 'admins'> & {
-  users: ObjectId[];
-  admins: ObjectId[];
+export type ConnectionModelType = Omit<
+  CConnectionType,
+  'users' | 'admins' | 'blocked'
+> & {
+  users: mongoose.Types.ObjectId[];
+  admins: mongoose.Types.ObjectId[];
+  blocked: {
+    by: mongoose.Types.ObjectId | null;
+    yes: boolean;
+  };
 };
 
 const connectionSchema = new mongoose.Schema<ConnectionModelType>({
@@ -27,7 +34,7 @@ const connectionSchema = new mongoose.Schema<ConnectionModelType>({
   ],
   group: { type: Boolean, require: true },
   blocked: {
-    by: { type: String },
+    by: { type: mongoose.Schema.Types.ObjectId },
     yes: { type: Boolean, required: true },
   },
 });

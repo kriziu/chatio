@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const message: MessageType = req.body.msg;
 
   try {
-    if (message.sender._id === _id) return res.status(403).end();
+    if (message.sender._id === _id.toString()) return res.status(403).end();
 
     const messages = await messageModel.updateMany(
       {

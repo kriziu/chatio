@@ -8,10 +8,6 @@ import getUserId from 'backend/middlewares/getUserId';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const _id = getUserId(req);
 
-  if (!_id) {
-    return res.status(400).end();
-  }
-
   try {
     const connId = req.query['id'];
 

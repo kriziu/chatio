@@ -180,7 +180,7 @@ const Chat: FC = () => {
       return () => {
         channel.unbind('new_msg', newMsgClb);
         channel.unbind('read_msg', readMsgClb);
-        channel.unbind('delete_message', delMsgClb);
+        channel.unbind('delete_msg', delMsgClb);
         channel.unbind('pin_msg', pinMsgClb);
         channel.unbind('delete_connection', delConnClb);
         channel.unbind('block_connection', blockConnClb);

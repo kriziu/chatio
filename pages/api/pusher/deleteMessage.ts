@@ -11,7 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const message = await messageModel.findById(messageId);
 
-  if (!message || message?.sender.equals(_id)) {
+  if (!message || !message?.sender.equals(_id)) {
     return res.status(403).end();
   }
 

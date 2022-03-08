@@ -95,8 +95,6 @@ const MessageList: FC = () => {
                 : messagesRef.current[position]?.offsetTop +
                   messagesRef.current[position]?.clientHeight;
 
-              console.log(usersRead);
-
               return (
                 <AvatarsContainer key={position} height={height}>
                   {Array.from(usersRead).map(([key, value], index, arr) => {

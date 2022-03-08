@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import { Flex } from 'common/components/Flex';
 
 export const PageContainer = styled(Flex)`
-  width: 100vw;
-  height: 85vh;
+  width: 100%;
+  height: 85%;
   flex-direction: column;
 
   h1 {

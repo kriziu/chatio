@@ -50,12 +50,7 @@ const ChatSettings: FC<Props> = ({
     <>
       <GroupManagment opened={managment} setOpened={setManagment} />
 
-      <Settings
-        w="100vw"
-        h="100vh"
-        opened={opened}
-        {...handlersToCloseSettings}
-      >
+      <Settings w="100%" h="100%" opened={opened} {...handlersToCloseSettings}>
         <Top onClick={() => setOpened(false)}>
           <AvatarSmall
             active={active}

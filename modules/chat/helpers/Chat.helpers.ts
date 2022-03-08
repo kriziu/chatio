@@ -20,6 +20,11 @@ export const getAndSetMessagesHelper = async (
   reset?: boolean
 ) => {
   if (connectionId) {
+    setScrollTo({
+      behavior: 'auto',
+      id: '',
+    });
+
     setFetched(true);
 
     let tempTopMsgId = !reset ? messages[0]?._id : '',
@@ -109,13 +114,9 @@ export const getAndSetMessagesHelper = async (
 
         return filteredMessages;
       });
-    } else
-      setScrollTo({
-        behavior: 'auto',
-        id: '',
-      });
-    setLoading(false);
+    }
 
+    setLoading(false);
     setFetched(false);
   }
 };

@@ -15,6 +15,8 @@ import { Background } from 'common/components/Background';
 import Circle from 'common/components/Shapes/AnimatedCircle';
 import Navigation from 'modules/navigation/components/Navigation';
 import Head from 'next/head';
+import { MainContainer } from 'common/components/MainContainer';
+import { Flex } from 'common/components/Flex';
 
 const animation = {
   variants: {
@@ -35,6 +37,8 @@ const animation = {
 
 const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
+
+  console.log(router.pathname);
 
   return (
     <UserProvider>
@@ -84,14 +88,26 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
                   variants={animation.variants}
                   transition={animation.transition}
                 >
-                  <Navigation />
-                  <div
-                    style={{
-                      padding: '2rem 0',
-                    }}
-                  >
-                    <Component {...pageProps} />
-                  </div>
+                  <Flex style={{ height: '100vh' }}>
+                    <MainContainer
+                      id="container"
+                      shadow={
+                        router.pathname !== '/login' &&
+                        router.pathname !== '/register'
+                      }
+                    >
+                      <Navigation />
+                      <div
+                        style={{
+                          padding: '2rem 0',
+                          width: '100%',
+                          height: '100%',
+                        }}
+                      >
+                        <Component {...pageProps} />
+                      </div>
+                    </MainContainer>
+                  </Flex>
                 </m.div>
               </AnimatePresence>
             </LazyMotion>

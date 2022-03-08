@@ -3,7 +3,7 @@ import { scrollY } from 'common/styles/scroll';
 
 export const List = styled.ul`
   list-style: none;
-  height: 17vh;
+  height: 17%;
   ${scrollY}
 
   div {

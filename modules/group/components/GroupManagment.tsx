@@ -107,7 +107,7 @@ const GroupManagment: FC<{
         setUser={setActiveUser}
         setGroupUsers={setGroupUsers}
       />
-      <Managment w="100vw" h={windowHeight + 'px'} opened={opened}>
+      <Managment w="100%" h={windowHeight + 'px'} opened={opened}>
         <Flex className="close">
           <Button
             onClick={() => setOpened(false)}

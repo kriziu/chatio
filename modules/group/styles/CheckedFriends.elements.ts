@@ -22,6 +22,10 @@ export const List = styled.ul`
   li:not(:first-of-type) {
     margin-left: 1rem;
   }
+
+  li {
+    cursor: pointer;
+  }
 `;
 
 export const Container = styled.div`

@@ -5,7 +5,7 @@ import { Flex } from 'common/components/Flex';
 export const NavBtn = styled.button<{ active: boolean }>`
   width: 4rem;
   height: 4rem;
-  position: fixed;
+  position: absolute;
   top: 2.5rem;
   background-color: transparent;
   border: none;
@@ -83,7 +83,7 @@ export const NavBackground = styled(Background)<{ opened: boolean }>`
   transform: ${({ opened }) =>
     opened ? 'translateX(0)' : 'translateX(-100%)'};
 
-  max-width: 100vw;
+  max-width: 100%;
 
   border-top-right-radius: 2rem;
   border-bottom-right-radius: 2rem;

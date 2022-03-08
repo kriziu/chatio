@@ -12,8 +12,8 @@ export const Circle = styled(m.div)<{
   width: ${({ radius }) => radius}rem;
   height: ${({ radius }) => radius}rem;
   position: absolute;
-  left: ${({ position, radius }) => `calc(${position.x}vw - ${radius}rem)`};
-  top: ${({ position, radius }) => `calc(${position.y}vh - ${radius}rem)`};
+  left: ${({ position, radius }) => `calc(${position.x}% - ${radius}rem)`};
+  top: ${({ position, radius }) => `calc(${position.y}% - ${radius}rem)`};
   z-index: -50;
 
   transition: none;

@@ -25,6 +25,7 @@ const MessageMenu: FC<Props> = ({ selected, setSelected, setHover }) => {
     messagesRef.current[selected] &&
     messagesRef.current[selected].getBoundingClientRect();
   const top = viewportOffset ? viewportOffset.top : 0;
+  const left = viewportOffset ? viewportOffset.left : 0;
 
   const selectedMessage = messages[selected];
 
@@ -49,10 +50,13 @@ const MessageMenu: FC<Props> = ({ selected, setSelected, setHover }) => {
           }, 100)
         }
         top={top}
+        left={left}
       >
         <p
           onClick={() =>
-            axios.delete(`/api/pusher/pin?messageId=${selectedMessage._id}`)
+            axios
+              .delete(`/api/pusher/pin?messageId=${selectedMessage._id}`)
+              .catch(err => errToast('You are not admin!'))
           }
         >
           {selectedMessage.pin ? 'Unpin' : 'Pin'}

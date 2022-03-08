@@ -130,7 +130,7 @@ const Navigation: FC = () => {
           >
             <NavBtnIcon opened={opened} />
           </NavBtn>
-          <NavBackground opened={opened} w="32rem" h="100vh" ref={back}>
+          <NavBackground opened={opened} w="32rem" h="100%" ref={back}>
             <Link href="/">
               <a>
                 <Top

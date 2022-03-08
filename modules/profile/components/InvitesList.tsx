@@ -20,7 +20,7 @@ const InvitesList: FC<Props> = ({ accept, invites, setInvites }) => {
   const { mutate } = useSWRConfig();
 
   if (!invites.length)
-    return <Header5 style={{ height: '17vh' }}>No invites...</Header5>;
+    return <Header5 style={{ height: '17%' }}>No invites...</Header5>;
 
   return (
     <List>

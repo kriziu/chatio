@@ -14,7 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!connection) {
     return res.status(404).end();
   }
-  console.log(connection);
+
   if (connection?.group) {
     const testConnection = await checkAdmin(req, connectionId as string);
 

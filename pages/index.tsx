@@ -10,7 +10,6 @@ import { connectionsContext } from 'common/context/connectionsContext';
 
 import InvitesList from 'modules/profile/components/InvitesList';
 import { Header1, Header2 } from 'common/components/Headers';
-import { Flex } from 'common/components/Flex';
 import { Avatar } from 'common/components/Avatars';
 import { Button } from 'common/components/Button';
 import AvatarPicker from 'common/components/AvatarPicker/AvatarPicker';

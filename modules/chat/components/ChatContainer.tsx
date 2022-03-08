@@ -23,6 +23,7 @@ import {
 } from '../helpers/ChatContainer.helpers';
 
 let keyboardSize = 0;
+let readyToSend = true;
 
 const ChatContainer: FC = () => {
   const { user } = useContext(userContext);
@@ -170,13 +171,19 @@ const ChatContainer: FC = () => {
         <form
           onSubmit={e => {
             e.preventDefault();
-            message &&
-              axios.post('/api/pusher/send', {
-                connectionId,
-                message,
-                sender: user,
-              });
-            setMessage('');
+            if (readyToSend) {
+              message &&
+                axios.post('/api/pusher/send', {
+                  connectionId,
+                  message,
+                  sender: user,
+                });
+              setMessage('');
+              readyToSend = false;
+              setTimeout(() => {
+                readyToSend = true;
+              }, 500);
+            }
           }}
         >
           <FlexTop>

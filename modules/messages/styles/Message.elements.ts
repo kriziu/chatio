@@ -13,7 +13,7 @@ export const MessageContainer = styled.li<{
   flex-direction: ${({ mine }) => (mine ? 'row-reverse' : 'row')};
 
   transition: none;
-  max-width: 80%;
+  max-width: 90%;
   :last-of-type {
     margin-bottom: 3rem;
   }
@@ -46,6 +46,7 @@ export const MessageP = styled.p<{
     deleted ? 'none' : mine ? 'var(--gradient-mine)' : 'var(--gradient-main)'};
   border: ${({ pinned }) => (pinned ? 2 : 0)}px solid white;
   width: max-content;
+  max-width: ${({ mine }) => (mine ? '' : '65%')};
   border-radius: ${({ mine, bottom, margin, both }) =>
     !margin
       ? mine
@@ -57,7 +58,7 @@ export const MessageP = styled.p<{
       ? `2rem ${bottom ? '0.5rem 2rem' : '2rem 0.5rem'} 2rem`
       : `${bottom ? '0.5rem 2rem 2rem 2rem' : '2rem 2rem 2rem 0.5rem'}`};
   margin-left: ${({ mine, avatar }) => (!mine ? (avatar ? 0.5 : 3.5) : 0)}rem;
-  word-break: break-all;
+  word-break: break-word;
   user-select: none;
   background-color: black;
 `;

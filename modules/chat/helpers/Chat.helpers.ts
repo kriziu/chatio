@@ -64,15 +64,11 @@ export const getAndSetMessagesHelper = async (
       });
 
       setMessages(prev => {
-        if (!tempBotMsgId && !tempTopMsgId) return res.data;
+        const seen = new Set();
+        let filteredMessages: MessageType[] = [];
 
-        if (top) return [...res.data, ...prev].slice(0, 201);
-
-        if (messagesLength > 200) {
-          const messages = [...prev.slice(res.data.length - 1), ...res.data];
-          const seen = new Set();
-
-          const filteredMessages = messages.filter(msg => {
+        if (!tempBotMsgId && !tempTopMsgId) {
+          filteredMessages = res.data.filter(msg => {
             const duplicate = seen.has(msg._id);
             seen.add(msg._id);
             return !duplicate;
@@ -81,7 +77,37 @@ export const getAndSetMessagesHelper = async (
           return filteredMessages;
         }
 
-        return [...prev, ...res.data];
+        if (top) {
+          const messages = [...res.data, ...prev].slice(0, 201);
+
+          filteredMessages = messages.filter(msg => {
+            const duplicate = seen.has(msg._id);
+            seen.add(msg._id);
+            return !duplicate;
+          });
+
+          return filteredMessages;
+        }
+
+        if (messagesLength > 200) {
+          const messages = [...prev.slice(res.data.length - 1), ...res.data];
+
+          filteredMessages = messages.filter(msg => {
+            const duplicate = seen.has(msg._id);
+            seen.add(msg._id);
+            return !duplicate;
+          });
+
+          return filteredMessages;
+        }
+
+        filteredMessages = [...prev, ...res.data].filter(msg => {
+          const duplicate = seen.has(msg._id);
+          seen.add(msg._id);
+          return !duplicate;
+        });
+
+        return filteredMessages;
       });
     } else
       setScrollTo({

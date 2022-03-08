@@ -17,13 +17,17 @@ const readPositions: number[] = [];
 const MotionList = m(List);
 
 const MessageList: FC = () => {
-  const { messages, messagesRef, setListRef, loading, connectionId, channel } =
+  const { messages, messagesRef, setListRef, loading, connectionId } =
     useContext(chatContext);
 
   const [selected, setSelected] = useState(-1);
   const [touched, setTouched] = useState(false);
   const [hover, setHover] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType>();
+
+  useEffect(() => {
+    usersRead.clear();
+  }, [connectionId]);
 
   useEffect(() => {
     messages.forEach((message, index) => {
@@ -90,6 +94,8 @@ const MessageList: FC = () => {
                 ? 0
                 : messagesRef.current[position]?.offsetTop +
                   messagesRef.current[position]?.clientHeight;
+
+              console.log(usersRead);
 
               return (
                 <AvatarsContainer key={position} height={height}>

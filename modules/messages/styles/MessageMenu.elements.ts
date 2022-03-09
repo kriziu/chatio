@@ -18,7 +18,7 @@ export const Container = styled.div<{
   top: ${({ top }) => top - 45}px;
 
   ${({ mine, width, left }) =>
-    !mine ? `left: ${left + width - 40}px` : `left: ${left - width + 50}px`};
+    !mine ? `left: ${left + width - 40}px` : `left: ${left - 40}px`};
 
   p {
     padding: 1rem 0.5rem;

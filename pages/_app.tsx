@@ -39,7 +39,7 @@ const animation = {
 const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
 
-  const [height] = useWindowSize(true);
+  const [, height] = useWindowSize(true);
 
   return (
     <UserProvider>

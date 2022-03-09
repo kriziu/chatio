@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 
-export const MainContainer = styled.div<{ shadow?: boolean }>`
+export const MainContainer = styled.div<{ shadow?: boolean; height: number }>`
   width: 100vw;
-  height: 100vh;
+  height: ${({ height }) => height}px;
+  position: absolute;
+  top: 0;
 
   @media (min-width: 68.75rem) {
     width: 80vw;

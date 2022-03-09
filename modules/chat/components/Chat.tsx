@@ -200,6 +200,8 @@ const Chat: FC = () => {
     mutate,
   ]);
 
+  useEffect(() => console.log(listRef), [listRef]);
+
   useEffect(() => {
     const getMoreMessages = (e: Event) => {
       const list = e.currentTarget as HTMLElement;
@@ -268,6 +270,13 @@ const Chat: FC = () => {
   };
 
   const goToNewestMessages = () => {
+    if (!listRef) {
+      console.log('123');
+      const list = document.getElementById(connectionId);
+      list?.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+      return;
+    }
+
     setScrollTo(prev => {
       return { ...prev, id: '' };
     });
@@ -278,6 +287,8 @@ const Chat: FC = () => {
 
       setNewestMsgs(true);
     }
+
+    console.log(listRef?.scrollHeight);
 
     listRef?.scrollTo({
       top: listRef.scrollHeight,

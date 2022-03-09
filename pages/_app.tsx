@@ -17,6 +17,7 @@ import Navigation from 'modules/navigation/components/Navigation';
 import Head from 'next/head';
 import { MainContainer } from 'common/components/MainContainer';
 import { Flex } from 'common/components/Flex';
+import useWindowSize from 'common/hooks/useWindowSize';
 
 const animation = {
   variants: {
@@ -38,7 +39,7 @@ const animation = {
 const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
   const router = useRouter();
 
-  console.log(router.pathname);
+  const [height] = useWindowSize(true);
 
   return (
     <UserProvider>
@@ -90,6 +91,7 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
                 >
                   <Flex style={{ height: '100vh' }}>
                     <MainContainer
+                      height={height}
                       id="container"
                       shadow={
                         router.pathname !== '/login' &&

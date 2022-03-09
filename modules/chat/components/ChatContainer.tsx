@@ -191,6 +191,7 @@ const ChatContainer: FC = () => {
               value={message}
               onChange={e => setMessage(e.target.value)}
               name="message input"
+              autoComplete="off"
             />
             <Button type="submit" icon aria-label="send message">
               <BiSend />
